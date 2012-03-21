@@ -1,4 +1,4 @@
-// Hevp7wpynH2mwFCvFwGpudL+6LQCLbFPfWEWfI3yQJIkaop82pf/OrShedzPQQ6Nk2DJyrkxzmDQbXpIAv/1v4h6sqYuhDXQM+IyNOz6EBKPW34Z7QqIbgXWCQxkZ24v0Z8B6/x/C9o5JR/FCptCJJebG5F/HDemL3YjHe9kXuCFWmVHX6czE/53qZqmYXo6D+bz26k+sTsTEaaB9wrqDwvZWImvmLY4eZSC7Fb562aogqW3gzlTBkPT6S7SytLd2dMmnYXPg3nXQwnH2MKJARdp1rzDm7aWgvNL08ZgMr6i4OnAhSifmKyqdO86+pfLYpMt7NT5emY0qIXM2q0yfA==
+// dNQsEE+tShQ/bu8D6ViymDT5wK1e3BRkXtHBgznCUATgbyh49MrVO1TdVR5ODGgvmSyhZ0iTtVzHV5daN1f7lhKeohqGlGAnqJ07fFhKl0LogwPLOrnlBnge6Ww6jkrdixEY2ssawhMV2BNfWSyjUjiRbO2VfnUKMH6HGj/d9E4U2KGnFbyNpPT23ymydXUN0EgZnuTFqG78QHHwa69XWO98polILrvRdI2mJaZjBxpS44joCCkBk5iqKyY/E0gFtelH7NDV1An1LFKJLF2lx45tjmsv3uhH9WPUJeOsCKibE1Op5+o/yZcivJJi6UFflj+9MRlKNp+Zod7eqbXWrA==
 /**
 ** Copyright (C) 2000-2012 Opera Software AS.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.50 core 2.9.168, March 13, 2012. Active patches: 209 ';
+	var bjsversion=' Opera Desktop 11.50 core 2.9.168, March 21, 2012. Active patches: 211 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -661,9 +661,11 @@ function setTinyMCEVersion(e){
 			document.addEventListener('DOMContentLoaded', function(){document.documentElement.className='SAF';}, false);
 				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (AOL.jp sniffing prevents styling). See browser.js for details');
 		}
-		if(hostname.indexOf('aol.com') >-1){			// 188197, Making sure AOL pages are not overwritten by ad script
+		if(hostname.indexOf('aol.com')>-1){			// 188197, Making sure AOL pages are not overwritten by ad script
 			avoidDocumentWriteAbuse();
-				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Making sure AOL pages are not overwritten by ad script). See browser.js for details');
+					// PATCH-608, Aol.com: Avoid ad overwrite
+			addPreprocessHandler(/\|\|adsUA\.indexOf\(\'opera\'\)>-1/,'');
+				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Making sure AOL pages are not overwritten by ad script\nAol.com: Avoid ad overwrite). See browser.js for details');
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (AOL). See browser.js for details');
 	} else if(hostname.indexOf('.apple.com')>-1){			// PATCH-387, Make Apple Store menu visible
@@ -820,7 +822,9 @@ function setTinyMCEVersion(e){
 		}
 		if(hostname.indexOf('maps.google.')>-1 || hostname.indexOf('mapy.google.')>-1){			// PATCH-454, No closure for eval'ed function expression means no way to close info box on GMaps
 			addPreprocessHandler(  /function\(a\)\{eval\(a\)\}/g, '(function(){return function(a){eval(a)}})()' );
-				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (No closure for eval\'ed function expression means no way to close info box on GMaps). See browser.js for details');
+					// PATCH-610, GMaps: avoid autoclose of problem reporting dialog
+			opera.addEventListener('BeforeEventListener.mousedown', function(e){if(e.event.target.tagName=='OPTION')e.preventDefault()}, false);
+				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (No closure for eval\'ed function expression means no way to close info box on GMaps\nGMaps: avoid aut...). See browser.js for details');
 		}
 		if(hostname.indexOf('plus.google')>-1){			// PATCH-526, G+: avoid tall narrow posts due to word-wrap in table 
 			addCssToDocument('div.B-u-nd-nb, div.s-r-Ge-ec {display:block}');
@@ -1276,7 +1280,7 @@ function setTinyMCEVersion(e){
 		fixHierMenus();
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Old HierMenus on cdec-sic.cl). See browser.js for details');
 	} else if(hostname.indexOf('cnnturk.com')>-1){			// PATCH-509, cnnturk: work around CSS bug that causes footer content to float upwards
-		addCssToDocument('#fbtm div.dtc ul{position: static !important; display:inline !important}');
+		addCssToDocument('#fbtm div.dtc{bottom:-170px !important;}#fbtm div.dtc ul{position: static !important; display:inline !important}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (cnnturk: work around CSS bug that causes footer content to float upwards). See browser.js for details');
 	} else if(hostname.indexOf('comcast.net')>-1){			// PATCH-405, Prevent focusing search field and messed up rendering
 		HTMLInputElement.prototype.focus=function(){};
