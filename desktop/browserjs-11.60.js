@@ -1,4 +1,4 @@
-// wcfuEWfvlYGEovImGw/rj+mvIDRksrWRmp60jHR16vbEArWu649ZOg6pGch5XoS6rrECezGJUEXKJah5ffnk/oErlNoDEwEBPX95IpPYwJYykRKhlvKxrKTkpqP7zYHwRDtuRNv/ngoK9lM7w80VmujckB4ZGt0LtPVr3AUQtkM9i64HkgQZBBUtdMxY8nHcG9LyDwvu5AmiDu26V40yneHlOYvCLAS3WXh2HKodEqg5m1/ZMq9m0WHj+Beq28T8gaqydZ2OBZYxHIzwKBf1+6nSw7HYssndalZ5caHoww+/a8KRqgwCGAghrVqzPE9aLDBQAuMT4EhEl7aXu/GGMQ==
+// udY7nUU0Pl9VbpfAk6tAdYASUYoz3J/MvKaJnNxZU2IRDLzpZSmSssGr2QMV0CK9zT2p690NZ8x4mhwi74cKRw5eEP/xtT3iJAS4t6UHtSWSeaXEfIcm9xHLC+7QwXOVDJ/ceJ76OaH5AOozySL2QDmaIv0bDGX7tmP59F35cRZ+NrhqrbnNTRp3gDYh3/H8vU4xv5gFAhWx3y2pbz2rNNhqOVXw//KVqt+HKDY4Z85ltrLuxydZTPPs8nlbUA6SvbxrNBVPF7U60FcUIb+aNRurhCfF+45uzB1DrxpgrwxbA0NanIsBTiRr3UR6uTvWKA4eD/yQyzxh4SvTNA/XWA==
 /**
 ** Copyright (C) 2000-2012 Opera Software AS.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.60 core 2.10.229, March 13, 2012. Active patches: 179 ';
+	var bjsversion=' Opera Desktop 11.60 core 2.10.229, March 21, 2012. Active patches: 182 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -335,6 +335,7 @@ function setTinyMCEVersion(e){
 // Disable sniffing in old HTMLArea editors
 // Asia-region Generic Patches
 // Work around Facebook's attachEvent usage in all.js
+// remove document.charset
 // TinyMCE double IFRAME init problem, some versions
 			// PATCH-177, Sending an extra onreadystatechange causes some ad scripts to eat memory
 	opera.addEventListener( 'BeforeEventListener.readystatechange', function(e){
@@ -618,6 +619,8 @@ function setTinyMCEVersion(e){
 		}
 	
 	},false);
+			// PATCH-605, remove document.charset
+	document.charset=undefined;
 			// PATCH-373, TinyMCE double IFRAME init problem, some versions
 	opera.addEventListener('bjsOnTinyMCEScript', function(e){
 	  if( tinyMCEVersionInfo && tinyMCEVersionInfo.majorVersion==3 && tinyMCEVersionInfo.minorVersion>1.0 ){
@@ -660,9 +663,11 @@ function setTinyMCEVersion(e){
 			document.addEventListener('DOMContentLoaded', function(){document.documentElement.className='SAF';}, false);
 				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (AOL.jp sniffing prevents styling). See browser.js for details');
 		}
-		if(hostname.indexOf('aol.com') >-1){			// 188197, Making sure AOL pages are not overwritten by ad script
+		if(hostname.indexOf('aol.com')>-1){			// 188197, Making sure AOL pages are not overwritten by ad script
 			avoidDocumentWriteAbuse();
-				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Making sure AOL pages are not overwritten by ad script). See browser.js for details');
+					// PATCH-608, Aol.com: Avoid ad overwrite
+			addPreprocessHandler(/\|\|adsUA\.indexOf\(\'opera\'\)>-1/,'');
+				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Making sure AOL pages are not overwritten by ad script\nAol.com: Avoid ad overwrite). See browser.js for details');
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (AOL). See browser.js for details');
 	} else if(hostname.indexOf('.apple.com')>-1){			// PATCH-387, Make Apple Store menu visible
@@ -818,6 +823,10 @@ function setTinyMCEVersion(e){
 					// PATCH-582, GMail: override workaround for old font-size bug in Opera
 			addCssToDocument('body.editable.LW-avf{font-size: small !important}');
 				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (GMail: override overflow and fixed position styles to improve scrolling performance\nGMail: override...). See browser.js for details');
+		}
+		if(hostname.indexOf('maps.google.')>-1 || hostname.indexOf('mapy.google.')>-1){			// PATCH-610, GMaps: avoid autoclose of problem reporting dialog
+			opera.addEventListener('BeforeEventListener.mousedown', function(e){if(e.event.target.tagName=='OPTION')e.preventDefault()}, false);
+				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (GMaps: avoid autoclose of problem reporting dialog). See browser.js for details');
 		}
 		if(hostname.indexOf('plus.google')>-1){			// PATCH-526, G+: avoid tall narrow posts due to word-wrap in table 
 			addCssToDocument('div.B-u-nd-nb, div.s-r-Ge-ec {display:block}');
@@ -1175,7 +1184,7 @@ function setTinyMCEVersion(e){
 		fixHierMenus();
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Old HierMenus on cdec-sic.cl). See browser.js for details');
 	} else if(hostname.indexOf('cnnturk.com')>-1){			// PATCH-509, cnnturk: work around CSS bug that causes footer content to float upwards
-		addCssToDocument('#fbtm div.dtc ul{position: static !important; display:inline !important}');
+		addCssToDocument('#fbtm div.dtc{bottom:-170px !important;}#fbtm div.dtc ul{position: static !important; display:inline !important}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (cnnturk: work around CSS bug that causes footer content to float upwards). See browser.js for details');
 	} else if(hostname.indexOf('computerra.ru')>-1){			// PATCH-267, Make BBCode editor buttons work by disabling Opera sniffing
 		document.addEventListener('DOMContentLoaded', function(){
