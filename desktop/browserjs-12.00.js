@@ -1,4 +1,4 @@
-// t40+XOvqPuYPRMmx3gNjL/zeSKLcgfExoqq5G4HNvVtS0/EGciOUOAq+6F6I9CTQY9SbGDRggv17ot0/VALZaYhwH3BTYB4z/U3KcGy3IUF8W1XGtkuL3Vn2Mw0XUZILWssGMVxHNRy3FTgkEXR7qreoS/2BXjJTbUMtqPT0iCOGEmpGmsNrSMCHu4/gnzMI7bfMpE1uQqaUJiTAWp9hfbP+mnp7QQvqnHCftzXRJgZcr8CxTgAbcNcYKzwpSdlwkRcAo13br7Eqh+hydIpszZvUXs6YzntHLMmEmqovngdyeuLE0suH+4+RoS0qMR/36Bqujaboh4YEzGK9HQryZA==
+// n2/nwDGbVp2/lkXOptiyW4KkM/n9mp5djLngiPUFzeZuEuE/aLVPco8EDUIjGh1VYs04RxW4hmFfmcP0NNiRpmfeHueUr18BHPWCLnJmvKxu+qe6jBd1YmX+J6zbR6PqWtx7X9EuYzavfZpxDKjFwLb39z84FzcIkguHV1SEmioOjWWdb0NhrGg4BIemKQqHAa971n9CzohZcRNJkDl1JMIEpiYnEhnb28MvXEsqylRIhyR0+KEm0e9t8Xl6v5dfY0CGTZnhHnxXe1mcxxFAPZY/zCdINAneelgCctvOtZa29X127OF8n660v+DHlfQvoyO8l9LbJoFKY6Ob2e0tcg==
 /**
 ** Copyright (C) 2000-2012 Opera Software AS.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.00 core 2.10.282, March 21, 2012. Active patches: 169 ';
+	var bjsversion=' Opera Desktop 12.00 core 2.10.282, March 29, 2012. Active patches: 170 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1191,6 +1191,9 @@ function setTinyMCEVersion(e){
 			}
 		}, false);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix SiteCatalyst H.9 code on Nissan/Infiniti USA). See browser.js for details');
+	} else if(hostname.indexOf('internetbank.swedbank.se')>-1){			// PATCH-611, SwedBank: temporary work around for mismatch between window.event support and charcode support
+		Event.prototype.__defineGetter__('charCode', function(){if( this.keyCode>=48 && this.keyCode<=57  )return this.keyCode;});
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (SwedBank: temporary work around for mismatch between window.event support and charcode support). See browser.js for details');
 	} else if(hostname.indexOf('investordaily.com.au')>-1){			// PATCH-238, Override minmax IE helper script
 		opera.defineMagicFunction('minmax_scan', function(){});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Override minmax IE helper script). See browser.js for details');
@@ -1368,6 +1371,9 @@ function setTinyMCEVersion(e){
 			false
 		);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Allow upload of workspace resources in Salesforce). See browser.js for details');
+	} else if(hostname.indexOf('santanderbank.de')>-1){			// PATCH-84, Santander bank prevents typing certain keys
+		ignoreCancellationOfCertainKeyEvents('keypress', {114:'', 116:'', 117:'', 122:''});
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Santander bank prevents typing certain keys). See browser.js for details');
 	} else if(hostname.indexOf('seb-bank.de')>-1){			// PATCH-84, SEB bank prevents typing certain keys
 		ignoreCancellationOfCertainKeyEvents('keypress', {114:'', 116:'', 117:'', 122:''});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (SEB bank prevents typing certain keys). See browser.js for details');
@@ -1501,9 +1507,6 @@ function setTinyMCEVersion(e){
 			}
 		);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (xcweather: make sure the preference form is available when running script). See browser.js for details');
-	} else if(hostname.indexOf('yihaodian.com')>-1){			// PATCH-543, yihaodian.com: fix wrongly aligned product image
-		addCssToDocument('#main .produce .sideleft .pic{text-align: inherit}');
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (yihaodian.com: fix wrongly aligned product image). See browser.js for details');
 	} else if(hostname.indexOf('yoyaku.rakubus.jp')>-1){			// PATCH-559, Browser sniffing on Raku Bus
 		navigator.appName = 'Microsoft '+navigator.appName;
 		navigator.appVersion = 'MSIE 9.0; '+navigator.appVersion;
