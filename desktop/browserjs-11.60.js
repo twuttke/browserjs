@@ -1,4 +1,4 @@
-// udY7nUU0Pl9VbpfAk6tAdYASUYoz3J/MvKaJnNxZU2IRDLzpZSmSssGr2QMV0CK9zT2p690NZ8x4mhwi74cKRw5eEP/xtT3iJAS4t6UHtSWSeaXEfIcm9xHLC+7QwXOVDJ/ceJ76OaH5AOozySL2QDmaIv0bDGX7tmP59F35cRZ+NrhqrbnNTRp3gDYh3/H8vU4xv5gFAhWx3y2pbz2rNNhqOVXw//KVqt+HKDY4Z85ltrLuxydZTPPs8nlbUA6SvbxrNBVPF7U60FcUIb+aNRurhCfF+45uzB1DrxpgrwxbA0NanIsBTiRr3UR6uTvWKA4eD/yQyzxh4SvTNA/XWA==
+// BH2kf3J+ok2mGa3aShTDsBWclpTD8meP7vkeZP3YWNN4+58jmfBA//IrX35AT2aO7CpwZsOsfqtCbHBZcSrMUa/14UiI4/RU3JJQmrokwyxrPXPOusUm3eGDbR9cOx+qgSZEiAMXx0k0+RC4dxQjMkBef8YyrFZIsiRE5Hc3fy4Oh93XDMcFmQQaOZtlOJ1aK1b5D9gKw26MuWr+EdcphhQUzjSMvZ4sYtxNctBWtOD/+CpQhS5slVyJVa8B7TbGgsqOt71PUTc18/Bsb1Gpx3Dg9HJwc9FSB32SLMjBjFO+8Q5Hg77Fge5odaxXsC7QDmT4nLhAo8onKx21iFfjdQ==
 /**
 ** Copyright (C) 2000-2012 Opera Software AS.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.60 core 2.10.229, March 21, 2012. Active patches: 182 ';
+	var bjsversion=' Opera Desktop 11.60 core 2.10.229, March 29, 2012. Active patches: 182 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1492,6 +1492,9 @@ function setTinyMCEVersion(e){
 			false
 		);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Allow upload of workspace resources in Salesforce). See browser.js for details');
+	} else if(hostname.indexOf('santanderbank.de')>-1){			// PATCH-84, Santander bank prevents typing certain keys
+		ignoreCancellationOfCertainKeyEvents('keypress', {114:'', 116:'', 117:'', 122:''});
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Santander bank prevents typing certain keys). See browser.js for details');
 	} else if(hostname.indexOf('seb-bank.de')>-1){			// PATCH-84, SEB bank prevents typing certain keys
 		ignoreCancellationOfCertainKeyEvents('keypress', {114:'', 116:'', 117:'', 122:''});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (SEB bank prevents typing certain keys). See browser.js for details');
@@ -1624,9 +1627,6 @@ function setTinyMCEVersion(e){
 			}
 		);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (xcweather: make sure the preference form is available when running script). See browser.js for details');
-	} else if(hostname.indexOf('yihaodian.com')>-1){			// PATCH-543, yihaodian.com: fix wrongly aligned product image
-		addCssToDocument('#main .produce .sideleft .pic{text-align: inherit}');
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (yihaodian.com: fix wrongly aligned product image). See browser.js for details');
 	} else if(hostname.indexOf('yoyaku.rakubus.jp')>-1){			// PATCH-559, Browser sniffing on Raku Bus
 		navigator.appName = 'Microsoft '+navigator.appName;
 		navigator.appVersion = 'MSIE 9.0; '+navigator.appVersion;
