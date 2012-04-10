@@ -1,4 +1,4 @@
-// n2/nwDGbVp2/lkXOptiyW4KkM/n9mp5djLngiPUFzeZuEuE/aLVPco8EDUIjGh1VYs04RxW4hmFfmcP0NNiRpmfeHueUr18BHPWCLnJmvKxu+qe6jBd1YmX+J6zbR6PqWtx7X9EuYzavfZpxDKjFwLb39z84FzcIkguHV1SEmioOjWWdb0NhrGg4BIemKQqHAa971n9CzohZcRNJkDl1JMIEpiYnEhnb28MvXEsqylRIhyR0+KEm0e9t8Xl6v5dfY0CGTZnhHnxXe1mcxxFAPZY/zCdINAneelgCctvOtZa29X127OF8n660v+DHlfQvoyO8l9LbJoFKY6Ob2e0tcg==
+// x8ljjfIFs6OEFZdvMnOGVw7aKpxv/wwZpKJ083e4SeEir6XSU7BRoHKB7S7AUuHd4J17RZJPhMKaTQdioe4JvLwRtMMPFQXnJD20eJn8dgK/Az4jrdR7IYOMu3Gq0hjY3oqZ/QfZTRtGUp54z/1r0hgCg0EQKQmmn6OVbgjflD0HB2LSdV33AHEeUpZjFbF3O5rcMXHbAU+eWAIHGEUy8q1ZikFVTwBBIOYe59rnGjXFylPhHV992Vy4n6VLzOhWrQMf1xyWUP705F38Z0P58LsO00TLw0k2y728m3pjlx3rUBzSWOh30S6ce4YO+UQ+YbLDV0YkJZnwa48KKCg0YA==
 /**
 ** Copyright (C) 2000-2012 Opera Software AS.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.00 core 2.10.282, March 29, 2012. Active patches: 170 ';
+	var bjsversion=' Opera Desktop 12.00 core 2.10.289, April 10, 2012. Active patches: 170 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -619,10 +619,6 @@ function setTinyMCEVersion(e){
 			document.addEventListener('DOMContentLoaded', function(){document.documentElement.className='SAF';}, false);
 				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (aol.fr: gice Opera better styling). See browser.js for details');
 		}
-		if(hostname.indexOf('.aol.jp')>-1){			// PATCH-45, AOL.jp sniffing prevents styling
-			document.addEventListener('DOMContentLoaded', function(){document.documentElement.className='SAF';}, false);
-				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (AOL.jp sniffing prevents styling). See browser.js for details');
-		}
 		if(hostname.indexOf('aol.com')>-1){			// 188197, Making sure AOL pages are not overwritten by ad script
 			avoidDocumentWriteAbuse();
 					// PATCH-608, Aol.com: Avoid ad overwrite
@@ -826,6 +822,9 @@ function setTinyMCEVersion(e){
 			}
 		})(Element.prototype.getAttribute);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Work around sniffing in old BackBase library on ing.nl\nEnsure submit button is visible\nMake sure g...). See browser.js for details');
+	} else if(hostname.indexOf('.sina.com.cn')>-1){			// PATCH-614, sina.com: video doesn't play due to missing script readystate support
+		navigator.userAgent += ' not Gecko';
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (sina.com: video doesn\'t play due to missing script readystate support). See browser.js for details');
 	} else if(hostname.indexOf('.t-online.de')>-1){			// 225374,  video problems on T-online.de
 		if(hostname.indexOf('unterhaltung')>-1){
 					//Fix browser detection
@@ -1170,7 +1169,7 @@ function setTinyMCEVersion(e){
 		opera.defineMagicVariable('is_nav', function(){return true;}, null);
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( BlueCross browser sniffing prevents insurance search). See browser.js for details');
-	} else if(hostname.indexOf('googletv.blogspot.com')>-1){			// PATCH-603, GoogleTV: fix broken word spacing - Opera bug
+	} else if(hostname.indexOf('googletv.blogspot.')>-1){			// PATCH-603, GoogleTV: fix broken word spacing - Opera bug
 		addCssToDocument('div.post-body div{text-align:inherit !important}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (GoogleTV: fix broken word spacing - Opera bug). See browser.js for details');
 	} else if(hostname.indexOf('hk.centamap.com')>-1){			// PATCH-318, Fix missing menu and misplaced highlights on hk.centamap.com
@@ -1211,9 +1210,12 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('kort.arealinfo.dk')>-1){			// PATCH-348, Disable Opera detection that causes hidden content
 		opera.defineMagicVariable('op', function(){return false}, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Disable Opera detection that causes hidden content). See browser.js for details');
-	} else if(hostname.indexOf('kuwaitairways.com')>-1){			// PATCH-493, kuwaitairways.com - Fix browser sniffing
-		navigator.appName='Netscape';
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (kuwaitairways.com - Fix browser sniffing). See browser.js for details');
+	} else if(hostname.indexOf('latenightwithjimmyfallon.com')>-1){			// PATCH-615, Unexpected script loading order breaks video player ready check
+		window.addEventListener('load', function(){
+			if(window.DPSVPlayer && window.DPSVPlayer.onReady)DPSVPlayer.onReady.call(window);
+		}, false);
+		
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Unexpected script loading order breaks video player ready check). See browser.js for details');
 	} else if(hostname.indexOf('lottery.sina.2caipiao.com')>-1){			// PATCH-556, 2caipiao.com: fix iframe resize
 		fixIFrameSSIscriptII('dyniframesize');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (2caipiao.com: fix iframe resize). See browser.js for details');
