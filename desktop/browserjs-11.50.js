@@ -1,4 +1,4 @@
-// rkM1GUvFUrDRCxrQALItWtlwKjOKS+GZak/aeWsaWgILjbjhyh1R28TNn7aWw2hHEvZgcRjs8LZ2vq1hQawcKVfC7ep5Nk0XrJLuwxX+RnBhjV6jxAx/C9K3wKKA4WTzmHRStxBqlKoxsxeG3lAH+cRYRPBpqdUYSTrO6IO24RtMVMhMBmefiuyzym86ACqQXEHesOMPPZ1At57L8GSbLXu105TaASgx2VLpToFAonq0vePy4ZeE0asgWxlyv6G3etOuSWUq03MOPEWCSeAX5spBddD8UR2iiZZOkX/DOmVdwrVwGxZ6ExpeenusIE9ATMOoe3CUXTc0zJjjC2QoXg==
+// Nrfje/dX4MACY+IdDRdXh9FBaMbFJfsnF9RTDwzxIVXFbWSFoh/KAQdWR/zQPE0AbOyyI7qPx6XWsV1+waXRBKD43P6zSixcJWK/0sND5DeKEqUb7rQssU/PpgIfUqrOPwmBvtuc4aF8p4YSOBH5oZTuz4y/VHOiytYDyP4flSkXsHjao4kv3P+EFXDTyHUrK7wVMKu7e28hRam+Djnj0PHijqiTJaNN5RIGlh3Ky5cmpl+UmFIcpIrcBwCrsaKvvcQKatlO2X1CUuxnraezBfkrLNZ+n1HC2MLeUSCf47laJs4jJ9iB8qZ4Wjgp8sA6W9Z/YUPtuoOrHVcZ7lJKaQ==
 /**
 ** Copyright (C) 2000-2012 Opera Software AS.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.50 core 2.9.168, March 29, 2012. Active patches: 211 ';
+	var bjsversion=' Opera Desktop 11.50 core 2.9.168, April 10, 2012. Active patches: 209 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -656,10 +656,6 @@ function setTinyMCEVersion(e){
 		if(hostname.indexOf('.aol.fr')>-1){			// PATCH-563, aol.fr: gice Opera better styling
 			document.addEventListener('DOMContentLoaded', function(){document.documentElement.className='SAF';}, false);
 				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (aol.fr: gice Opera better styling). See browser.js for details');
-		}
-		if(hostname.indexOf('.aol.jp')>-1){			// PATCH-45, AOL.jp sniffing prevents styling
-			document.addEventListener('DOMContentLoaded', function(){document.documentElement.className='SAF';}, false);
-				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (AOL.jp sniffing prevents styling). See browser.js for details');
 		}
 		if(hostname.indexOf('aol.com')>-1){			// 188197, Making sure AOL pages are not overwritten by ad script
 			avoidDocumentWriteAbuse();
@@ -1448,9 +1444,12 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('kort.arealinfo.dk')>-1){			// PATCH-348, Disable Opera detection that causes hidden content
 		opera.defineMagicVariable('op', function(){return false}, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Disable Opera detection that causes hidden content). See browser.js for details');
-	} else if(hostname.indexOf('kuwaitairways.com')>-1){			// PATCH-493, kuwaitairways.com - Fix browser sniffing
-		navigator.appName='Netscape';
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (kuwaitairways.com - Fix browser sniffing). See browser.js for details');
+	} else if(hostname.indexOf('latenightwithjimmyfallon.com')>-1){			// PATCH-615, Unexpected script loading order breaks video player ready check
+		window.addEventListener('load', function(){
+			if(window.DPSVPlayer && window.DPSVPlayer.onReady)DPSVPlayer.onReady.call(window);
+		}, false);
+		
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Unexpected script loading order breaks video player ready check). See browser.js for details');
 	} else if(hostname.indexOf('livedoor.com')>-1){			// PATCH-424, layout issue on livedoor's search box
 		addCssToDocument("form#search-form div.searhline-outer button { text-indent:0 !important; content:'' }");
 		
@@ -1800,9 +1799,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('westjet.com')>-1 ){			// PATCH-260,  Westjet browser sniffing warns against Opera
 		opera.defineMagicVariable('browser', function(o){ o.isSupported=true; return o; }, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( Westjet browser sniffing warns against Opera). See browser.js for details');
-	} else if(hostname.indexOf('www.fbi.gov')>-1){			// PATCH-401, Avoid scrollbar on FBI
-		addCssToDocument('ul#topnav li div.topnav-dd-outer{margin-left: auto !important}');
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Avoid scrollbar on FBI). See browser.js for details');
 	} else if(hostname.indexOf('www.slideshare.net')>-1){			// PATCH-453, Slideshare: avoid plugin-triggered document.cookie setting script deadlock bug
 		(function(){
 			var actualGetter=document.__lookupGetter__('cookie');
