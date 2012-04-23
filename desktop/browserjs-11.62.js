@@ -1,4 +1,4 @@
-// rF/0+A+4SxRCN75Br2GyyaOHuCxply+lOs+bLVuldH31WvjAoUsMMA6hwFHdyTSEginPH/M4WTGWIX7jt2zTYUqmaY/KxoP/8i4ofMD5yPD4nTdjr08lbw2C6YHXIrCLUOAnW7T+S0sdQDZWdY9WQUunV+R6ID2aLg+5zIXUh0QZk5lQ7St448Q+rrCoZvaI6/AM8JpdGM7d964ZHUK5vkrIKLEx1d9yXkGDzarlxiKijL/7io72CgG+IQ2ZIsEzD7CB/D30nzTSnkuDbGpmT/5GSCoqwbeTikRorkmrKbNXMBBPzrcYidZLnBRGEJV2JN95dY0RHRL5IkqOdu3W5g==
+// jNJUez+8XpZ1koopQCfNA8Uxv+Tf2E4aCny8r1xI38P11RBrGfgzOIIDeQiw+oKpRUBY6UtXD38M7yQuKsohOPWKkxYc/6J5dui0QveY2B+tg7oxJSFn+P+lPq3PKRyoEG375pavxJc0dSuxWDp+du+iA/bwYO1H3gfW2v+ub+pqxHywv8fpeaJ7a7cyOtDZPifbEgCfsL76IRWB+lHvYb7cadYO17fggZSYmaXf76lYPyeIiQdZThPL7hBc4qjyk7g5EjudPshOjoIOlBFrzycz3HfqqrAcALDVeNM3GKiW/ZkeFqEO9rhcr6zOWpRZ9Fg+6/lFt2dshzKNTONwIA==
 /**
 ** Copyright (C) 2000-2012 Opera Software AS.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, April 10, 2012. Active patches: 179 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, April 12, 2012. Active patches: 180 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -335,6 +335,7 @@ function setTinyMCEVersion(e){
 // Asia-region Generic Patches
 // Facebook: work around iframe load event issue
 // remove document.charset
+// Make document.attachEvent extra undefined for Dojo 1.7.x
 // TinyMCE double IFRAME init problem, some versions
 			// DSK-223254, lines reversed on enter by workaround against old Opera bug
 	opera.addEventListener('bjsOnTinyMCEScript', function(e){
@@ -471,7 +472,7 @@ function setTinyMCEVersion(e){
 			// PATCH-452, Validate result from document.all.item
 	try{
 	//Credits Makoto Mizukami
-	if( document.all!==undefined )document.all.item = function(lIndex, iSubindex){
+	document.all.item = function(lIndex, iSubindex){
 		var i = 0, j = 0,
 		byId = document.getElementById(lIndex),
 		byName = document.getElementsByName(lIndex),
@@ -575,6 +576,12 @@ function setTinyMCEVersion(e){
 	},false);
 			// PATCH-605, remove document.charset
 	document.charset=undefined;
+			// PATCH-616, Make document.attachEvent extra undefined for Dojo 1.7.x
+	opera.addEventListener('BeforeExternalScript', function(e){
+		if(e.element && e.element.src && e.element.src.indexOf('dojo') && /1\.7\.\d/.test(e.element.src)){
+			document.attachEvent = undefined;
+		}
+	}, false);
 			// PATCH-373, TinyMCE double IFRAME init problem, some versions
 	opera.addEventListener('bjsOnTinyMCEScript', function(e){
 	  if( tinyMCEVersionInfo && tinyMCEVersionInfo.majorVersion==3 && tinyMCEVersionInfo.minorVersion>1.0 ){
