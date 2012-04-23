@@ -1,4 +1,4 @@
-// jNJUez+8XpZ1koopQCfNA8Uxv+Tf2E4aCny8r1xI38P11RBrGfgzOIIDeQiw+oKpRUBY6UtXD38M7yQuKsohOPWKkxYc/6J5dui0QveY2B+tg7oxJSFn+P+lPq3PKRyoEG375pavxJc0dSuxWDp+du+iA/bwYO1H3gfW2v+ub+pqxHywv8fpeaJ7a7cyOtDZPifbEgCfsL76IRWB+lHvYb7cadYO17fggZSYmaXf76lYPyeIiQdZThPL7hBc4qjyk7g5EjudPshOjoIOlBFrzycz3HfqqrAcALDVeNM3GKiW/ZkeFqEO9rhcr6zOWpRZ9Fg+6/lFt2dshzKNTONwIA==
+// aL5NTunmpForIXQuxqwucSDKoUik2dnVWAjZGmGOMGgeNAIKgSiPoSMzs2wPjRFToJYGHAAIReMPDf4JSkBrTS2+bPHr1qhlpGrB8Kqr37E3gj9LttqVCCktMZKRi1TKvQim3GUGkhYCebqyqJjaalwClhMpCc1orJzsug+dvT3tejO5qBCeo5RrjknrmPk5jBLQqc8gipt3/SuarZiCsgJl1f1nc0iZATt4T6R8mMvO+ARVa6nffemJFPa0srr3Akdkd47DWetAYr95lPGpXwHGsnueCv07BuaWf9alRwBZeJ5uaqVQp5X9YKod9U+HxQXIJM6tZp5XGIjkbO7imA==
 /**
 ** Copyright (C) 2000-2012 Opera Software AS.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, April 12, 2012. Active patches: 180 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, April 23, 2012. Active patches: 182 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -567,6 +567,7 @@ function setTinyMCEVersion(e){
 	opera.addEventListener( 'BeforeExternalScript', function(ev){
 		indexOf.call=addEventListener.call=removeEventListener.call=call;
 		var name=ev.element.src;
+		if(!name)return;
 		if(indexOf.call(name,'connect.facebook.net')>-1 && indexOf.call(name,'all.js')>-1){
 			var ifrScrollingSetter = (document.createElement('iframe')).__lookupSetter__('scrolling');
 			var ifrScrollingGetter = (document.createElement('iframe')).__lookupGetter__('scrolling');
@@ -578,7 +579,7 @@ function setTinyMCEVersion(e){
 	document.charset=undefined;
 			// PATCH-616, Make document.attachEvent extra undefined for Dojo 1.7.x
 	opera.addEventListener('BeforeExternalScript', function(e){
-		if(e.element && e.element.src && e.element.src.indexOf('dojo') && /1\.7\.\d/.test(e.element.src)){
+		if(e.element && e.element.src && e.element.src.indexOf('dojo')>-1 && /1\.7\.\d/.test(e.element.src)){
 			document.attachEvent = undefined;
 		}
 	}, false);
@@ -1045,6 +1046,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('265.com')>-1){			// PATCH-475, Avoid overflowing text on 265.com
 		addCssToDocument('#coolSites .body li, #coolSites .body li a{line-height:2em !important}')
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Avoid overflowing text on 265.com). See browser.js for details');
+	} else if(hostname.indexOf('aeonretail.jp')>-1){			// PATCH-88, Make links work on Aeonretail (outdated jQuery plugin detects Opera and scrolls up)
+		addPreprocessHandler(/var el = win \? \$\.browser\.opera \? document\.body : document\.documentElement : elem;/, 'var el = win ? document.documentElement : elem;', true, function(elm){ return elm.src&&elm.src.indexOf('scroll.js')>-1&&elm.text.indexOf('Opera 9.22')>-1; });
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Make links work on Aeonretail (outdated jQuery plugin detects Opera and scrolls up)). See browser.js for details');
 	} else if(hostname.indexOf('alfresco.com')>-1){			// PATCH-467, Get rid of browser warning on Alfresco help pages
 		if(hostname.indexOf('alfresco.com')>-1){
 			if(pathname.indexOf('help/')>-1){
@@ -1110,9 +1114,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('britannica.com')>-1){			// 332948, Prevent overwriting document with stats graphic on britannica.com
 		avoidDocumentWriteAbuse();
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Prevent overwriting document with stats graphic on britannica.com). See browser.js for details');
-	} else if(hostname.indexOf('britishairways.')!=-1){			// 206810, Prevent britishairways.com from reloading the page on resize
-		opera.defineMagicFunction('resizeHandler', function(){});
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Prevent britishairways.com from reloading the page on resize). See browser.js for details');
 	} else if(hostname.indexOf('cajamadrid.es')!=-1){			// PATCH-208, Caja Madrid hides login form by CSS mistake
 		document.addEventListener( 'DOMContentLoaded', function(){
 			for(var collection=document.getElementsByClassName('clearfix'), el; el=collection[0];){
@@ -1193,6 +1194,11 @@ function setTinyMCEVersion(e){
 		}, false);
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Facebook: fake paste event to make show preview immediately after pasting links in status\nFacebook ...). See browser.js for details');
+	} else if(hostname.indexOf('forever21.co.jp') > -1){			// PATCH-617, missing QuickView background color on Forever21.co.jp
+		if (pathname.indexOf('QuickView.aspx')>-1) {
+			addCssToDocument('html{background:#fff}');
+		}
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (missing QuickView background color on Forever21.co.jp). See browser.js for details');
 	} else if(hostname.indexOf('g4tv.com')>-1){			// PATCH-281, messed up layout in lower part of page due to wrong percentage rounding
 		window.addEventListener('DOMContentLoaded', function(e){
 			var el;
@@ -1475,6 +1481,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('smn.gov.ar')>-1){			// PATCH-572, smn.gov.ar: reduce search input width to avoid wrapping
 		addCssToDocument('input#busqueda{max-width:108px}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (smn.gov.ar: reduce search input width to avoid wrapping). See browser.js for details');
+	} else if(hostname.indexOf('social.')>-1&&hostname.indexOf('.microsoft.')>-1){			// PATCH-619, Emulating IE breaks Microsoft fora
+		document.getSelection=function(){return window.getSelection();}
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Emulating IE breaks Microsoft fora). See browser.js for details');
 	} else if(hostname.indexOf('sslsecure.maybank.com')>-1){			// PATCH-415, Browser sniffing causes 404 page on login to Maybank
 		opera.defineMagicFunction('MM_checkBrowser', function(){});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Browser sniffing causes 404 page on login to Maybank). See browser.js for details');
