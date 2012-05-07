@@ -1,6 +1,6 @@
-// QiJRaameqMiwomS4DuXUMC7HWmhal9FT40tXanLFUq0d//RoGQQ9oa6tffxMwq4fwFuE6pDg00br4mWOzyeZPerQt+iyCTH6H1Mj2hFpjmzrit0q80XBFmdM3z1QT8q/DaChyDOURTdrD1mlIrERZ75tI1siJ87JVZG/zZ6AI6kaKU5JtIBscIfT5obBuYnum/CVKH2HI6cloMzJ9jZDkRjNWQ9OMacfiLSF306mqBdkQ2/NVv3/AF36tbet+A9u5zT8Zp2RFlFftmkPInGj9BtI02oau54jeOC/IroTjZbsWuDRc1tNSh0kifG98kGwtI9GNB+LFUfLpioKbTxZcg==
+// xDxsNlGQpbE1814axZPBiSTniq1HSIl5gN5vM6xCgHnll689tWDDn3t0sUl3I138NN5DGhonkggL9s916Ef5poGProXmtwBUpwOc8fG+fss+1mbvJUjVy2Z19u9T7EgLhVfcXS1KBiVhgaUZDZU6B2kyadlianDSpTIPV8E6zZNjLwpIbplPJ7sQOeg3VBHuUdZYNCNxkmksegGK7ypnnhoAyJFpqrb1NhR3A9DCS4Tg8NKiPZOFWXZpEY0/4qIbldP2zIZ24Lz0HJxQa1QuWP+c6sE46ReRZlqW2zys3QkjCvzIF75U8WhuGVu0PPaQYCKTHBgpyYtPKV57Gh7o5g==
 /**
-** Copyright (C) 2000-2012 Opera Software AS.  All rights reserved.
+** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
 ** This file is part of the Opera web browser.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.00 core 2.10.254, April 23, 2012. Active patches: 113 ';
+	var bjsversion=' Opera Mobile 12.00 core 2.10.254, May 7, 2012. Active patches: 112 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -697,10 +697,6 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('image.baidu.com')>-1){			// YUSHAN-2320, Fix links display inside searchbox - image.baidu.com
 		addCssToDocument(" #kw{width:200px !important;  } #l, #nv { width: auto !important; text-indent: 0px !important; text-align:center; }  form[name=f], form[name=f1], #nv, #l {white-space:nowrap; } #mCon { display:none;} ");
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix links display inside searchbox - image.baidu.com). See browser.js for details');
-	} else if(hostname.indexOf('isbank.com.tr')>-1){			// 265077,  fixing navigation menu on isbank.com.tr
-		opera.addEventListener('BeforeScript', function(e){ replace.call=call; e.element.text=replace.call(e.element.text, 'SaklaGoster(sFrameAdi, 0, i.sMenuAd);};else if', 'SaklaGoster(sFrameAdi, 0, i.sMenuAd);}else if') },false);
-		
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( fixing navigation menu on isbank.com.tr). See browser.js for details');
 	} else if(hostname.indexOf('java.vnet.mobi')>-1){			// HMONY-1927, Remove overlapping text on vnet.mobi
 		if( document.documentElement ){ 
 		 var meta=document.documentElement.appendChild(document.createElement('meta')); 
