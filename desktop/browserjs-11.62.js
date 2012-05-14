@@ -1,4 +1,4 @@
-// pXWVG6/orqnWtc7E13BFApAzVuGb3DKjk39n0q/4r93baFRh0i5/MtBAItlzBVV7XMXhaG4Bl4442ytz2qoST+r9e0ls/yu7R8TUQ9aPFv3n/dDfHGtQA+2r4nnF77c4U+sUvlIKzUpEhV863RBMy0SpwfLktXA5rFCSHk3PalCOZQOVK/PQIY8Rs1KrEk41SR8xrLY6C+evNTbxazQaWE8zWTHqH6ucSFIm2Z4cNZWyPBNy32vhNe1F7Feo27Ih3eRZzsbLdTkl+NNMOHf9pPP/gL/7WKcQWBZ0Iu0qJqlUlcLD0u05DYcYPXWeTenkX9KefaUDaa4avqTic7x5Ow==
+// bi9Q72NfLK/yI6HASsh4HlTnX2AOw9TEfnHcvhen1px1biQUBRVaMjcdGOit6p17Niauv5EgII3qV1TnKl0NrzCE9d0/IG7UM2n3PMk5oMd7p5jDy+8Pi0lM6W8d59U1iSgmgbq5iHFL0DYl+wMEgtTHbxxz9RJNxd9QMRlcBhM5/cq88fGVZ9hlqaIPhO9Ba4ntb2kuORNwCk9dMF3avf3dgs/8bnLzlBIr1jt74nYiPDRBm6DAeHGSTQKG7b/aXBCboJ+AwsAPf+DqJ6pB6QZGMqiA2hg1CVQt9EQsDaVMflqOdN/p7GGwsBjZrV3xBy12eEBDqq9Z229qMvddGw==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, May 7, 2012. Active patches: 184 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, May 14, 2012. Active patches: 193 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -626,6 +626,9 @@ function setTinyMCEVersion(e){
 		);
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (cang.baidu.com for Baidu SouCang can\'t display saved items, window.top). See browser.js for details');
+	} else if(hostname.indexOf('.aaa.com')>-1){			// PATCH-646, Fix AAA TripTik sniffing
+		opera.defineMagicVariable('ttp_isFirefox', function(){return true;}, null);
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix AAA TripTik sniffing). See browser.js for details');
 	} else if(hostname.indexOf('.aol.') >-1){			// 0, AOL
 		/* AOL */
 	
@@ -847,6 +850,12 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('.jcrew.com')>-1){			// PATCH-338, If XHR doesn't support EventTarget interface, setting onload should throw
 		XMLHttpRequest.prototype.__defineSetter__('onload', function(){ throw 'unsupported'; });
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (If XHR doesn\'t support EventTarget interface, setting onload should throw). See browser.js for details');
+	} else if(hostname.indexOf('.meitu.com')>-1){			// PATCH-645, meitu.com: sniffs for Gecko
+		navigator.userAgent += ' not Gecko';
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (meitu.com: sniffs for Gecko). See browser.js for details');
+	} else if(hostname.indexOf('.nab.com.au')>-1){			// PATCH-643, nab.com.au: avoid browser warning
+		opera.defineMagicFunction('detectBrowser', function(){return 'correct';});
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (nab.com.au: avoid browser warning). See browser.js for details');
 	} else if(hostname.indexOf('.sina.com.cn')>-1){			// PATCH-614, sina.com: video doesn't play due to missing script readystate support
 		navigator.userAgent += ' not Gecko';
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (sina.com: video doesn\'t play due to missing script readystate support). See browser.js for details');
@@ -1193,7 +1202,53 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('etour.co.jp') > -1){			// PATCH-152, etour.co.jp fix non-disappearing overlapping image
 		navigator.appName='Netscape';
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (etour.co.jp fix non-disappearing overlapping image). See browser.js for details');
-	} else if(hostname.indexOf('facebook.com')!=-1){			// PATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status
+	} else if(hostname.indexOf('facebook.com')!=-1){			// PATCH-630, facebook: work around Opera's too strict origin checks on https for https -> http(s) other site -> https IFRAME communication
+		if( top==self && location.href.indexOf('www.facebook.com/dialog/')>-1 && location.protocol==='https:' ){
+			var buggy=false;
+			try{
+				var s=typeof opener.frames['fb_xdm_frame_https'];
+			}catch(e){
+				buggy=true;
+			}
+			if(buggy){
+				addEventListener('DOMContentLoaded', function(){
+					var doFix=0;
+					for(var i=0;i<document.scripts.length;i++){
+						if( document.scripts[i].text && document.scripts[i].text.indexOf('fb_xdm_frame_https') )doFix=1;
+					}
+					if(!doFix)return;
+					var ifr=document.body.appendChild(document.createElement('iframe'));
+					ifr.src='https://s-static.ak.facebook.com/platform/page_proxy.php';
+					ifr.setAttribute('style', 'width:1px; height:1px');
+					ifr.id='_browserjsFBHack';
+				}, false);
+				opera.addEventListener('BeforeScript', function(e){
+					if(e.element.text.indexOf('ref.frames[frame].proxyMessage(fragment);}catch(e) {')>-1){
+						e.element.text = e.element.text.replace('ref.frames[frame].proxyMessage(fragment);}catch(e) {', 'ref.frames[frame].proxyMessage(fragment);}catch(e) {try{document.getElementById(\'_browserjsFBHack\').contentWindow.postMessage(fragment, \'https://s-static.ak.facebook.com\');}catch(e){}');
+					}
+				}, false);
+			}
+		}else if(location.href.indexOf('https://s-static.ak.facebook.com/connect/xd_arbiter.php')==0){
+			addEventListener('storage', function(e){
+				if(e.key==='_browserjsFBHack' && typeof proxyMessage =='function'){
+					try{
+						proxyMessage(e.newValue);
+						window.localStorage.removeItem('_browserjsFBHack')
+					}catch(e){}
+				}
+			}, false);
+		}else if( location.href==='https://s-static.ak.facebook.com/platform/page_proxy.php' ){
+			addEventListener('message', function(e){
+				if(e.origin==='https://www.facebook.com' && e.source===parent){
+					localStorage.removeItem('_browserjsFBHack');
+					localStorage['_browserjsFBHack']=e.data;
+				}
+			}, false);
+			addEventListener('storage', function(e){
+				if(e.key==='_browserjsFBHack' && e.newValue===null)parent.close();
+			}, false);
+		}
+				// PATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status
 		opera.addEventListener('BeforeEventListener.keypress', function(e){
 			if( e.event.ctrlKey && (e.event.keyCode==86 || e.event.keyCode==118 ) ){
 				var trgt=e.event.target;
@@ -1213,12 +1268,15 @@ function setTinyMCEVersion(e){
 			e.cssText = e.cssText.replace(/border-(top|bottom)-(right|left)-radius:3px/g, '');
 		}, false);
 		
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Facebook: fake paste event to make show preview immediately after pasting links in status\nFacebook ...). See browser.js for details');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (facebook: work around Opera\'s too strict origin checks on https for https -> http(s) other site -> h...). See browser.js for details');
 	} else if(hostname.indexOf('forever21.co.jp') > -1){			// PATCH-617, missing QuickView background color on Forever21.co.jp
 		if (pathname.indexOf('QuickView.aspx')>-1) {
 			addCssToDocument('html{background:#fff}');
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (missing QuickView background color on Forever21.co.jp). See browser.js for details');
+	} else if(hostname.indexOf('frys.com')>-1){			// PATCH-638, frys.com: avoid racy framebuster due to lack of script async
+		addPreprocessHandler('self.parent.location=document.location;','if(self!=top)self.parent.location=document.location;');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (frys.com: avoid racy framebuster due to lack of script async). See browser.js for details');
 	} else if(hostname.indexOf('g4tv.com')>-1){			// PATCH-281, messed up layout in lower part of page due to wrong percentage rounding
 		window.addEventListener('DOMContentLoaded', function(e){
 			var el;
@@ -1249,6 +1307,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('huffingtonpost.com')>-1){			// PATCH-601, Huffingtonpost: Avoid ad overwrite
 		addPreprocessHandler(/\|\|adsUA\.indexOf\(\'opera\'\)>-1/,'');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Huffingtonpost: Avoid ad overwrite). See browser.js for details');
+	} else if(hostname.indexOf('icicibank.com')>-1){			// PATCH-641, icicibank: fix browser sniffing that causes broken positioning of slideshow on frontpage
+		addPreprocessHandler( /if\(Opera\)imgObj\.style\.position = 'static';/, '' );
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (icicibank: fix browser sniffing that causes broken positioning of slideshow on frontpage). See browser.js for details');
 	} else if(hostname.indexOf('infinitiusa.com')>-1 || hostname.indexOf('nissanusa.com')>-1){			// PATCH-529, Fix SiteCatalyst H.9 code on Nissan/Infiniti USA
 		opera.addEventListener('BeforeScript', function(e){
 			if (e.element.src.indexOf('codepack.incGlobPaths.true.content.js')>-1){
@@ -1463,6 +1524,18 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('santanderbank.de')>-1){			// PATCH-84, Santander bank prevents typing certain keys
 		ignoreCancellationOfCertainKeyEvents('keypress', {114:'', 116:'', 117:'', 122:''});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Santander bank prevents typing certain keys). See browser.js for details');
+	} else if(hostname.indexOf('sbrf.ru')>-1){			// PATCH-644, Resolving sbrf.ru's menus mouseout confusion by helping them use mouseleave instead
+		addEventListener('DOMContentLoaded', function(){s
+			var nodes=document.evaluate('//*[@onmouseover | @onmouseout]', document.body, null, 4, null), node;
+			while(node=nodes.iterateNext()){
+				node.onmouseenter = node.onmouseover;
+				node.onmouseover=null;
+				node.onmouseleave = node.onmouseout;
+				node.onmouseout=null; 
+			}
+		}, false);
+		
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Resolving sbrf.ru\'s menus mouseout confusion by helping them use mouseleave instead). See browser.js for details');
 	} else if(hostname.indexOf('seb-bank.de')>-1){			// PATCH-84, SEB bank prevents typing certain keys
 		ignoreCancellationOfCertainKeyEvents('keypress', {114:'', 116:'', 117:'', 122:''});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (SEB bank prevents typing certain keys). See browser.js for details');
@@ -1571,10 +1644,12 @@ function setTinyMCEVersion(e){
 		window.constructor={};
 		window.constructor.prototype={};
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (wangpiao.com: allow seat selection). See browser.js for details');
-	} else if(hostname.indexOf('washingtonpost.com')>-1){			// PATCH-494, Washingtonpost: avoid articles being overwritten in race condition
+	} else if(hostname.indexOf('washingtonpost.com')>-1){			// PATCH-633, No load fires for LINK element if href returns an empty file with text/javascript type - breaks Washingtonpost.com slideshows
+		addPreprocessHandler(  /if\(\(b\.webkit\|\|b\.gecko\)&&y\.type==="css"\)/  ,'if((b.webkit||b.gecko||b.opera)&&y.type==="css")' , true, function(el){return el.src.indexOf('yui/yui-min.js')>-1;} );
+				// PATCH-494, Washingtonpost: avoid articles being overwritten in race condition
 		avoidDocumentWriteAbuse(/<div id="trc_related_container".*/);
 		
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Washingtonpost: avoid articles being overwritten in race condition). See browser.js for details');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (No load fires for LINK element if href returns an empty file with text/javascript type - breaks Wash...). See browser.js for details');
 	} else if(hostname.indexOf('webprint.post.japanpost.jp')>-1){			// PATCH-449, japanpost.jp: Fix broken _supportsDOM function
 		opera.defineMagicFunction('_supportsDOM',function (oReal,oThis) { return true; });
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (japanpost.jp: Fix broken _supportsDOM function). See browser.js for details');
@@ -1587,6 +1662,15 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('www.yoka.com')>-1){			// PATCH-238, Override minmax IE helper script
 		opera.defineMagicFunction('minmax_scan', function(){});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Override minmax IE helper script). See browser.js for details');
+	} else if(hostname.indexOf('www.yr.no')==0){			// PATCH-629, yr.no: don't define responseXML for text/plain responses, even if it looks like valid markup
+		(function (){
+			var realGetter=(new XMLHttpRequest).__lookupGetter__('responseXML');
+			XMLHttpRequest.prototype.__defineGetter__('responseXML', function(){
+				if(this.getResponseHeader('content-type') && this.getResponseHeader('content-type').indexOf('text/plain')>-1)return;
+				return realGetter.call(this);
+			});
+		})();
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (yr.no: don\'t define responseXML for text/plain responses, even if it looks like valid markup). See browser.js for details');
 	} else if(hostname.indexOf('xcweather.co.uk')>-1){			// PATCH-519, xcweather: make sure the preference form is available when running script
 		opera.defineMagicFunction('populateForm',
 			function(real,oThis,oForm){
