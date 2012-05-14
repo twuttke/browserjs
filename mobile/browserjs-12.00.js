@@ -1,4 +1,4 @@
-// xDxsNlGQpbE1814axZPBiSTniq1HSIl5gN5vM6xCgHnll689tWDDn3t0sUl3I138NN5DGhonkggL9s916Ef5poGProXmtwBUpwOc8fG+fss+1mbvJUjVy2Z19u9T7EgLhVfcXS1KBiVhgaUZDZU6B2kyadlianDSpTIPV8E6zZNjLwpIbplPJ7sQOeg3VBHuUdZYNCNxkmksegGK7ypnnhoAyJFpqrb1NhR3A9DCS4Tg8NKiPZOFWXZpEY0/4qIbldP2zIZ24Lz0HJxQa1QuWP+c6sE46ReRZlqW2zys3QkjCvzIF75U8WhuGVu0PPaQYCKTHBgpyYtPKV57Gh7o5g==
+// AUKCPB4oTScRxpZm5lhPfaSXH2qzT76M131eOcjXsbp5sHu5dMsmXaYibyaFKwnf3qr7uEWH0tsQCmvKrrl+BbElaT7o7mnmbdGMI2Y3y6Z39jeGWc9KAWkMqaHyUqdDa6rreHzBRS047xVdc+CPzrljbAE/5vSAhv8nTDOt6QIq8wnChvADbGsz0oKY61Cj4nb04svt/fFC0tIxX1wmv54c7kR2JstFkehxEiWFbEFwOwahADgUf5r9ti0yG3kvXO0Ehr9gC9LCE2//bCoR66zA6t9PTn9wGm0P0wlYTnU971RK0hjFDPmE1/lk6qB6ofFoICsGc0DN8E5/TtHMog==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.00 core 2.10.254, May 7, 2012. Active patches: 112 ';
+	var bjsversion=' Opera Mobile 12.00 core 2.10.254, May 14, 2012. Active patches: 115 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -447,6 +447,9 @@ function stopKeypressIfDownCancelled(stopKey){
 				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Google Mail navigation bar overlaps if localised text is too long). See browser.js for details');
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Google). See browser.js for details');
+	} else if(hostname.indexOf('.meitu.com')>-1){			// PATCH-645, meitu.com: sniffs for Gecko
+		navigator.userAgent += ' not Gecko';
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (meitu.com: sniffs for Gecko). See browser.js for details');
 	} else if(hostname.indexOf('.yahoo.')>-1){			// 0, Yahoo!
 		/* Yahoo! */
 	
@@ -541,6 +544,9 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('addynamix.com') > -1){			// SEOUL-601, Fixes panning on addynamix.com
 		addCssToDocument('#main {overflow: visible;}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fixes panning on addynamix.com). See browser.js for details');
+	} else if(hostname.indexOf('aeonretail.jp')>-1){			// PATCH-88, Make links work on Aeonretail (outdated jQuery plugin detects Opera and scrolls up)
+		addPreprocessHandler(/var el = win \? \$\.browser\.opera \? document\.body : document\.documentElement : elem;/, 'var el = win ? document.documentElement : elem;', true, function(elm){ return elm.src&&elm.src.indexOf('scroll.js')>-1&&elm.text.indexOf('Opera 9.22')>-1; });
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Make links work on Aeonretail (outdated jQuery plugin detects Opera and scrolls up)). See browser.js for details');
 	} else if(hostname.indexOf('att.com')!=-1){			// PIONER-195, Browser sniffing causes failed Flash detection
 		if(opera.flashPluginAX && opera.flashPluginAX()){
 			opera.addEventListener('BeforeExternalScript', function(e){
@@ -684,6 +690,9 @@ function stopKeypressIfDownCancelled(stopKey){
 			addCssToDocument('html{background:#fff}');
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (missing QuickView background color on Forever21.co.jp). See browser.js for details');
+	} else if(hostname.indexOf('frys.com')>-1){			// PATCH-638, frys.com: avoid racy framebuster due to lack of script async
+		addPreprocessHandler('self.parent.location=document.location;','if(self!=top)self.parent.location=document.location;');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (frys.com: avoid racy framebuster due to lack of script async). See browser.js for details');
 	} else if(hostname.indexOf('geoaccess.com')!=-1){			// 318050,  BlueCross browser sniffing prevents insurance search
 		opera.defineMagicVariable('is_nav', function(){return true;}, null);
 		
