@@ -1,4 +1,4 @@
-// N7XONgfW3Fwe+5iooEMMsQ8LrvTp4P7Pj7zpE29S0ZnXrUljYKm2EDVb6AKkPlqSCO7c5HOWPU6UF9eLLLjJrTQHxVskydeJdqMqa4cfmKf04QoLBk8srubZTOHYsFMZV1qMlhYh//kSk69Hdj7n+qF3CBkpwU7EoFoqU8LVfG5cYAA8YYCdoBu+sQ2jY+WnAiV6v4erPxSlqPkokQSFKALod5DdTjKfjJZidfthK+n9pa6iVlh/j2kp45/01DsS82dThBHdjin6irJa8YHhJOVNhF7jE6lNyrmKrZwswaeZ3+bYIQh75kTQnG6Uvyz+q0QleuAE4XCzFfRVaa2m8g==
+// xqFFn/Lf8vSIwnYFnoO3IvvOQQE1xouQNs805AwYdO68BSG/DMVZO8kQonIKRgXhAk2Gg2D6PrvXXdXGdhQTv8KvzETrZcBVUlAU55nSleyTdM5o8XK+ViPzzt5KdcurlCZGLuYJnW2puWSSSIxtd7dccnqIWJwqtC+nSrYVieWEwo+1JWnnnV7J2QexBbLrqsT6CUdq7P5uoI7KosXtfPMsIqodc1wHdYC4P3fBsKXhibcIpHOsumTK/UpmCnsD8uUiiaN/AQaLITjdszGxZIdPrwtuLppuut0sRDfyhT1TnZzVUsL6HxAJide+iCPuUfwbtfqQChcTTUowY2BLEQ==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.00 core 2.10.289, May 14, 2012. Active patches: 183 ';
+	var bjsversion=' Opera Desktop 12.00 core 2.10.289, May 22, 2012. Active patches: 189 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -294,6 +294,22 @@ function ignoreCancellationOfCertainKeyEvents(type, list){
 			preventDefault.call(e);
 		}
 	},false );
+}
+function makePropertyCacheable(obj, prop){ 
+ (function() { 
+	 var is_cached = false; 
+	 var cached_value; 
+	 obj.__defineGetter__(prop, function() 
+	 { 
+		 if (!is_cached) 
+		 { 
+			 cached_value = Object.getOwnPropertyDescriptor(this, prop).get.call(this); 
+			 is_cached = true; 
+		 } 
+
+		 return cached_value; 
+	 }); 
+ })(); 
 }
 function sendOperaEvent(name, target){
 	initEvent.call=createEvent.call=dispatchEvent.call=call;
@@ -1054,11 +1070,23 @@ function setTinyMCEVersion(e){
 			}
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Get rid of browser warning on Alfresco help pages). See browser.js for details');
-	} else if(hostname.indexOf('amazon.')>-1){			// PATCH-527, Add more spoofing when masking as another browser on Amazon
+	} else if(hostname.indexOf('allegro.pl')>-1){			// PATCH-653, allegro.pl: cache plugin properties to avoid performance impact from short interval
+		makePropertyCacheable(HTMLEmbedElement.prototype, 'type'); 
+		makePropertyCacheable(HTMLEmbedElement.prototype, 'src');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (allegro.pl: cache plugin properties to avoid performance impact from short interval). See browser.js for details');
+	} else if(hostname.indexOf('amazon.')>-1){			// PATCH-652, Fix displaying recommended items in Amazon
+		window.opera.addEventListener('BeforeScript', function (ev) {
+			var name=ev.element.src; 
+			if(!name){return;}
+			if(name.indexOf('amazonShoveler')>-1){
+				ev.element.text = ev.element.text.replace('if(li[0]!=cell){var self=this;','if(li[0]!=cell){li.append(cell);var self=this;');
+			}
+		}, false);
+				// PATCH-527, Add more spoofing when masking as another browser on Amazon
 		if (navigator.appName!=='Opera'){
 			document.documentElement.style.MozAppearance = 'Opera';
 		}
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Add more spoofing when masking as another browser on Amazon). See browser.js for details');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix displaying recommended items in Amazon\nAdd more spoofing when masking as another browser on Ama...). See browser.js for details');
 	} else if(hostname.indexOf('ameba.jp')!=-1){			// 331093, Work around Opera bug where second BR tag overwrites newly inserted IMG
 		addPreprocessHandler(/editor\.insertNodeAtSelection\(link\);\s*editor\.insertNodeAtSelection\(document\.createElement\('br'\)\);/, 'editor.insertNodeAtSelection(link);');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Work around Opera bug where second BR tag overwrites newly inserted IMG). See browser.js for details');
@@ -1133,6 +1161,9 @@ function setTinyMCEVersion(e){
 			if(window.jsUtils&&window.jsUtils.bOpera)jsUtils.bOpera=false;
 		}, false);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Make BBCode editor buttons work by disabling Opera sniffing). See browser.js for details');
+	} else if(hostname.indexOf('cs.kddi.com')>-1){			// PATCH-656, Fix disabled buttons on KDDI Customer Support page
+		HTMLInputElement.prototype.__defineSetter__('disabled', function(){});
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix disabled buttons on KDDI Customer Support page). See browser.js for details');
 	} else if(hostname.indexOf('danawa.com')!=-1 && href.indexOf('danawa.com/product/item.html')!=-1){			// PATCH-14, Iframe content height is too small and not expanded on danawa.com
 		HTMLBodyElement.prototype.__defineGetter__('offsetHeight', function(){
 			return  (this.scrollHeight);
@@ -1205,6 +1236,14 @@ function setTinyMCEVersion(e){
 		opera.defineMagicVariable('is_nav', function(){return true;}, null);
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( BlueCross browser sniffing prevents insurance search). See browser.js for details');
+	} else if(hostname.indexOf('goo.ne.jp')>-1){			// PATCH-650, Fix search suggestions on Goo search engine
+		HTMLElement.prototype.__defineGetter__('currentStyle', function(){})
+		document.addEventListener('DOMContentLoaded',function(e){
+			if (gooSuggest && typeof sgtObj == "undefined") {
+				createSuggest();
+			}
+		},false);
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix search suggestions on Goo search engine). See browser.js for details');
 	} else if(hostname.indexOf('googletv.blogspot.')>-1){			// PATCH-603, GoogleTV: fix broken word spacing - Opera bug
 		addCssToDocument('div.post-body div{text-align:inherit !important}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (GoogleTV: fix broken word spacing - Opera bug). See browser.js for details');
@@ -1235,6 +1274,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('investordaily.com.au')>-1){			// PATCH-238, Override minmax IE helper script
 		opera.defineMagicFunction('minmax_scan', function(){});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Override minmax IE helper script). See browser.js for details');
+	} else if(hostname.indexOf('jcpenney.com')>-1){			// PATCH-651, jcpenney: avoid broken sniffer
+		navigator.userAgent += ' not Gecko';
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (jcpenney: avoid broken sniffer). See browser.js for details');
 	} else if(hostname.indexOf('journalism.org')>-1){			// PATCH-523, journalism.org: fix old IFrame SSI script
 		fixIFrameSSIscriptII('resizeIframe');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (journalism.org: fix old IFrame SSI script). See browser.js for details');
@@ -1302,6 +1344,22 @@ function setTinyMCEVersion(e){
 			return styleSetterLookupMethod.call(document.createElement('span').style, prop);
 		 };
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix drag and drop in Hotmail\nMispositioned sprites due to missing CSS\nEmulating IE\'s cssText prope...). See browser.js for details');
+	} else if(hostname.indexOf('mapion.co.jp')>-1){			// PATCH-649, Enable keyboard controls on Mapion
+		opera.addEventListener('BeforeScript',function(ev){
+			var name=ev.element.src; 
+			if(!name){return;}
+			if(name.indexOf('merge_all_logic.js')!=-1){
+				ev.element.text = ev.element.text.replace(/if\s*\(!MBrowser.opera\)\s*{/,'if(true){');
+			}
+		},false);
+		document.addEventListener('DOMContentLoaded', function(e){
+			var orig_onKeyDown = MKeyboardHandler.onKeyDown;
+			MKeyboardHandler.onKeyDown = function(e) {
+				orig_onKeyDown(e);
+				e.preventDefault();
+			}
+		},false);
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Enable keyboard controls on Mapion). See browser.js for details');
 	} else if(hostname.indexOf('mb.softbank.jp')!=-1){			// PATCH-588, SoftBank Mobile History Plugin browser sniffing
 		window.opera.addEventListener('BeforeScript', function (e) {
 			if (e.element.src.indexOf('history.js') > -1) {
