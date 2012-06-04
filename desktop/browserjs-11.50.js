@@ -1,4 +1,4 @@
-// ee4d1MPNr43M76h1Lvkt5JDjpEO2NLkCBCazTp16K78uhCjph2BNcfCG2OdxYucY9OrZjj61C6tJretaTKE47WOyFa53bK1jtHAK7JMXsXjfPthNGrL1AVAyvO/D89BX0JdKnjQ85z/5CzoHj14wQYrmM4XaHxdlHGekNDvv2USLaG671Cq2yrUbQlMGNEXICJIh7xmIWldW0/uNTmXM/cvU+L5Ph/0HokJNuUkslfvCTaH9gTXzRtJYeUote6YX09A8p2wxEhPygUXQeqHjnsm4NZ96MDIsP0Oi45NFW4SUA9y1F6ulGRc+pTuUvPG9c+HN8OGm3H5Of3YV/P/RSA==
+// X3iIirIPG7NhqPYCz4jPoO/R9mmgu3t3KjXIRBolMNU5hwO20LkrUtfdBA8KcHMwK2bg3NtC1ACTmfcnl9CEfLmh+7zucmJbPX30CKjkwtaaI1UOqOG38ZJmNqpgwUDfGl1uqJwgDYNQtpyJRHVUkQEb4AGmelq+3XyvWOmyqlZVdRmp3z1kEVbJ1bZzMKMd3O9ffsXQcaipctQb4yK2/S7io90WYT3axigzpkM1qG5w4B1r0ub8Iss9zdT3AQBlr4yGMzYMQXLtCloclFNpQI1TYrn/32YjibTiyFU166tuJX3c49jd1BDnCeforZjEIfencZLMNMGI+tA2iR+TbQ==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.50 core 2.9.168, May 30, 2012. Active patches: 225 ';
+	var bjsversion=' Opera Desktop 11.50 core 2.9.168, June 4, 2012. Active patches: 227 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -668,9 +668,9 @@ function setTinyMCEVersion(e){
 		/* AOL */
 	
 	
-		if(hostname.indexOf('.aol.fr')>-1){			// PATCH-563, aol.fr: gice Opera better styling
+		if(hostname.indexOf('.aol.fr')>-1){			// PATCH-563, aol.fr: give Opera better styling
 			document.addEventListener('DOMContentLoaded', function(){document.documentElement.className='SAF';}, false);
-				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (aol.fr: gice Opera better styling). See browser.js for details');
+				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (aol.fr: give Opera better styling). See browser.js for details');
 		}
 		if(hostname.indexOf('aol.com')>-1){			// 188197, Making sure AOL pages are not overwritten by ad script
 			avoidDocumentWriteAbuse();
@@ -1020,7 +1020,7 @@ function setTinyMCEVersion(e){
 			document.addEventListener('load', function(e){
 				if(e.target && e.target.tagName=='IFRAME'){
 					var ifrWin, gCS;
-					try{ifrWin=e.target.contentWindow.location&&e.target.contentWindow;}catch(e){}
+					try{ifrWin=e.target.contentWindow.location&&e.target.contentWindow.document.URL&&e.target.contentWindow;}catch(e){}
 					if(ifrWin){
 						gCS=ifrWin.getComputedStyle;
 						ifrWin.getComputedStyle=function(el, str){
@@ -1254,6 +1254,9 @@ function setTinyMCEVersion(e){
 			navigator.userAgent=ua;
 		});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Enable news ticker on Balkanweb). See browser.js for details');
+	} else if(hostname.indexOf('bankofamerica.com')>-1){			// PATCH-668, Broken browser sniffing prevents SafePass login on Bank of America site
+		opera.defineMagicFunction('getVersionString', function(){ return ''+parseFloat(opera.version()); });
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Broken browser sniffing prevents SafePass login on Bank of America site). See browser.js for details');
 	} else if(hostname.indexOf('bcbssc.com')>-1){			// PATCH-93, Blue Cross SC looks up named elements with getElementById()
 		(function(gEBI) { 
 		  document.getElementById = function(idOrName) { 
@@ -1287,7 +1290,7 @@ function setTinyMCEVersion(e){
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Bing Maps deadlock on accessing document.cookie from Silverlight). See browser.js for details');
 	} else if(hostname.indexOf('boortz.com')>-1){			// PATCH-665, boortz.com: override abuse of CSS content on real elements
 		opera.addEventListener('BeforeCSS', function(e){
-		  e.cssText = e.cssText.replace(/#cmArticleWell q:before,#cmArticleWell blockquote,.cmStaffBioContent q:before,.cmStaffBioContent blockquote{content:open-quote}/g,'#cmArticleWell q:before,.cmStaffBioContent q:before{content:open-quote}')
+		  e.cssText = e.cssText.replace(/#cmArticleWell q:before,#cmArticleWell blockquote,.cmStaffBioContent q:before,.cmStaffBioContent blockquote{ content:open-quote}/g,'#cmArticleWell q:before,.cmStaffBioContent q:before{content:open-quote}')
 		  .replace(/#cmArticleWell q:after,#cmArticleWell blockquote,.cmStaffBioContent q:after,.cmStaffBioContent blockquote{content:close-quote}/g,'#cmArticleWell q:after,.cmStaffBioContent q:after{content:close-quote}');
 		}, false);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (boortz.com: override abuse of CSS content on real elements). See browser.js for details');
@@ -1776,6 +1779,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('siren24.com')!=-1){			// SEOUL-609, ActiveX installation page redirect on siren24.com due to sniffing limitation on redirect script
 		navigator.appName = 'Netscape';
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (ActiveX installation page redirect on siren24.com due to sniffing limitation on redirect script). See browser.js for details');
+	} else if(hostname.indexOf('skydrive.live.com')>-1){			// PATCH-679, skydrive: correct MouseEvent which
+		MouseEvent.prototype.__defineGetter__('button',function(){return this.which == 2 ? 1 : this.which == 3 ? 2 : 0;;})
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (skydrive: correct MouseEvent which). See browser.js for details');
 	} else if(hostname.indexOf('smithbarney.com')>-1){			// PATCH-360, Enable the password box on smithbarney.com
 		HTMLInputElement.prototype.__defineSetter__('type',function(){
 			if (this.getAttribute('type')!=arguments[0]) {
@@ -1847,7 +1853,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('tvguide.com')>-1){			// PATCH-274, TVGuide doesn't show program descriptions, due to browser sniffing
 		opera.defineMagicVariable('isSafari', function(){return true;}, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (TVGuide doesn\'t show program descriptions, due to browser sniffing). See browser.js for details');
-	} else if(hostname.indexOf('twitter.com')>-1){			// PATCH-561, Twitter: allow selection in TEXTAREA
+	} else if(hostname.indexOf('twitter.com')>-1){			// PATCH-671, Twitter: avoid ghost @ before username
+		addCssToDocument('strong.fullname + span:not([class]){content:""}')
+				// PATCH-561, Twitter: allow selection in TEXTAREA
 		HTMLTextAreaElement.prototype.setAttribute=(function(s){
 			return function(n, v){
 				if(n=='dir' && this.getAttribute(n)===v){
@@ -1857,7 +1865,7 @@ function setTinyMCEVersion(e){
 			}
 		})(HTMLTextAreaElement.prototype.setAttribute);
 		HTMLTextAreaElement.prototype.__defineSetter__('dir', function(v){ this.setAttribute('dir', v); });
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Twitter: allow selection in TEXTAREA). See browser.js for details');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Twitter: avoid ghost @ before username\nTwitter: allow selection in TEXTAREA). See browser.js for details');
 	} else if(hostname.indexOf('vgtv.no')>-1 || hostname.indexOf('movenetworkshd.com')>-1){			// PATCH-110, Work around browser sniffing for Move media player
 		opera.defineMagicVariable('QI', function(o){ o.browserIsGood=true; return o; }, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Work around browser sniffing for Move media player). See browser.js for details');
@@ -1879,11 +1887,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('westjet.com')>-1 ){			// PATCH-260,  Westjet browser sniffing warns against Opera
 		opera.defineMagicVariable('browser', function(o){ o.isSupported=true; return o; }, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( Westjet browser sniffing warns against Opera). See browser.js for details');
-	} else if(hostname.indexOf('www.nola.com')>-1){			// PATCH-662, nola.com: work around abuse of CSS content on real elements
-		opera.addEventListener('BeforeCSS', function(e){
-		  e.cssText = e.cssText.replace(/.adv-clearfix:after, body { content: ""; display: table; clear: both; }/g,'.adv-clearfix:after { content: ""; display: table; clear: both; }');
-		}, false);
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (nola.com: work around abuse of CSS content on real elements). See browser.js for details');
 	} else if(hostname.indexOf('www.slideshare.net')>-1){			// PATCH-453, Slideshare: avoid plugin-triggered document.cookie setting script deadlock bug
 		(function(){
 			var actualGetter=document.__lookupGetter__('cookie');
