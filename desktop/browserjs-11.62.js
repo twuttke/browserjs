@@ -1,4 +1,4 @@
-// R6duEFpTeFG0VBQAAIzerhRAT/KvCsQySmo3TriQlNarTWjSaJNfa7D7ab8ekXBXfg6uZEdBoUTjs40M3iu+WtMZOLtMbnv1CHP+XVX8lFosKWbam9ioQMOxsuEPUqVoWmZVXCcA3s+LJIIDoSxd4I7myHNVsXTdlMkcuYFjOYpdg3uKNP3pcJKMj3VaOeP7vikWUgbZ05+byzjY6Cs8V4IwxxF75ufzU6JQdFZ8KVKCRxROqjnQwrrm6tvJTeLBMBm0HiA28pHtZHtZLB11bwIoBWQ4YQ5+yBY3gAgpmTUV2RNf0bHVarGBZZvECqm+sbmj9CC9NpjaN/c15Obr0g==
+// VAWZ6+UAaebyqQ48lR6+9gzIcdFCRBERZF7F9PboXld5emiGFJWUfLDwHQT2dv+sWmAFteohTB/XgbxhLKkrKU5KomJH77sYBQXsJIfSikSyRh1E9Si41yh3RdLB5Q9Y8qDDi7rlv/LU6h4xTFThVRaPYLStZUeElSP6iUounBFDWGAl7QowwZGQEdmrriyLR1NbO8eipRIRfOckndEGuQ1Xv37tGROz5wkuplz6Qdqn09sshtBk7PoQ1MSp3Zms10MFicZpKRbHbdzxzTl9XmVMwbatZgiv9dkxWcTUcvXgkEbKF/0ponq2aqT2jDFbDt02mUgMMvr7UABjcLRKWA==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, May 30, 2012. Active patches: 207 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, June 4, 2012. Active patches: 210 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -635,9 +635,9 @@ function setTinyMCEVersion(e){
 		/* AOL */
 	
 	
-		if(hostname.indexOf('.aol.fr')>-1){			// PATCH-563, aol.fr: gice Opera better styling
+		if(hostname.indexOf('.aol.fr')>-1){			// PATCH-563, aol.fr: give Opera better styling
 			document.addEventListener('DOMContentLoaded', function(){document.documentElement.className='SAF';}, false);
-				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (aol.fr: gice Opera better styling). See browser.js for details');
+				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (aol.fr: give Opera better styling). See browser.js for details');
 		}
 		if(hostname.indexOf('aol.com')>-1){			// 188197, Making sure AOL pages are not overwritten by ad script
 			avoidDocumentWriteAbuse();
@@ -659,6 +659,9 @@ function setTinyMCEVersion(e){
 		 addCssToDocument('#globalheader #globalnav li{width: auto !important}');
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Make Apple Store menu visible\nEnable menu on Apple support pages\nEnable menu on Apple community pa...). See browser.js for details');
+	} else if(hostname.indexOf('.bmo.com')>-1){			// PATCH-676, RegExp parsing exception confuses Dojo, breaks BMO.com interface
+		addPreprocessHandler(/return "\(\?:"\+([^+]+)\+([^+]+)\+([^+]+)\+"\)\?";/, 'return ($1+$2+$3=="") ? "()?" : "(?:"+$1+$2+$3+")?";' );
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (RegExp parsing exception confuses Dojo, breaks BMO.com interface). See browser.js for details');
 	} else if(hostname.indexOf('.cnet.com')>-1){			// PATCH-567, cnet: remove box-shadow to improve scrolling performance
 		addCssToDocument('*{box-shadow:none!important;}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (cnet: remove box-shadow to improve scrolling performance). See browser.js for details');
@@ -811,9 +814,25 @@ function setTinyMCEVersion(e){
 			opera.addEventListener('BeforeEventListener.mousedown', function(e){if(e.event.target.tagName=='OPTION')e.preventDefault()}, false);
 				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (GMaps: avoid autoclose of problem reporting dialog). See browser.js for details');
 		}
-		if(hostname.indexOf('plus.google')>-1){			// PATCH-526, G+: avoid tall narrow posts due to word-wrap in table 
+		if(hostname.indexOf('plus.google')>-1){			// PATCH-680, Work around bug that disregards BASE href on G+
+			(function(ps){ 
+			 history.pushState=function(){
+			  var retval = ps.apply(history, arguments);
+			  resetBase();
+			  return retval;
+			 }
+			  function resetBase(){
+			   var base, url;
+			   if(base=document.getElementsByTagName('base')[0]){
+			    url=base.href; base.href=''; base.href=url;
+			   }
+			  }
+			  addEventListener('load', resetBase, false);
+			})(history.pushState);
+			
+					// PATCH-526, G+: avoid tall narrow posts due to word-wrap in table 
 			addCssToDocument('div.B-u-nd-nb, div.s-r-Ge-ec {display:block}');
-				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (G+: avoid tall narrow posts due to word-wrap in table ). See browser.js for details');
+				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Work around bug that disregards BASE href on G+\nG+: avoid tall narrow posts due to word-wrap in tab...). See browser.js for details');
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Google). See browser.js for details');
 	} else if(hostname.indexOf('.hbo.com')>-1){			// PATCH-399, Avoid browser detection on hbo.com
@@ -970,7 +989,7 @@ function setTinyMCEVersion(e){
 			document.addEventListener('load', function(e){
 				if(e.target && e.target.tagName=='IFRAME'){
 					var ifrWin, gCS;
-					try{ifrWin=e.target.contentWindow.location&&e.target.contentWindow;}catch(e){}
+					try{ifrWin=e.target.contentWindow.location&&e.target.contentWindow.document.URL&&e.target.contentWindow;}catch(e){}
 					if(ifrWin){
 						gCS=ifrWin.getComputedStyle;
 						ifrWin.getComputedStyle=function(el, str){
@@ -1123,6 +1142,9 @@ function setTinyMCEVersion(e){
 			navigator.userAgent=ua;
 		});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Enable news ticker on Balkanweb). See browser.js for details');
+	} else if(hostname.indexOf('bankofamerica.com')>-1){			// PATCH-668, Broken browser sniffing prevents SafePass login on Bank of America site
+		opera.defineMagicFunction('getVersionString', function(){ return ''+parseFloat(opera.version()); });
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Broken browser sniffing prevents SafePass login on Bank of America site). See browser.js for details');
 	} else if(hostname.indexOf('bcbssc.com')>-1){			// PATCH-93, Blue Cross SC looks up named elements with getElementById()
 		(function(gEBI) { 
 		  document.getElementById = function(idOrName) { 
@@ -1159,7 +1181,7 @@ function setTinyMCEVersion(e){
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (4chan: add bottom margin to blockquote for better readability). See browser.js for details');
 	} else if(hostname.indexOf('boortz.com')>-1){			// PATCH-665, boortz.com: override abuse of CSS content on real elements
 		opera.addEventListener('BeforeCSS', function(e){
-		  e.cssText = e.cssText.replace(/#cmArticleWell q:before,#cmArticleWell blockquote,.cmStaffBioContent q:before,.cmStaffBioContent blockquote{content:open-quote}/g,'#cmArticleWell q:before,.cmStaffBioContent q:before{content:open-quote}')
+		  e.cssText = e.cssText.replace(/#cmArticleWell q:before,#cmArticleWell blockquote,.cmStaffBioContent q:before,.cmStaffBioContent blockquote{ content:open-quote}/g,'#cmArticleWell q:before,.cmStaffBioContent q:before{content:open-quote}')
 		  .replace(/#cmArticleWell q:after,#cmArticleWell blockquote,.cmStaffBioContent q:after,.cmStaffBioContent blockquote{content:close-quote}/g,'#cmArticleWell q:after,.cmStaffBioContent q:after{content:close-quote}');
 		}, false);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (boortz.com: override abuse of CSS content on real elements). See browser.js for details');
@@ -1358,9 +1380,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('huffingtonpost.com')>-1){			// PATCH-601, Huffingtonpost: Avoid ad overwrite
 		addPreprocessHandler(/\|\|adsUA\.indexOf\(\'opera\'\)>-1/,'');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Huffingtonpost: Avoid ad overwrite). See browser.js for details');
-	} else if(hostname.indexOf('icicibank.com')>-1){			// PATCH-641, icicibank: fix browser sniffing that causes broken positioning of slideshow on frontpage
-		addPreprocessHandler( /if\(Opera\)imgObj\.style\.position = 'static';/, '' );
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (icicibank: fix browser sniffing that causes broken positioning of slideshow on frontpage). See browser.js for details');
 	} else if(hostname.indexOf('infinitiusa.com')>-1 || hostname.indexOf('nissanusa.com')>-1){			// PATCH-529, Fix SiteCatalyst H.9 code on Nissan/Infiniti USA
 		opera.addEventListener('BeforeScript', function(e){
 			if (e.element.src.indexOf('codepack.incGlobPaths.true.content.js')>-1){
@@ -1637,7 +1656,9 @@ function setTinyMCEVersion(e){
 		Blob = undefined;
 		FileList = undefined;
 		File = undefined;
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (skydrive: disable new upload code due to various Opera bugs). See browser.js for details');
+				// PATCH-679, skydrive: correct MouseEvent which
+		MouseEvent.prototype.__defineGetter__('button',function(){return this.which == 2 ? 1 : this.which == 3 ? 2 : 0;;})
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (skydrive: disable new upload code due to various Opera bugs\nskydrive: correct MouseEvent which). See browser.js for details');
 	} else if(hostname.indexOf('smithbarney.com')>-1){			// PATCH-360, Enable the password box on smithbarney.com
 		HTMLInputElement.prototype.__defineSetter__('type',function(){
 			if (this.getAttribute('type')!=arguments[0]) {
@@ -1709,7 +1730,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('tvguide.com')>-1){			// PATCH-274, TVGuide doesn't show program descriptions, due to browser sniffing
 		opera.defineMagicVariable('isSafari', function(){return true;}, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (TVGuide doesn\'t show program descriptions, due to browser sniffing). See browser.js for details');
-	} else if(hostname.indexOf('twitter.com')>-1){			// PATCH-561, Twitter: allow selection in TEXTAREA
+	} else if(hostname.indexOf('twitter.com')>-1){			// PATCH-671, Twitter: avoid ghost @ before username
+		addCssToDocument('strong.fullname + span:not([class]){content:""}')
+				// PATCH-561, Twitter: allow selection in TEXTAREA
 		HTMLTextAreaElement.prototype.setAttribute=(function(s){
 			return function(n, v){
 				if(n=='dir' && this.getAttribute(n)===v){
@@ -1719,7 +1742,7 @@ function setTinyMCEVersion(e){
 			}
 		})(HTMLTextAreaElement.prototype.setAttribute);
 		HTMLTextAreaElement.prototype.__defineSetter__('dir', function(v){ this.setAttribute('dir', v); });
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Twitter: allow selection in TEXTAREA). See browser.js for details');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Twitter: avoid ghost @ before username\nTwitter: allow selection in TEXTAREA). See browser.js for details');
 	} else if(hostname.indexOf('vgtv.no')>-1 || hostname.indexOf('movenetworkshd.com')>-1){			// PATCH-110, Work around browser sniffing for Move media player
 		opera.defineMagicVariable('QI', function(o){ o.browserIsGood=true; return o; }, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Work around browser sniffing for Move media player). See browser.js for details');
@@ -1746,11 +1769,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('westjet.com')>-1 ){			// PATCH-260,  Westjet browser sniffing warns against Opera
 		opera.defineMagicVariable('browser', function(o){ o.isSupported=true; return o; }, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( Westjet browser sniffing warns against Opera). See browser.js for details');
-	} else if(hostname.indexOf('www.nola.com')>-1){			// PATCH-662, nola.com: work around abuse of CSS content on real elements
-		opera.addEventListener('BeforeCSS', function(e){
-		  e.cssText = e.cssText.replace(/.adv-clearfix:after, body { content: ""; display: table; clear: both; }/g,'.adv-clearfix:after { content: ""; display: table; clear: both; }');
-		}, false);
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (nola.com: work around abuse of CSS content on real elements). See browser.js for details');
 	} else if(hostname.indexOf('www.yoka.com')>-1){			// PATCH-238, Override minmax IE helper script
 		opera.defineMagicFunction('minmax_scan', function(){});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Override minmax IE helper script). See browser.js for details');
