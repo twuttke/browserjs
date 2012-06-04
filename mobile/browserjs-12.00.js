@@ -1,4 +1,4 @@
-// jVIzDgs+XNGr+2XEiJYVd4DUtNBRa1CV272AuxLld07v/sVM5zvj8V9L/4/A0nbT35wzHE8NE8W1gmlgGDYHimcPjQgUDyt/eerxKBy4b5XGyIPdiJ69ypfPG2/zQb6XXARyMMSagKg3LgvkSpoNFQdtuadXlE0eRLtDKTTIFxRyA/icNXLQAa4NZp2Nl0z2cqJ0ZhgFJECZLUoir1v4k0S3XAidOx5i7/hWWF6s1Y6FwmW/BnbwtsbDHr5cOSdH627SzWnU89GF4J7GKVHSjSr1xd6fk4foUTZsfxAldNiYHlfJLoxxwAq7cYMTDM8+arMa2E+VfylngEDYmpsQqg==
+// rq4ZRffyWLRX+3rbxuOkTw5/mDbC0MKr5Slv0I2w0lv8hkx82aLfPznNYx1gPzAoh1qY/3cu8qiC6bjcU3Fnl3TPFzh6yf0Ne+2hK2uSr/dv6BDqqMHvawHUdiq6VAplQ37X5FHetoUoaKafe5gnDex7U+5o7gMrdiKswMC6w6zSAqZWAnNNyKmrQLPW3corkP0xVSdHGCXSnjM+eV3Nhp/0SXGupCuYpGRfYqBJcWznXoE3Xlr+laWv+ECQJUN81mVo/oTPBKr2KRnrzzpdA472U+fSW1G9mdrh7MrtOpZZd0YORwIcfZCgft6njgPm4166PiAmtnxHCz6oO1IKWg==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.00 core 2.10.254, May 30, 2012. Active patches: 138 ';
+	var bjsversion=' Opera Mobile 12.00 core 2.10.254, June 4, 2012. Active patches: 138 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -603,6 +603,16 @@ function stopKeypressIfDownCancelled(stopKey){
 			},false);
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Browser sniffing causes failed Flash detection). See browser.js for details');
+	} else if(hostname.indexOf('autohome.com.cn')>-1){			// OMO-345, Images loading issue on autohome.com.cn
+		function lazyloadiframe_replace(real, thisObject, oParam1, oParam2)
+		{
+		    oParam1.readyState = "complete";
+		    oParam2 = true;
+		    return real(oParam1, oParam2);
+		};
+		
+		window.opera.defineMagicFunction('lazyloadIframe', lazyloadiframe_replace);
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Images loading issue on autohome.com.cn). See browser.js for details');
 	} else if(hostname.indexOf('baidu.com') > -1){			// OMO-102, Fix "more" link issue of m.baidu.com
 		if( (hostname.indexOf('m.baidu.com') > -1  && pathname.indexOf('/ssid=') > -1 ) || //news
 		    (hostname.indexOf('m.baidu.com') > -1  && pathname.indexOf('/img') > -1 ) || //image
@@ -676,7 +686,7 @@ function stopKeypressIfDownCancelled(stopKey){
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix "more" link issue of m.baidu.com). See browser.js for details');
 	} else if(hostname.indexOf('baidu.com')>-1){			// YUSHAN-3971, Fix search result page display issue of baidu.com
-		if(pathname.indexOf('www.') >-1 && href.indexOf('s?') > -1){
+		if(hostname.indexOf('www.') >-1 && href.indexOf('s?') > -1){
 		      addCssToDocument("#head form, #search form { white-space: nowrap !important; }");
 		}
 				// YUSHAN-2320, Fix links display inside searchbox - image.baidu.com
@@ -1115,11 +1125,6 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('westjet.com')>-1 ){			// PATCH-260,  Westjet browser sniffing warns against Opera
 		opera.defineMagicVariable('browser', function(o){ o.isSupported=true; return o; }, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( Westjet browser sniffing warns against Opera). See browser.js for details');
-	} else if(hostname.indexOf('www.nola.com')>-1){			// PATCH-662, nola.com: work around abuse of CSS content on real elements
-		opera.addEventListener('BeforeCSS', function(e){
-		  e.cssText = e.cssText.replace(/.adv-clearfix:after, body { content: ""; display: table; clear: both; }/g,'.adv-clearfix:after { content: ""; display: table; clear: both; }');
-		}, false);
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (nola.com: work around abuse of CSS content on real elements). See browser.js for details');
 	} else if(hostname.indexOf('xuan.3g.cn')>-1){			// OMO-89, Fix page layout issues on 3G.cn
 		addCssToDocument('.navMain p a {width:16% !important; } .screen-gt320 h1, .screen-gt320 h1 a { font-size: 16px !important;  }');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix page layout issues on 3G.cn). See browser.js for details');
