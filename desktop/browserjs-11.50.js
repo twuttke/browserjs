@@ -1,4 +1,4 @@
-// ObAberVymABc2YsvmPbqU9fRONJVw/hKxfRn0GsY+ut2nihYhOAMNERSQ9EhyQx39Y/3Jtltr5jOqY/2gISC60cwCG2k8M95kVTrp1CXpPbvMBsONV2lJgwEUz0UCerrSdtdmdlzgTZ5+6vjLXsyMjFe2G0oX0uM/yWQngcmgrq5KqzSDogj4xszuwzrAg85Ch7MkBh5q602n5Wed0hI/IMt0ijV3iwL02GjTL+hqYZ1W2WsZvKLpNv1DwF2Tx5PNcAzW8cvmXg7FSVIDlK/dYeQb/uLA+gx6K/q3fF7lEU5pTId45dOSL71DS5lcI7XMchH+Zp54lKK2zQS7+XcHg==
+// KIHpWmOCOq7M63Wo+TTfwrikeEDzEKcR+QdRFzS1jmgCjkGly8cjV6X79G5ggwr/dwp0/+IbM+yY59DQzPWkhT48/rcd+lXP7MYlRZI7lrOuaLWMvIgnNPZQT0wzjUgBj44LSse2aVXv9spnCeAqNsIPSxdPGAtdacysOkz3vcBVER+H6mPG7+C+QzAZYDfdAesGONr5iMgRyMnhQvDIvrmk7XZR8rNhkwmLufCfn6chStGerPEUFqdvbcAnI/Xt98cdVEMyk+lGrhj2uOdm81ZxgmVUbH5XoDzPwy/2PkqMRbBU6hJMfa0wj4TbdTXYUKPEUCD/MvH/mfyiKb0eZA==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.50 core 2.9.168, June 11, 2012. Active patches: 232 ';
+	var bjsversion=' Opera Desktop 11.50 core 2.9.168, June 18, 2012. Active patches: 231 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1523,9 +1523,6 @@ function setTinyMCEVersion(e){
 		  e.cssText = e.cssText.replace(/.clearfix:after,#content,#content:after,/g,'.clearfix:after,#content:after,');
 		}, false);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (jabong.com: override usage of CSS content property on element content). See browser.js for details');
-	} else if(hostname.indexOf('jcpenney.com')>-1){			// PATCH-651, jcpenney: avoid broken sniffer
-		navigator.userAgent += ' not Gecko';
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (jcpenney: avoid broken sniffer). See browser.js for details');
 	} else if(hostname.indexOf('journalism.org')>-1){			// PATCH-523, journalism.org: fix old IFrame SSI script
 		fixIFrameSSIscriptII('resizeIframe');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (journalism.org: fix old IFrame SSI script). See browser.js for details');
