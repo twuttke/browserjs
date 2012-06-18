@@ -1,4 +1,4 @@
-// dxcgVnMUP+0cMUW42eONc507tuueok/E1vnadwQuSJ2N99vMySSrrtJLZyE94BBw6jwkYedR+asinJNCVjxqn7O3dVDe/0mj8sxn/VD9odxoSnPmUoOI3IoDQSYLw2ApcDE2sTZIV6xIXUM5riCZDaAWOf71F80FYEQ4zRBrFpFJo1VDZLz1EQiHyhuBNEa7IIbX9Esqf3CqUaX6ZPTEwygIk1VoBcnXC6Z32/zWvf+AqVfj+VFQiswKqJEWRKkBLcoiK/ng6rMTnyK6E0VZzLBpcKYUL4OUJsME+Xw1vHK9AsCtR+Y/RM8Jfmq79W/SgggYZAgiPtnLbKJ+wowgUw==
+// L6bYiEmoX3ClYWbkaHGfmEYiEs8bXGwBfgWj6RdSj8F5xV2/TN05qkQyeNOu3JDKXXvUHACfphnJB4kgalyerECuAoRCrlZj1nued02VB9v6k7OIQSOb2ObPDgeQ5ZfI+tejaOzdbXeDukHM2sfiBFNm9CpE6XF+5fVgh2UbnYnVAIn11G4qwXq2xv/dxYu1Ad5gLhu9tSPP2iUx6ersdcOPHm1uGe5SyJ3eo7X8yIZQVqpvAqquauLEgDRVb6x0CQnSkpkvdvfWT0zDgdPmdlJ61L0bxkLlaQ4pi1UVcrJ70JC5n8TU4UkCVT2TjySC4zK9Ux1V25XfEYHTa17HhQ==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.00 core 2.10.289, June 11, 2012. Active patches: 205 ';
+	var bjsversion=' Opera Desktop 12.00 core 2.10.289, June 18, 2012. Active patches: 207 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1258,6 +1258,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('easycruit.com')>-1){			// PATCH-219, Fujitsu recruitment page on EasyCruit hides content due to browser sniffing
 		fixIFrameSSIscriptII('resizeIframe');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fujitsu recruitment page on EasyCruit hides content due to browser sniffing). See browser.js for details');
+	} else if(hostname.indexOf('engfilms.ru')>-1){			// PATCH-699, engfilms.ru: needs navigator.product to work
+		navigator.product = "Gecko";
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (engfilms.ru: needs navigator.product to work). See browser.js for details');
 	} else if(hostname.indexOf('enter.nifmail.jp') > -1){			// OTW-4878, Nifmail web mail bypass browser blocking
 		opera.defineMagicFunction('checkBrowser',function(){
 			return 1;
@@ -1339,6 +1342,9 @@ function setTinyMCEVersion(e){
 			}
 		}, false);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix SiteCatalyst H.9 code on Nissan/Infiniti USA). See browser.js for details');
+	} else if(hostname.indexOf('insubuy.com')>-1){			// PATCH-703, insubuy.com: don't prevent mouse click
+		opera.defineMagicFunction('disableSelection',function(){});
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (insubuy.com: don\'t prevent mouse click). See browser.js for details');
 	} else if(hostname.indexOf('internetbank.swedbank.se')>-1){			// PATCH-611, SwedBank: temporary work around for mismatch between window.event support and charcode support
 		Event.prototype.__defineGetter__('charCode', function(){if( this.keyCode>=48 && this.keyCode<=57  )return this.keyCode;});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (SwedBank: temporary work around for mismatch between window.event support and charcode support). See browser.js for details');
@@ -1350,9 +1356,6 @@ function setTinyMCEVersion(e){
 		  e.cssText = e.cssText.replace(/.clearfix:after,#content,#content:after,/g,'.clearfix:after,#content:after,');
 		}, false);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (jabong.com: override usage of CSS content property on element content). See browser.js for details');
-	} else if(hostname.indexOf('jcpenney.com')>-1){			// PATCH-651, jcpenney: avoid broken sniffer
-		navigator.userAgent += ' not Gecko';
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (jcpenney: avoid broken sniffer). See browser.js for details');
 	} else if(hostname.indexOf('journalism.org')>-1){			// PATCH-523, journalism.org: fix old IFrame SSI script
 		fixIFrameSSIscriptII('resizeIframe');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (journalism.org: fix old IFrame SSI script). See browser.js for details');
@@ -1457,6 +1460,9 @@ function setTinyMCEVersion(e){
 		}, false);
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Make NBC videos work\nUnexpected script loading order breaks video player ready check). See browser.js for details');
+	} else if(hostname.indexOf('nbs.rs')>-1){			// PATCH-704, nbs.rs: fix iframe resize
+		fixIFrameSSIscriptII('dyniframesize');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (nbs.rs: fix iframe resize). See browser.js for details');
 	} else if(hostname.indexOf('news.qq.com')>-1){			// PATCH-112, weather.news.qq.com expects getElementById() to find named elements
 		var gEBI=document.getElementById;
 		document.getElementById=function(){
