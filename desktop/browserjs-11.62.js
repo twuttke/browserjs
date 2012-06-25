@@ -1,4 +1,4 @@
-// Ia1rc3YZlDbfdLjRnV/y5BYBdC7GeOjnwJ37pqaH268rNn8pfjksAPojb5SPzNY4GXIu7xG5bcKlNCt3XEXf9u9OSlIaXiOvW2ziHD7i/JR9U/vgRq6iFVU4AI78NQveyu5TddFBoQn0YYDlbImisoZm19FUrNpwaZOn5EgSM5VBZzfe6OFd0r0aNdIutZpTIoJRX3t2ErrUtJC0wLYydDknpaHEyCPYHEu1C40+Lukn4pyCA+TEagyxicXpFkAGIwO8c63GRW7UtQ81ZHp4IABSRqF7f0ORZjJ8vseJnUvHpHo/1bJ2H+/kuS4873SMi5BFAp5Xfkv3QC0UZVd1SA==
+// m0UleN1RF0A29qllgllgZVr28evORqJSCw2M+pi4n7veVPYfsJ+e5NhSBr9nMIO4qW3VQp1iDAXMQP1t5EHrBvR9XBUfZgTKUJaZ5oT36zZJ8tGmIjg4BuIDTos0lToAGU3IqKbrHHMsBohvnxyp71txVw09aFvvlyEZhSZ3b4+el9njDmyowWgyOBn6GJfPE8/ndxjda0mXn4BcZIcCeik+Ey4DXqNzRRdqH2w9r42hv6rHo28jg69uXB1Bc+RTHWV2RkwTEJ7/XKvco5Kbnm+81H+nz7xCgC9JjWgvdgyHGexWcE0VaYtLhFffe23AJeGIA1h4N4RhhKRc0u4fEA==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, June 18, 2012. Active patches: 219 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, June 25, 2012. Active patches: 219 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -672,9 +672,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('.cnet.com')>-1){			// PATCH-567, cnet: remove box-shadow to improve scrolling performance
 		addCssToDocument('*{box-shadow:none!important;}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (cnet: remove box-shadow to improve scrolling performance). See browser.js for details');
-	} else if(hostname.indexOf('.dell.')!=-1&&hostname.indexOf('support.')!=-1){			// 286618,  browser sniffing on support.dell.com
-		opera.defineMagicVariable( 'ig_shared', null, function(o){ o.IsNetscape6=true; return o; } );
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( browser sniffing on support.dell.com). See browser.js for details');
 	} else if(hostname.indexOf('.delta.com')>-1){			// PATCH-627, Fixing misaligned fieldset on Delta itinerary page
 		addCssToDocument('fieldset#content{clear: both;}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fixing misaligned fieldset on Delta itinerary page). See browser.js for details');
@@ -1269,6 +1266,13 @@ function setTinyMCEVersion(e){
 		});
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Iframe content height is too small and not expanded on danawa.com). See browser.js for details');
+	} else if(hostname.indexOf('dell.com')>-1){			// PATCH-710, dell.com: work around misguided use of prefixed white-space CSS property
+		if(pathname.indexOf('/support/')==0){
+		 opera.addEventListener('BeforeCSS', function(e){
+		  e.cssText = e.cssText.replace(/white-space: -o-pre-wrap;/g,'');
+		 }, false);
+		}
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (dell.com: work around misguided use of prefixed white-space CSS property). See browser.js for details');
 	} else if(hostname.indexOf('di.jal.co.jp')>-1){			// PATCH-237, Delay script execution on JAL map
 		var dw=document.write;
 		var MapViewer_dw;
@@ -1430,7 +1434,7 @@ function setTinyMCEVersion(e){
 		}, false);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix SiteCatalyst H.9 code on Nissan/Infiniti USA). See browser.js for details');
 	} else if(hostname.indexOf('insubuy.com')>-1){			// PATCH-703, insubuy.com: don't prevent mouse click
-		opera.defineMagicFunction('disableSelection',function(){});
+		HTMLElement.prototype.onselectstart = true;
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (insubuy.com: don\'t prevent mouse click). See browser.js for details');
 	} else if(hostname.indexOf('internetbank.swedbank.se')>-1){			// PATCH-611, SwedBank: temporary work around for mismatch between window.event support and charcode support
 		Event.prototype.__defineGetter__('charCode', function(){if( this.keyCode>=48 && this.keyCode<=57  )return this.keyCode;});
@@ -1458,6 +1462,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('lottery.sina.2caipiao.com')>-1){			// PATCH-556, 2caipiao.com: fix iframe resize
 		fixIFrameSSIscriptII('dyniframesize');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (2caipiao.com: fix iframe resize). See browser.js for details');
+	} else if(hostname.indexOf('loyalbank.com')>-1){			// PATCH-707, loyalbank.com: prevent mousedown prevention
+		HTMLElement.prototype.onselectstart = true;
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (loyalbank.com: prevent mousedown prevention). See browser.js for details');
 	} else if(hostname.indexOf('mail.live.com')!=-1){			// CORE-17444, Fix drag and drop in Hotmail
 		function fixButton(e) {
 			if (e.button == 1) {
@@ -1796,9 +1803,6 @@ function setTinyMCEVersion(e){
 		})(HTMLTextAreaElement.prototype.setAttribute);
 		HTMLTextAreaElement.prototype.__defineSetter__('dir', function(v){ this.setAttribute('dir', v); });
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Twitter: avoid ghost @ before username\nTwitter: allow selection in TEXTAREA). See browser.js for details');
-	} else if(hostname.indexOf('vgtv.no')>-1 || hostname.indexOf('movenetworkshd.com')>-1){			// PATCH-110, Work around browser sniffing for Move media player
-		opera.defineMagicVariable('QI', function(o){ o.browserIsGood=true; return o; }, null);
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Work around browser sniffing for Move media player). See browser.js for details');
 	} else if(hostname.indexOf('virginamerica.com')>-1){			// PATCH-492, virginamerica.com - Fix browser sniffing
 		navigator.appName='Netscape';
 		opera.defineMagicVariable('browserType',function(){return 'gecko'},null);
