@@ -1,4 +1,4 @@
-// m0UleN1RF0A29qllgllgZVr28evORqJSCw2M+pi4n7veVPYfsJ+e5NhSBr9nMIO4qW3VQp1iDAXMQP1t5EHrBvR9XBUfZgTKUJaZ5oT36zZJ8tGmIjg4BuIDTos0lToAGU3IqKbrHHMsBohvnxyp71txVw09aFvvlyEZhSZ3b4+el9njDmyowWgyOBn6GJfPE8/ndxjda0mXn4BcZIcCeik+Ey4DXqNzRRdqH2w9r42hv6rHo28jg69uXB1Bc+RTHWV2RkwTEJ7/XKvco5Kbnm+81H+nz7xCgC9JjWgvdgyHGexWcE0VaYtLhFffe23AJeGIA1h4N4RhhKRc0u4fEA==
+// U7zE663L2WliZMJyZdAtiUgW+LDRXZp7IGjS4DSdBTm1kgVZRE7hRK8ar/rWEPHSf1cirv/0marqOslGv3Vh1yoeslS52sWiuwmTWy6Wph8uXLkxH14XkrKPeAShUUGfHykJ+7Vt7OKb91g3+tACtwh4X+/R4SR3mPYtNDvuq4fNHXmhtTOOi1XTOajg7lPnt5MtZ8jkek6YDUz9YgL5rDryislzVYsUKHthjFutJaBPgKyU1BgSeNNNIPDXZTH3yrgCHk6R5lfubnS84EdwV9bkHve2JQE6Jl11CpYefWCEfGkbRT9zfX6WqI1ARjIO3JH1MYWPZYpZjOu9XnAs6Q==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, June 25, 2012. Active patches: 219 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, June 26, 2012. Active patches: 220 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1307,7 +1307,7 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('etour.co.jp') > -1){			// PATCH-152, etour.co.jp fix non-disappearing overlapping image
 		navigator.appName='Netscape';
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (etour.co.jp fix non-disappearing overlapping image). See browser.js for details');
-	} else if(hostname.indexOf('facebook.com')!=-1){			// PATCH-630, facebook: work around Opera's too strict origin checks on https for https -> http(s) other site -> https IFRAME communication
+	} else if(hostname.indexOf('facebook.com')>-1){			// PATCH-630, facebook: work around Opera's too strict origin checks on https for https -> http(s) other site -> https IFRAME communication
 		if( top==self && location.href.indexOf('www.facebook.com/dialog/')>-1 && location.protocol==='https:' ){
 			var buggy=false;
 			try{
@@ -1353,6 +1353,8 @@ function setTinyMCEVersion(e){
 				if(e.key==='_browserjsFBHack' && e.newValue===null)parent.close();
 			}, false);
 		}
+				// PATCH-714, facebook: prevent chat window overflow - Presto bug
+		addCssToDocument('div.fbNubFlyoutBody.scrollable{position:inherit}');
 				// PATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status
 		opera.addEventListener('BeforeEventListener.keypress', function(e){
 			if( e.event.ctrlKey && (e.event.keyCode==86 || e.event.keyCode==118 ) ){
