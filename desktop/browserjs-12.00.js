@@ -1,4 +1,4 @@
-// B5NgdvkX6ya9iCecbmrsjcgZb9AODyNijE6AQZQ5pKxOXocwqeFJgdSdyix/8EN9NV91O8aAGYOyrUmT9QSZ7+rNador+z/xZpRco7sBEQn2bigZj7U8YGx6Iq4utv9IFdIWuhqCCRfeArFuENxP2R0vWYt7Vfdq5KwqXWPtAbEiuwmGtNp24rH2SVjpF5txeybsWN89dAtJ9gWVUfTmR1T/8wbD1fmuBeJ9b2PK3A0MpH1i4MaRm9zID8OaOzMY0gAmBPMZGRoIf3nrg1HswMrMygPwtQQiS2FJTmdb2+p9/Qrqldki8pbdL1ReLI+eKUUvW/QwJX1mVAUaj5wUuA==
+// EEz6APDrz+ta4GxDsqvb5cALyx1SSyO+xwfC7Tw2Z+ZUChDLCVntkcNxUSpTeIJMuJbIsPFxDawohXX0eCycMd414aj/4Z8cpK2Pgc5AmlrcW/WmwliNOQoz28In9e9fcmywk0w7E62rJ/vnjzQd8s760lw+jHAbwaArNH9KCriXdms2bXo7unjJt1+LbVTDY+uHsuN6DwsKaia/h30Y63At2dox7OLidyuKDcnJHlBeRce+48FeXErvyr5VRtXhAAdtUhL3yfE5fzpaJKCP2huwU4IIGiu3EGBI/7wAKsnMkNGnyDUOoQW6JJzUGUzjqm/AZNE9SQYnYidJAmAdJg==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.00 core 2.10.289, June 25, 2012. Active patches: 205 ';
+	var bjsversion=' Opera Desktop 12.00 core 2.10.289, June 26, 2012. Active patches: 205 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1052,10 +1052,6 @@ function setTinyMCEVersion(e){
 			null);
 				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Yahoo! Japan services block Opera from using Silverlight plugin). See browser.js for details');
 		}
-		if(hostname.indexOf('yahoo.co.jp')>-1&&pathname == '/'){			// PATCH-669, Fix 100.5% width search box on Yahoo! Japan
-			addCssToDocument('#srchbtn{width:26%}');
-				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix 100.5% width search box on Yahoo! Japan). See browser.js for details');
-		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Yahoo!). See browser.js for details');
 	} else if(hostname.indexOf('.yammer.com')>-1){			// PATCH-512, Yammer: work around limitation on setting document.referrer inside https IFRAME
 		window.addEventListener('message', function(e){
@@ -1269,7 +1265,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('etour.co.jp') > -1){			// PATCH-152, etour.co.jp fix non-disappearing overlapping image
 		navigator.appName='Netscape';
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (etour.co.jp fix non-disappearing overlapping image). See browser.js for details');
-	} else if(hostname.indexOf('facebook.com')!=-1){			// PATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status
+	} else if(hostname.indexOf('facebook.com')>-1){			// PATCH-714, facebook: prevent chat window overflow - Presto bug
+		addCssToDocument('div.fbNubFlyoutBody.scrollable{position:inherit}');
+				// PATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status
 		opera.addEventListener('BeforeEventListener.keypress', function(e){
 			if( e.event.ctrlKey && (e.event.keyCode==86 || e.event.keyCode==118 ) ){
 				var trgt=e.event.target;
@@ -1287,7 +1285,7 @@ function setTinyMCEVersion(e){
 			e.cssText = e.cssText.replace(/border-(top|bottom)-(right|left)-radius:3px/g, '');
 		}, false);
 		
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Facebook: fake paste event to make show preview immediately after pasting links in status\nFacebook\'...). See browser.js for details');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (facebook: prevent chat window overflow - Presto bug\nFacebook: fake paste event to make show preview...). See browser.js for details');
 	} else if(hostname.indexOf('fintyre.it')>-1){			// PATCH-661, fintyre.it: work around sniffing
 		navigator.appName = "Netscape";
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (fintyre.it: work around sniffing). See browser.js for details');
