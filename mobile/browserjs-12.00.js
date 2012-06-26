@@ -1,4 +1,4 @@
-// aa/jXJxzw2zOonM8x4ZlFF2eZT+yhopfus4pO4lWQiIgI/908ojlM9H47RkHoBNu+/S03Hjmgkb2B44P29uMzONuOc9xDoMLKEHSJqlhpR0opHaPH+whp3O9jgoGRLFI+NLUc4wE/bDZo0TOruwvqNJ0k1P3He1QBosmMXeYW4Y9NfABm9gqFgTew2dhq0sJ2JIrzxpfiu2a2j1Cw/csgTQM2QhKru7xGXR3SVztaanPg8yRxJ0C69B7KUOBtDhOpR5FeJpcuhN4WTdjW5LxK+SedIEFLqTnxEop5Do0YkHZIEbSG1CUS7d4UUILu5u2H+hq4MsUPVoTEZcHHAW31Q==
+// uCybe6A/kZchyxXOQl7tIUT/8f/fBJuigbufFmEgYvfENmHo8r8PWke6pZAdRZ+rKiG8qQzmsZdvww5gEgV4PFeGdOPC6NmtIgdXA9itNNczywgpFVdQkFKDl4rjxVmrQj5sr00uxlb0XHJTYuRiTNfnJUHnwnxZudpqXV3pg4+zhMUsaRSGbS6z5ap3r+QJV75DYxUkgyswJCaQjHNIh811V6k6F6gnIwKkiOESIf3N1TUW7Tfw7NqLrcfuyCXPDz/MqV0Zska3R3tD9/V5ePtbpGZc0GhJG1Uh7Amsk8Bvm7L8FIhNXqbxlJhq47tW4PV6glNgkaN/zPH2efRv/w==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.00 core 2.10.254, June 11, 2012. Active patches: 137 ';
+	var bjsversion=' Opera Mobile 12.00 core 2.10.254, June 26, 2012. Active patches: 144 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -418,10 +418,6 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf( 'bbc.co.uk' )>-1){			// YUSHAN-226, Fix page footer text overlap issue for bbc.co.uk
 		addCssToDocument(" #disclaimer { bottom: 6px !important; white-space:nowrap; } ");
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix page footer text overlap issue for bbc.co.uk). See browser.js for details');
-	} else if(hostname.indexOf( 'news.baidu.com' )>-1){			// YUSHAN-278, Text truncation in blog/forum module - news.baidu.com
-		addCssToDocument(".hotwords dd br {height:0px !important;line-height:0px !important; } .hotwords dd a { font-size:12px !important; }");
-		
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Text truncation in blog/forum module - news.baidu.com). See browser.js for details');
 	} else if(hostname.indexOf( 'windowsmedia.com' )!=-1 && pathname.match( /^\/mobile\// )){			// OSAN-91, Mobile Windowsmedia site does not trigger mobile view
 		forceMobileView();
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Mobile Windowsmedia site does not trigger mobile view). See browser.js for details');
@@ -524,7 +520,50 @@ function stopKeypressIfDownCancelled(stopKey){
 		 meta.setAttribute('content', "width=340,user-scalable=no");
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Remove overlapping text on vnet.mobi). See browser.js for details');
-	} else if(hostname.indexOf('10086.cn')>-1){			// YUSHAN-2359, Fix zoom issue of 10086.cn (cmcc portal)
+	} else if(hostname.indexOf('10086.cn')>-1){			// NHSP-427, Fix layout broken issue of CMCC mobile page
+		if(pathname.indexOf('m')>-1 && pathname.indexOf('service')>-1 ) {
+		   //NHSP-427
+		   addCssToDocument('.sel_001 li dd { height: auto !important; min-height: 140px;  } #header {white-space: nowrap;}');
+			function addViewport() {
+				var meta;
+				if (document.createElement && (meta = document.createElement('meta'))) {
+						meta.name = "viewport";
+						meta.content = "width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes";
+						document.getElementsByTagName('head')[0].appendChild(meta);
+				}	
+			}
+			
+			//<meta name="viewport" content="width=device-width, initial-scale=1.4, minimum-scale=1.0, maximum-scale=2.0"/>
+			function setViewport(){
+				//Remove iframe disturbance
+				var docT = document;
+				var eiFrame = docT.getElementsByTagName('iframe');
+				if(eiFrame) {
+					for(var i=0; i<eiFrame.length; i++) {
+						eiFrame[i].parentNode.removeChild(eiFrame[i]);	
+					}
+				}
+				
+				var eMeta = docT.getElementsByTagName('meta');
+				
+				if(eMeta){
+					for(var i=0; i<eMeta.length; i++){
+						if(eMeta[i].getAttribute('name')){
+							if(eMeta[i].getAttribute('name').toLowerCase()=='viewport') {
+								eMeta[i].parentNode.removeChild(eMeta[i]);
+							}
+						}
+					}
+					addViewport();
+				}
+				else {
+					addViewport();	
+				}
+			}	   
+		   document.addEventListener("DOMContentLoaded", setViewport,false);
+		}
+		
+				// YUSHAN-2359, Fix zoom issue of 10086.cn (cmcc portal)
 		if(location.pathname.indexOf('m') >-1)
 		      {  
 			function ModifyViewportInitialScale()
@@ -559,10 +598,22 @@ function stopKeypressIfDownCancelled(stopKey){
 		if(pathname.indexOf('m') >-1){
 		      addCssToDocument("#footer {min-width: 400px; background-color: #25557E !important; min-height: 38px; height: auto !important;} #footer li {line-height: normal;}"); 
 		}
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix zoom issue of 10086.cn (cmcc portal)\nFix page footer display issue of 10086.cn/m). See browser.js for details');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix layout broken issue of CMCC mobile page\nFix zoom issue of 10086.cn (cmcc portal)\nFix page foot...). See browser.js for details');
 	} else if(hostname.indexOf('11st.co.kr')>-1){			// DONGDAE-4055, Ignore popunder
 		opera.defineMagicFunction('openMainPopunder',function(){});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Ignore popunder). See browser.js for details');
+	} else if(hostname.indexOf('163.com')>-1){			// NHSP-416, Wrong page layout display of 163.com touch version
+		if(hostname.indexOf('3g.')>-1 ) {
+		  if(pathname.indexOf('touch')>-1 ) {
+			addCssToDocument('#mask { height: 0px !important; }');
+		  }
+		}
+				// NHSP-403, Log in page display issue of smart.mail.163.com
+		if(hostname.indexOf('mail.')>-1 && hostname.indexOf('smart.')>-1) {
+			addCssToDocument('.mod-login .loginBtn { -o-border-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAqCAYAAABhqXGIAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAABZ0RVh0Q3JlYXRpb24gVGltZQAwMS8wNy8xMUth1boAAAAcdEVYdFNvZnR3YXJlAEFkb2JlIEZpcmV3b3JrcyBDUzQGstOgAAACLUlEQVQ4jYWUX08TQRTFf3d2tlsQG4r8E4P/0Cc/gokPvPtg/JTEr6AhMRI/gPpEQkhMpDUthRQo7e7e68PS2d1ScJN52MmZc869587Il8O+AVxcTTj42aEzuGZ9OeHtm01aSwkAToDB+Yi9/SOurMmLnWdM3CJ7+0d0Ty8QwJkq3391WV1/xMbGCucTWFtrs7m1zsGPLprnuFwzfvcuabdb9C4zJpnSGaa02y1OTkdkeYZXhUlqOOeYpCkARvGJOMap4s2M6pp+4d8MTwWgc0BmhpfphiqmWoJUMTME8OGUFqsElfIeQNVQ6nKKoVoBlUx6B5MQADrrSQ0LcqaolfTFnqGmgP1fLlSnd8jVjavNlbMqqADUmVQ1tMSDBOo6aOpRSiasHgs3FWPgRQgst+TUEAnG75OrGDetVzetOHS82JiRM51pwT2eKnLFKc3rsYTshHIKbk2mVrO7iaQWi1q149Xsqsar2cl0Y84U1Jl0/r2rNtPumIIw44IUEdjMZIb5kvr4zsZSu3f3vgW1Ps3J7lafigekykTokxMRktiRpTmxkyIKA82LLOM4wjkHr7aX6Q+GbK0s0vCOp2sP6A+GPH/cohFHOHGO9+9e0uud86d7xurDBp2/Z/zp9Pmwu4Nzgnw9OrXxaMRJt8enz4ccnwzZ3lji4+5rtp+s0mwuIN+Oz0zznMl4zPX1FVma4WNPkizQSBIi74vqXBTRaDaJYo+pIs4RRb4wDPwDulhjLyjShpEAAAAASUVORK5CYII=) 0 4 0 4 stretch stretch;  } .mod-login .iptBox { background-color: #fff;} ');
+		}
+		
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Wrong page layout display of 163.com touch version\nLog in page display issue of smart.mail.163.com). See browser.js for details');
 	} else if(hostname.indexOf('218.206.177.209')>-1){			// YUSHAN-3774, Fix pop up issue of  CMCC IOT test
 		if(pathname.indexOf('waptest')>-1) {
 		  addPreprocessHandler('history.back()', 'location.href="pass.htm"; window.open("mytest.html");' );
@@ -570,10 +621,14 @@ function stopKeypressIfDownCancelled(stopKey){
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix pop up issue of  CMCC IOT test). See browser.js for details');
 	} else if(hostname.indexOf('3g.qq.com')>-1){			// OMO-408, Fix element shows abnormally issue of 3g.qq.com
 		if (hostname.indexOf('info') > -1 && pathname.indexOf('/g/s')==0) {
-		 addCssToDocument('.stock, .img-news{float:left;} .stock-up-num, .stock-down-num, .marquee {float:right;} .t-center {float:left; margin-left:2px; margin-right:2px;} #div_live_content > a {font-size:12px; !important; } .qq-product a  {display: inline-block !important;} .main-nav-list li, .main-nav-list li a { display:inline-block !important; }'); 
+		 addCssToDocument('.stock, .img-news{float:left;} .stock-up-num, .stock-down-num, .marquee {float:right;} .t-center {display: inline-block; margin-left:2px; margin-right:2px;} #div_live_content > a {font-size:12px; !important; } .qq-product a  {display: inline-block !important;} .main-nav-list li, .main-nav-list li a { display:inline-block !important; }'); 
 		 opera.addEventListener('BeforeCSS', function(userJSEvent){ userJSEvent.cssText = userJSEvent.cssText .replace(/-(webkit)-(background-size)/g,'$2'); }, false);
 		}
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix element shows abnormally issue of 3g.qq.com). See browser.js for details');
+				// NHSP-417, Broken layout on stock page in 3g.qq.com
+		if(hostname.indexOf('gp.') >-1) {
+		  addCssToDocument('.submit {background-color:#48629D; }  .txt-input {width: auto !important;} .stock-list li { padding: 6px 6px; float: left; } .stock-list li:nth-last-child(3), .img-slide { clear:both; } ');
+		}
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix element shows abnormally issue of 3g.qq.com\nBroken layout on stock page in 3g.qq.com). See browser.js for details');
 	} else if(hostname.indexOf('3g.sina.com.cn')>-1){			// OMO-103, Fix searchbox display issue of sina iAsk (webkit)
 		if(pathname.indexOf('/iask/')==0)
 		{   
@@ -590,19 +645,6 @@ function stopKeypressIfDownCancelled(stopKey){
 		opera.defineMagicFunction('checkTargetBrowser',function(){});
 		opera.defineMagicFunction('checkTargetCookie',function(){});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (athome.co.jp Hide warning messages because of Browser UA). See browser.js for details');
-	} else if(hostname.indexOf('att.com')!=-1){			// PIONER-195, Browser sniffing causes failed Flash detection
-		if(opera.flashPluginAX && opera.flashPluginAX()){
-			opera.addEventListener('BeforeExternalScript', function(e){
-				if(e.element.src.indexOf('flash.js')>-1){
-					var oldua=navigator.userAgent;
-					navigator.userAgent = navigator.userAgent.replace( /Opera/, 'MSIE' );
-					opera.addEventListener('AfterExternalScript',function(){
-						navigator.userAgent=oldua;
-					}, false);
-				}
-			},false);
-		}
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Browser sniffing causes failed Flash detection). See browser.js for details');
 	} else if(hostname.indexOf('autohome.com.cn')>-1){			// OMO-345, Images loading issue on autohome.com.cn
 		function lazyloadiframe_replace(real, thisObject, oParam1, oParam2)
 		{
@@ -613,7 +655,28 @@ function stopKeypressIfDownCancelled(stopKey){
 		
 		window.opera.defineMagicFunction('lazyloadIframe', lazyloadiframe_replace);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Images loading issue on autohome.com.cn). See browser.js for details');
-	} else if(hostname.indexOf('baidu.com') > -1){			// OMO-102, Fix "more" link issue of m.baidu.com
+	} else if(hostname.indexOf('baidu.com')>-1){			// YUSHAN-3971, Fix search result page display issue of baidu.com
+		if(hostname.indexOf('www.') >-1 && href.indexOf('s?') > -1){
+		      addCssToDocument("#head form, #search form { white-space: nowrap !important; }");
+		}
+				// YUSHAN-2320, Fix links display inside searchbox - image.baidu.com
+		if(hostname.indexOf('image.')>-1){
+		addCssToDocument(" #kw{width:200px !important;  } #l, #nv { width: auto !important; text-indent: 0px !important; text-align:center; }  form[name=f], form[name=f1], #nv, #l {white-space:nowrap; } #mCon { display:none;} ");
+		}
+				// NHSP-402, Fix image display issue on baidu news
+		if(hostname.indexOf('wap.') >-1 || hostname.indexOf('m.') >-1 || hostname.indexOf('gate.') >-1) {
+		 if(pathname.indexOf('news')>-1 || location.search.indexOf('news')>-1) {
+		  var iWidth = window.innerWidth;
+		  iWidth = iWidth - 20; 
+		  addCssToDocument('p img, div img { max-width:'+ iWidth +'px !important; }');
+		 } 
+		}
+				// YUSHAN-278, Text truncation in blog/forum module - news.baidu.com
+		if(hostname.indexOf( 'news.baidu.com' )>-1){
+		  addCssToDocument(".hotwords dd br {height:0px !important;line-height:0px !important; } .hotwords dd a { font-size:12px !important; }");
+		}
+		
+				// OMO-102, Fix "more" link issue of m.baidu.com
 		if( (hostname.indexOf('m.baidu.com') > -1  && pathname.indexOf('/ssid=') > -1 ) || //news
 		    (hostname.indexOf('m.baidu.com') > -1  && pathname.indexOf('/img') > -1 ) || //image
 		    (hostname.indexOf('m.baidu.com') > -1  && pathname.indexOf('/video') > -1 ) || //image
@@ -684,15 +747,6 @@ function stopKeypressIfDownCancelled(stopKey){
 		
 		    }, false);
 		}
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix "more" link issue of m.baidu.com). See browser.js for details');
-	} else if(hostname.indexOf('baidu.com')>-1){			// YUSHAN-3971, Fix search result page display issue of baidu.com
-		if(hostname.indexOf('www.') >-1 && href.indexOf('s?') > -1){
-		      addCssToDocument("#head form, #search form { white-space: nowrap !important; }");
-		}
-				// YUSHAN-2320, Fix links display inside searchbox - image.baidu.com
-		if(hostname.indexOf('image.')>-1){
-		addCssToDocument(" #kw{width:200px !important;  } #l, #nv { width: auto !important; text-indent: 0px !important; text-align:center; }  form[name=f], form[name=f1], #nv, #l {white-space:nowrap; } #mCon { display:none;} ");
-		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix search result page display issue of baidu.com\nFix links display inside searchbox - image.baidu....). See browser.js for details');
 	} else if(hostname.indexOf('bbc.co.uk')!=-1 && pathname.match( /^\/mobile\// )){			// TWEETY-118, Mobile BBC should default to mobile view
 		forceMobileView();
@@ -740,35 +794,7 @@ function stopKeypressIfDownCancelled(stopKey){
 					e.event.target.firstElementChild.dispatchEvent(evt);
 				}
 			},false);
-				// PATCH-618, touch.facebook.com:Fxi unclickable dropdowns, missing backgrounds on dropdowns, missing gradients
-		var cssText = '';
-		
-		/* CORE-30407 */
-		// Friend Requests / Messages / Notifications
-		cssText += '.jewel .flyout { border-width: 49px 28px 29px 28px; padding: 0px !important;'
-			+'-o-border-image: url('
-			+'data:image/png;base64,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'
-			+') 50 stretch; }';
-		cssText += '.jewel .flyout .header { top: -30px !important; }';
-		cssText += '.jewel .flyout .header .button { right: -12px !important; }';
-		// Sort
-		cssText += '.actionSheet .flyout.feedChooser .flyoutItem:nth-child(1) { border-top: none !important; }';
-		cssText += '.actionSheet .feedChooser .flyoutItem.checked .indicator { margin-right: 22px !important; }';
-		cssText += '.actionSheet .flyout .inner { '
-			+'-o-border-image: url('
-			+'data:image/png;base64,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'
-			+') 25 stretch; }';
-		
-		/* Gradients */
-		// Top Bar
-		cssText += '.chromeBar.acb { background-image: -o-linear-gradient(top, #738ABA, #2C4987); }';
-		cssText += '.touch .btnC, .touch .btnI.bgb { background: -o-linear-gradient(top, #647AAB, #2C467E); }';
-		// Search Bar
-		cssText += '.touch .mSearchOverlay .mSearchArea { background: -o-linear-gradient(top, #434B5B, #242B39); }';
-		cssText += '.touch .btnI.bgdb { background: -o-linear-gradient(top, #3B4456, #242A3A); }';
-		
-		addCssToDocument(cssText);
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Make share button on mobile facebook work\ntouch.facebook.com:Fxi unclickable dropdowns, missing bac...). See browser.js for details');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Make share button on mobile facebook work). See browser.js for details');
 	} else if(hostname.indexOf('forever21.co.jp') > -1){			// PATCH-617, missing QuickView background color on Forever21.co.jp
 		if (pathname.indexOf('QuickView.aspx')>-1) {
 			addCssToDocument('html{background:#fff}');
@@ -777,6 +803,22 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('frys.com')>-1){			// PATCH-638, frys.com: avoid racy framebuster due to lack of script async
 		addPreprocessHandler('self.parent.location=document.location;','if(self!=top)self.parent.location=document.location;');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (frys.com: avoid racy framebuster due to lack of script async). See browser.js for details');
+	} else if(hostname.indexOf('ganji.cn')>-1){			// NHSP-426, Fix touch version layout issue of 3g.ganji.com
+		if((hostname.indexOf('3g.')>-1 && location.search.indexOf('vvcc=3g')>-1) || location.search.length < 1) {
+			//NHSP-426 	  
+			opera.addEventListener('BeforeCSS', function(userJSEvent){
+				  userJSEvent.cssText = userJSEvent.cssText.replace(/-(moz|ms|webkit)-(linear-gradient|gradient|transform|transition|background-size|text-size-adjust|tap-highlight-color|touch-callout|appearance|animation|keyframes)/g,'-o-$2');
+			}, false);
+			
+			opera.addEventListener('BeforeCSS', function(userJSEvent){
+			  userJSEvent.cssText = userJSEvent.cssText.replace(/-(moz|ms|webkit)-(border|border-radius|border-top-left-radius|border-bottom-left-radius|border-top-right-radius|border-bottom-right-radius|text-overflow| box-shadow|box|box-sizing|box-pack|box-align|box-flex|box-orient)/g,'$2')
+			}, false);
+			
+			//Opera Doesn't support display: box; box-flex: 1; 
+			addCssToDocument('.gj-tab div {display:inline-block; width: 22.5%; } .gj-ntab-list div { display:inline-block; width: auto !important;  .gj-ntab-list div, .gj-ntab-index div { padding: 0px;} } .gj-footer-nav1 a  {display:inline-block; margin: 0px; padding: 0px 6px; } .gj-footer-nav2 a { display:inline-block; width: 40.5%; } .gj-footer-nav3 a { display:inline-block; width: 30%; } .gj-w-search {  background: -o-linear-gradient(top,#53AF00, #368F04); } ');
+		}
+		
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix touch version layout issue of 3g.ganji.com). See browser.js for details');
 	} else if(hostname.indexOf('geoaccess.com')!=-1){			// 318050,  BlueCross browser sniffing prevents insurance search
 		opera.defineMagicVariable('is_nav', function(){return true;}, null);
 		
@@ -808,15 +850,6 @@ function stopKeypressIfDownCancelled(stopKey){
 		}
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Remove overlapping text on vnet.mobi). See browser.js for details');
-	} else if(hostname.indexOf('jcpenney.com')>-1){			// PATCH-651, jcpenney: avoid broken sniffer
-		navigator.userAgent += ' not Gecko';
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (jcpenney: avoid broken sniffer). See browser.js for details');
-	} else if(hostname.indexOf('login.m.taobao.com')>-1){			// OMO-267, Fix input box and layout display issue of login.m.taobao.com
-		if(pathname.indexOf('login')>-1)
-		{
-			addCssToDocument('.login .login-form li {height:auto !important;} .common-btn-full {background: -o-linear-gradient(#F94920,#EB3E13) !important;}');
-		}
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix input box and layout display issue of login.m.taobao.com). See browser.js for details');
 	} else if(hostname.indexOf('m.deadspin.com')>-1){			// PATCH-655, Fix Gawker Media mobile site (Deadspin)
 		fixGawkerMobile();
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix Gawker Media mobile site (Deadspin)). See browser.js for details');
@@ -844,8 +877,22 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('m.reference.com')!=-1){			// TWEETY-107, Mobile reference.com uses generic doctype
 		forceMobileView();
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Mobile reference.com uses generic doctype). See browser.js for details');
+	} else if(hostname.indexOf('m.taobao.com')>-1){			// NHSP-407, Fix layout messing up issue of m.taobao.com touch screen version
+		if(hostname.indexOf('m.')>-1 || hostname.indexOf('wap.')>-1 ) {
+		  if(location.search.indexOf('v=0')>-1) {
+		    addCssToDocument('.nav li, .nav li a, .common-tab-v2 li, .common-tab-v2 li a { display: inline-block !important;} .common-tab-v2 li { min-width: 32%; max-width: 33%; display: inline-block !important;} .common-tab-v2 li, .common-tab-v2 li, .common-tab-v2.common li.cur { background-color: #F7481D; color: #fff; } .common-tab-v2 li.cur { background-color: #fff; } .common-tab-v2.common.simple li { min-width: 49%; max-width: 49.5%; } .common-tab-v2.common li { min-width: 23%; max-width: 24.5%; width: auto !important;  } .mix-widget-tab-v2 { position: static !important; height: auto !impornat; min-height: 38px; } ');
+		  }
+		}
+				// OMO-267, Fix input box and layout display issue of login.m.taobao.com
+		if(pathname.indexOf('login')>-1 && hostname.indexOf('login')>-1)
+		{
+			addCssToDocument('.login .login-form li {height:auto !important;} .common-btn-full {background: -o-linear-gradient(#F94920,#EB3E13) !important;}');
+		}
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix layout messing up issue of m.taobao.com touch screen version\nFix input box and layout display i...). See browser.js for details');
 	} else if(hostname.indexOf('m.weibo.cn')>-1){			// OMO-400, Fix m.weibo.cn screwed up issue
 		addCssToDocument('.ctrea { clear:both; }');
+				// NHSP-410, Fix friend thumbnails don't show in order of m.weibo.cn
+		addCssToDocument('.user_ta .user_if { display:inline-block; margin-right: 4px; }');
 				// OMO-76, Fix focus issue on sina weibo log in page
 		opera.defineMagicFunction('validat', 
 		        function()
@@ -923,7 +970,7 @@ function stopKeypressIfDownCancelled(stopKey){
 		    );
 				// OMO-84, Fix  buttons of post view display issue in weibo.cn
 		addCssToDocument('.fhs .return, .fhs .btn {background: -o-linear-gradient(#fff,#eaf5ff) !important;}');
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix m.weibo.cn screwed up issue\nFix focus issue on sina weibo log in page\nFix issue of word accoun...). See browser.js for details');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix m.weibo.cn screwed up issue\nFix friend thumbnails don\'t show in order of m.weibo.cn\nFix focus ...). See browser.js for details');
 	} else if(hostname.indexOf('m.zdnet.com')!=-1){			// TWEETY-110, Mobile zdnet.com should be displayed in mobile view
 		forceMobileView();
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Mobile zdnet.com should be displayed in mobile view). See browser.js for details');
@@ -978,6 +1025,9 @@ function stopKeypressIfDownCancelled(stopKey){
 				// OTW-4374, Hides background image in search bar on moneta.co.kr
 		opera.defineMagicFunction('searchCheck', function() { document.getElementsByName('kwd')[0].style.background = 'none';});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Renames method on moneta.co.kr (was named goto), also hides flash advertisements that cover content\...). See browser.js for details');
+	} else if(hostname.indexOf('myapp.com')>-1){			// NHSP-424, Navigation part display issue of myapp.com
+		addCssToDocument('header.main > nav ul li { display:inline-block; margin-right: 2px; padding: 0px 6px;}');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Navigation part display issue of myapp.com). See browser.js for details');
 	} else if(hostname.indexOf('myspace.com')>-1){			// EMO-4049, Enable log in to myspace
 		HTMLInputElement.prototype.__defineSetter__('type',function(v){
 			if (this.type!==v) {
@@ -1052,6 +1102,11 @@ function stopKeypressIfDownCancelled(stopKey){
 		}},true);
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (hides id and password background images that are text input backgrounds). See browser.js for details');
+	} else if(hostname.indexOf('sinaapp.com') > -1){			// NHSP-425, Draw game contents missing issue of sinaapp.com
+		if (hostname.indexOf('iavadraw') > -1 && pathname.indexOf('draw') >-1) {
+		 addCssToDocument('.gamelistb2in { width: 96px !important; }'); 
+		}
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Draw game contents missing issue of sinaapp.com). See browser.js for details');
 	} else if(hostname.indexOf('siren24.com')!=-1){			// SEOUL-609, ActiveX installation page redirect on siren24.com due to sniffing limitation on redirect script
 		navigator.appName = 'Netscape';
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (ActiveX installation page redirect on siren24.com due to sniffing limitation on redirect script). See browser.js for details');
