@@ -1,4 +1,4 @@
-// uCybe6A/kZchyxXOQl7tIUT/8f/fBJuigbufFmEgYvfENmHo8r8PWke6pZAdRZ+rKiG8qQzmsZdvww5gEgV4PFeGdOPC6NmtIgdXA9itNNczywgpFVdQkFKDl4rjxVmrQj5sr00uxlb0XHJTYuRiTNfnJUHnwnxZudpqXV3pg4+zhMUsaRSGbS6z5ap3r+QJV75DYxUkgyswJCaQjHNIh811V6k6F6gnIwKkiOESIf3N1TUW7Tfw7NqLrcfuyCXPDz/MqV0Zska3R3tD9/V5ePtbpGZc0GhJG1Uh7Amsk8Bvm7L8FIhNXqbxlJhq47tW4PV6glNgkaN/zPH2efRv/w==
+// FYEVp6I15Ua9/DUSDhG9xO/ADfYiX5BmazyjNWRLfqbxqK9j1NiL9MSqz2loTP4DnJS0CuJB2yn8lSEqa6fy9ILIE4kdeKaoDgbf2nfSe7mcSf+WFMfNpA52NYNNFe2ghOGkHRRWbL+1DxqT3Zbij8w1HxS6DlPrE8/Ted+LWz8vcxG0ROtWec9t9uqpMPbEXTmWdbyHsLwzDLx9zAtY4Xvz2ZVSA3zhcV9Z+qSOu3odiwSuP6ZC1KVFDNIbaiT54QiAPwn+BQY0lXbfhhGQlj2tjkFRn1ARXYoTFOBusg1xuYEcK71u8fBTESQfyxrgR367UN55RfHL8cVmacweog==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.00 core 2.10.254, June 26, 2012. Active patches: 144 ';
+	var bjsversion=' Opera Mobile 12.00 core 2.10.254, July 6, 2012. Active patches: 148 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -479,6 +479,9 @@ function stopKeypressIfDownCancelled(stopKey){
 				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Google Mail navigation bar overlaps if localised text is too long). See browser.js for details');
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Google). See browser.js for details');
+	} else if(hostname.indexOf('.usps.com')>-1){			// PATCH-718, USPS: work around old browser sniff
+		opera.defineMagicVariable('browserSupported',function(){return true},null);
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (USPS: work around old browser sniff). See browser.js for details');
 	} else if(hostname.indexOf('.yahoo.')>-1){			// 0, Yahoo!
 		/* Yahoo! */
 	
@@ -837,6 +840,9 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('hao123.com')>-1){			// DONGDAE-3678, Make sure site accesses correct Flash instance for saved user data
 		document.__defineGetter__('GlobalSharedObject', function(){ return document.getElementById('GlobalSharedObject'); });
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Make sure site accesses correct Flash instance for saved user data). See browser.js for details');
+	} else if(hostname.indexOf('huntington.com')>-1){			// PATCH-712, huntington.com: work around browser sniff
+		opera.defineMagicVariable('browserOkay',function(){return true},null);
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (huntington.com: work around browser sniff). See browser.js for details');
 	} else if(hostname.indexOf('jabong.com')>-1){			// PATCH-658, jabong.com: override usage of CSS content property on element content
 		opera.addEventListener('BeforeCSS', function(e){
 		  e.cssText = e.cssText.replace(/.clearfix:after,#content,#content:after,/g,'.clearfix:after,#content:after,');
@@ -877,22 +883,12 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('m.reference.com')!=-1){			// TWEETY-107, Mobile reference.com uses generic doctype
 		forceMobileView();
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Mobile reference.com uses generic doctype). See browser.js for details');
-	} else if(hostname.indexOf('m.taobao.com')>-1){			// NHSP-407, Fix layout messing up issue of m.taobao.com touch screen version
-		if(hostname.indexOf('m.')>-1 || hostname.indexOf('wap.')>-1 ) {
-		  if(location.search.indexOf('v=0')>-1) {
-		    addCssToDocument('.nav li, .nav li a, .common-tab-v2 li, .common-tab-v2 li a { display: inline-block !important;} .common-tab-v2 li { min-width: 32%; max-width: 33%; display: inline-block !important;} .common-tab-v2 li, .common-tab-v2 li, .common-tab-v2.common li.cur { background-color: #F7481D; color: #fff; } .common-tab-v2 li.cur { background-color: #fff; } .common-tab-v2.common.simple li { min-width: 49%; max-width: 49.5%; } .common-tab-v2.common li { min-width: 23%; max-width: 24.5%; width: auto !important;  } .mix-widget-tab-v2 { position: static !important; height: auto !impornat; min-height: 38px; } ');
-		  }
-		}
-				// OMO-267, Fix input box and layout display issue of login.m.taobao.com
-		if(pathname.indexOf('login')>-1 && hostname.indexOf('login')>-1)
-		{
-			addCssToDocument('.login .login-form li {height:auto !important;} .common-btn-full {background: -o-linear-gradient(#F94920,#EB3E13) !important;}');
-		}
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix layout messing up issue of m.taobao.com touch screen version\nFix input box and layout display i...). See browser.js for details');
 	} else if(hostname.indexOf('m.weibo.cn')>-1){			// OMO-400, Fix m.weibo.cn screwed up issue
 		addCssToDocument('.ctrea { clear:both; }');
 				// NHSP-410, Fix friend thumbnails don't show in order of m.weibo.cn
 		addCssToDocument('.user_ta .user_if { display:inline-block; margin-right: 4px; }');
+				// NHSP-434, Original photo button display issue of m.weibo.cn
+		addCssToDocument('.diack .btn { color: #fff !important; background-image: none !important; background: rgba(32, 32, 32, 0.6) !important; border: 0px !important; border: 1px solid #222; } ');
 				// OMO-76, Fix focus issue on sina weibo log in page
 		opera.defineMagicFunction('validat', 
 		        function()
@@ -970,7 +966,7 @@ function stopKeypressIfDownCancelled(stopKey){
 		    );
 				// OMO-84, Fix  buttons of post view display issue in weibo.cn
 		addCssToDocument('.fhs .return, .fhs .btn {background: -o-linear-gradient(#fff,#eaf5ff) !important;}');
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix m.weibo.cn screwed up issue\nFix friend thumbnails don\'t show in order of m.weibo.cn\nFix focus ...). See browser.js for details');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix m.weibo.cn screwed up issue\nFix friend thumbnails don\'t show in order of m.weibo.cn\nOriginal p...). See browser.js for details');
 	} else if(hostname.indexOf('m.zdnet.com')!=-1){			// TWEETY-110, Mobile zdnet.com should be displayed in mobile view
 		forceMobileView();
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Mobile zdnet.com should be displayed in mobile view). See browser.js for details');
@@ -1150,6 +1146,24 @@ function stopKeypressIfDownCancelled(stopKey){
 				}, false);	
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix log in issue of t.yuuquu.com). See browser.js for details');
+	} else if(hostname.indexOf('taobao.com')>-1){			// NHSP-435, Fix layout messing up issue of m.taobao.com touch screen version
+		if(hostname.indexOf('m.')>-1 || hostname.indexOf('wap.')>-1 ) {
+			 if(location.search.indexOf('v=1')<=-1 && (pathname.length <2 && (location.search.length <2 || location.search.indexOf('sprefer=sypc00')>-1))) {
+				location.replace('http://m.taobao.com/?v=1');
+			 }
+			 if(location.search.indexOf('v=1')>-1) {
+				 //Remove Touch version links
+				addCssToDocument('.vision, .website-nav a font[color=gray] {display: none;}'); 
+			 }
+		}
+				// OMO-267, Fix input box and layout display issue of login.m.taobao.com
+		if(hostname.indexOf('m.')>-1 || hostname.indexOf('wap.')>-1 ) {
+			if(pathname.indexOf('login')>-1 && hostname.indexOf('login')>-1)
+			{
+				addCssToDocument('.login .login-form li {height:auto !important;} .common-btn-full {background: -o-linear-gradient(#F94920,#EB3E13) !important;}');
+			}
+		}
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix layout messing up issue of m.taobao.com touch screen version\nFix input box and layout display i...). See browser.js for details');
 	} else if(hostname.indexOf('time.com')>-1){			// 229826, time.com script causes reload loop if UA contains "Windows CE"
 		navigator.userAgent=navigator.userAgent.replace( /windows ce/i, '' );
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (time.com script causes reload loop if UA contains "Windows CE"). See browser.js for details');
@@ -1199,6 +1213,9 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('westjet.com')>-1 ){			// PATCH-260,  Westjet browser sniffing warns against Opera
 		opera.defineMagicVariable('browser', function(o){ o.isSupported=true; return o; }, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( Westjet browser sniffing warns against Opera). See browser.js for details');
+	} else if(hostname.indexOf('www.answers.com')>-1){			// PATCH-719, answers.com: add background gradient
+		addCssToDocument('body{background-image: -o-linear-gradient(top,rgba(74,114,193,0.98),rgba(31,56,105,0.98)), url(http://en.site2.answcdn.com/templates/images/stripe.png?v=49d225d);}');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (answers.com: add background gradient). See browser.js for details');
 	} else if(hostname.indexOf('xuan.3g.cn')>-1){			// OMO-89, Fix page layout issues on 3G.cn
 		addCssToDocument('.navMain p a {width:16% !important; } .screen-gt320 h1, .screen-gt320 h1 a { font-size: 16px !important;  }');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix page layout issues on 3G.cn). See browser.js for details');
