@@ -1,4 +1,4 @@
-// Juj+d+Ib8WDe0RgB5f8lFXXT4Lc9nzzBzQ7WyQsqANtqEB1gr6KN20bwSx0H37ZVq3brcLhgKbSBCESmhX2SqjHFNwL7lnPE52A7rjh8pKAItY5VzQA3DWEBgi9MoWPm5rRxDEGANncg8ig2gDF5Pi43bWd9vEf6Hg+fJZ0ZyJdcI/+s8vl46ZySY40ug5vkSOyIX1hF3DY4l8jKaLb+LUInLEIrYic903nsC0OORZw9UlUCG9WMi8oAw8JMZGqEi67UHlefl26jNmoIotVbFBCotEM153sTMRHoVXN2OYjH6UQm79UNT+mVFfdZ2iSjsIp6vPw4vW1RhR73J+3mtA==
+// pCHoLHOvDVNL0N6hon7Xc7ksYqVQJgNv87DWQLUr1Fkp2524qehnwuXeaUxRYCwNoAo45/6vg7pLRIiTOKPsA2Mve2LuOkqN86RHSlk17K4V58oI/E03v4XO2SnQJ0sBRpUSB8BO+K0F0fg9Esmopi8cwF7gvw4d27vVRbSsgngrklnLDtLAYMHoo7gouhDJSjmG5PFmqoW0t/p3k0BiGeZNC5URDLeKnJ6NBrV2+TjNNxVlF9GBAevr7ZF9iqCvbqokJbghFqGVM43xoQhfbWH1uV4KMvp4KfZeZSx+oAEOVN8dPS01kshkbF/wdjNveAkZEnTzjxI3K1f2Yjke/Q==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, July 6, 2012. Active patches: 226 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, July 12, 2012. Active patches: 226 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -461,7 +461,7 @@ function setTinyMCEVersion(e){
 			navRestore.userAgent = navigator.userAgent;
 			navigator.userAgent+=' Gecko';
 			shouldRestore=true;
-		}else if(indexOf.call(name,'.disqus.com') && indexOf.call(name,'lib.js')){ //PATCH-724
+		}else if(indexOf.call(name,'.disqus.com')>-1 && indexOf.call(name,'lib.js')>-1){ //PATCH-724
 			addPreprocessHandler( /return a\.apply\(this,\n?arguments\)/g, 'this.toString()&&arguments.toString(); return a.apply(this,arguments)' );
 		}
 		if( typeof window._jive_plain_quote_text!='undefined' ){ // Jive forum embeds TinyMCE, possibly outdated versions - PATCH-248
@@ -960,6 +960,10 @@ function setTinyMCEVersion(e){
 		}, true);	
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( video problems on T-online.de\n video problems on T-online.de, WMP license installation\nIndicate l...). See browser.js for details');
+	} else if(hostname.indexOf('.terra.c')>-1){			// PATCH-623, Terra music: work around browser sniffing
+		//terra.cl, terra.com.{ar,br,mx,co,pe}
+		opera.defineMagicVariable('SonoraBrowserDetect', function(obj){ obj.browser='Firefox'; return obj; }, null)
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Terra music: work around browser sniffing). See browser.js for details');
 	} else if(hostname.indexOf('.tv.com')>-1){			// PATCH-720, tv.com: workaround misuse of CSS generated content
 		opera.addEventListener('BeforeCSS', function(e){
 		  e.cssText = e.cssText.replace(/br{content:"&nbsp;";/g,'br{ ');
@@ -1750,16 +1754,13 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('social.')>-1&&hostname.indexOf('.microsoft.')>-1){			// PATCH-619, Emulating IE breaks Microsoft fora
 		document.getSelection=function(){return window.getSelection();}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Emulating IE breaks Microsoft fora). See browser.js for details');
-	} else if(hostname.indexOf('sonora.terra.com.br')>-1){			// PATCH-623, Terra music: work around browser sniffing
-		opera.defineMagicVariable('SonoraBrowserDetect', function(obj){ obj.browser='Firefox'; return obj; }, null)
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Terra music: work around browser sniffing). See browser.js for details');
 	} else if(hostname.indexOf('sslsecure.maybank.com')>-1){			// PATCH-415, Browser sniffing causes 404 page on login to Maybank
 		opera.defineMagicFunction('MM_checkBrowser', function(){});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Browser sniffing causes 404 page on login to Maybank). See browser.js for details');
 	} else if(hostname.indexOf('support.asus.com.tw')>-1){			// PATCH-459, Prevent Asus browser sniffing from breaking support site software download
 		navigator.appName='Netscape';
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Prevent Asus browser sniffing from breaking support site software download). See browser.js for details');
-	} else if(hostname.indexOf('suzuki.co.jp')){			// OTW-6442, Suzuki Japan - fix 3D car browser functionality
+	} else if(hostname.indexOf('suzuki.co.jp')>-1){			// PATCH-716, Suzuki Japan - fix 3D car browser functionality
 		opera.defineMagicFunction('browserCheck',function(){return true});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Suzuki Japan - fix 3D car browser functionality). See browser.js for details');
 	} else if(hostname.indexOf('sytadin.fr')!=-1){			// OTW-5415, Sytadin.fr IFRAME resize script detects Opera
