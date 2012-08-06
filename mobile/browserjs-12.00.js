@@ -1,4 +1,4 @@
-// FYEVp6I15Ua9/DUSDhG9xO/ADfYiX5BmazyjNWRLfqbxqK9j1NiL9MSqz2loTP4DnJS0CuJB2yn8lSEqa6fy9ILIE4kdeKaoDgbf2nfSe7mcSf+WFMfNpA52NYNNFe2ghOGkHRRWbL+1DxqT3Zbij8w1HxS6DlPrE8/Ted+LWz8vcxG0ROtWec9t9uqpMPbEXTmWdbyHsLwzDLx9zAtY4Xvz2ZVSA3zhcV9Z+qSOu3odiwSuP6ZC1KVFDNIbaiT54QiAPwn+BQY0lXbfhhGQlj2tjkFRn1ARXYoTFOBusg1xuYEcK71u8fBTESQfyxrgR367UN55RfHL8cVmacweog==
+// GAhoXu10VL1axnFCW16ki4WjAYkSqF2GW6Dp6cjccYQWvIUMiVyMzvMSja+OwZECWu6lq+KRl9za1GRklwHDjVNPg5jfC4RCBc8dfSw7X8guOfXGg+4uRzEQDOlO9LbBMbHZ4vSzQTjYRu7uCk3Dq4gLU/cIHFz0gQSVIk1tTIGRLlQ//YgJtA/67/vBoTskj5f8s56NVGtSfEiTmJUjE2srpzAhaL93RJ/8rwNd4XcVxyI+kspKzAeTk1ayEgJY0aedXOkW1eVF1b4smj4wbvOsgmU/ljW4bAXRhb7ysJhKt/kRlxtTmfP5/61X3xY88ivTctVZT+sON1ME+ciF9w==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.00 core 2.10.254, July 6, 2012. Active patches: 148 ';
+	var bjsversion=' Opera Mobile 12.00 core 2.10.254, July 12, 2012. Active patches: 148 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1147,14 +1147,19 @@ function stopKeypressIfDownCancelled(stopKey){
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix log in issue of t.yuuquu.com). See browser.js for details');
 	} else if(hostname.indexOf('taobao.com')>-1){			// NHSP-435, Fix layout messing up issue of m.taobao.com touch screen version
-		if(hostname.indexOf('m.')>-1 || hostname.indexOf('wap.')>-1 ) {
-			 if(location.search.indexOf('v=1')<=-1 && (pathname.length <2 && (location.search.length <2 || location.search.indexOf('sprefer=sypc00')>-1))) {
+		if(hostname.indexOf('m.')>-1 || hostname.indexOf('wap.')>-1 || hostname.indexOf('3g.')>-1) {
+			if(location.search.indexOf('v=1')<=-1 && (pathname.length <2 && (location.search.length <2 || location.search.indexOf('sprefer=sypc00')>-1))) {
 				location.replace('http://m.taobao.com/?v=1');
-			 }
-			 if(location.search.indexOf('v=1')>-1) {
-				 //Remove Touch version links
+			} 
+			else if(location.search.indexOf('v=0')>-1 && pathname.length <2) {
+				var obaoUrl = href;
+				obaoUrl = obaoUrl.replace('v=0','v=1');
+				location.replace(obaoUrl);
+			} 
+			if(location.search.indexOf('v=1')>-1) {
 				addCssToDocument('.vision, .website-nav a font[color=gray] {display: none;}'); 
-			 }
+			}
+		
 		}
 				// OMO-267, Fix input box and layout display issue of login.m.taobao.com
 		if(hostname.indexOf('m.')>-1 || hostname.indexOf('wap.')>-1 ) {
