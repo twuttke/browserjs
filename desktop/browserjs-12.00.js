@@ -1,4 +1,4 @@
-// EwWBXHv4LM8bsHnlNEUfkqtMcdJt+o30vRPv9FelSS1KVabKK6aEiaNvK3rNPVaB173+0mzokdG3b7obetyDZnnuPNjMz2mcVpntfbMeuTR+PEPaX2hxjr9cpBpJ004I/uyRe9P+6Hpe3/KaB5OmUzJUrUTfyP9mgR/LWATfhgKuHNR0OGMQ8GjyG9N1fXh4f8AFIkMteZ8eDa90kzCn1At9UMcErb4DlxbaJcizFBwnEsy7PhPhSDSh/BUmGhieKRJdzwK7Ttbd+EiUy1bs5JtK3dKC10xMQCqDYw85IqdpURYez6GQVBAJP6Lbdgl7LapMQb7/tR2X2z9x4pDliA==
+// j+e5uKTQsTjsinub8h7c12D3cD2OZqq2Bje7blPfJ1HNUbpFvGqImjp7MxbbeRo/OD0/huEScDdFtxvh5w0yrloFb3VcrXxaKUmOA37VnJVJ1kVgVY1mJRHy4hw4xTYy4wLfEtxUrKitQ6rNxEbe7030IBdNmDA1qYDPFOhWjG/la25Nh8dghq5VELkt7BVAcD78HywMbvuneJe/AZwXuxLD1F8lMO41YeRDmVY3mYhKg0K8Ynn0gayjnqGcNOEvfPDGEvN+tUCogTNKkLb0fyw6nU/iUrNbNwueGSnfiucRXgaBGfr+LKWe86pIPAFjN1hX5REH+y6RB/RxGUfQ0w==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,11 +18,19 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.00 core 2.10.289, July 17, 2012. Active patches: 218 ';
+	var bjsversion=' Opera Desktop 12.00 core 2.10.289, August 1, 2012. Active patches: 225 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
-	var hostname = location.hostname; // caching some strings for performance
+	var hostname = {
+		value:location.hostname, 
+		toString:function(){return this.value;},
+		valueOf:function(){return this.value;}, 
+		indexOf:function(str){return this.value.indexOf(str);},
+		match: function( rx ){ return this.value.match(rx); },
+		contains:function(str){ return this.value.indexOf(str)>-1; },
+		endsWith:function(str){ return this.value.length==this.value.indexOf(str)+str.length; }
+	}
 	var href = location.href;
 	var pathname=location.pathname;
 	var fixed = false; // magic fixes need only run once
@@ -311,6 +319,14 @@ function makePropertyCacheable(obj, prop){
 	 }); 
  })(); 
 }
+function prestoVersionBelow(ver){
+	var parts=ver.split(/\./);
+	var current=navigator.userAgent.match(/Presto\/(\d+)\.(\d+)\.(\d+)/);
+	if(!current)return true;
+	if( parts[0] > current[1] )return true;
+	if( parts[0] < current[1] )return false;
+	return parseFloat(parts[1]+'.'+parts[2]) > parseFloat(current[2]+'.'+current[3]);
+}
 function sendOperaEvent(name, target){
 	initEvent.call=createEvent.call=dispatchEvent.call=call;
 	var evt=createEvent.call(document, 'Event');
@@ -478,8 +494,11 @@ function setTinyMCEVersion(e){
 			navRestore.userAgent = navigator.userAgent;
 			navigator.userAgent+=' Gecko';
 			shouldRestore=true;
-		}else if(indexOf.call(name,'.disqus.com')>-1 && indexOf.call(name,'lib.js')>-1){ //PATCH-724
-			addPreprocessHandler( /return a\.apply\(this,\n?arguments\)/g, 'this.toString()&&arguments.toString(); return a.apply(this,arguments)' );
+		}else if(indexOf.call(name, '.virtualearth.net/mapcontrol')>-1 && !fixed){ 
+			if(prestoVersionBelow('2.12.356')){// required up to 2.12.356
+				addCssToDocument('.MicrosoftMap button:first-child{display:none}');
+				fixed=!0;
+			}
 		}
 		if( typeof window._jive_plain_quote_text!='undefined' ){ // Jive forum embeds TinyMCE, possibly outdated versions - PATCH-248
 			opera.addEventListener('BeforeScript', function(e){
@@ -644,6 +663,90 @@ function setTinyMCEVersion(e){
 			},false);
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (tokyo.jp, lg.jp enable maps). See browser.js for details');
+	} else if(hostname.contains('sheet.zoho.com')){			// PATCH-766, Make mouse scrolling work in Zoho spreadsheets
+		MouseEvent.prototype.axis=2;
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Make mouse scrolling work in Zoho spreadsheets). See browser.js for details');
+	} else if(hostname.endsWith('grooveshark.com')){			// PATCH-767, Avoid number truncation bug on Grooveshark
+		(function(strfy){
+			JSON.stringify=function(){
+				parseInt("123");
+				return strfy.apply(this, arguments);
+			}
+		})(JSON.stringify);
+		
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Avoid number truncation bug on Grooveshark). See browser.js for details');
+	} else if(hostname.endsWith('mail.live.com')){			// CORE-17444, Fix drag and drop in Hotmail
+		function fixButton(e) {
+			if (e.button == 1) {
+				e.__defineGetter__('button', function() { return 0 });
+			}
+		};
+		window.addEventListener('mousedown', fixButton, true);
+		window.addEventListener('mousemove', fixButton, true);
+		window.addEventListener('mouseup', fixButton, true);
+		window.addEventListener('click', fixButton, true);
+				// CORE-17447, Mispositioned sprites due to missing CSS
+		addCssToDocument('.c_is { display: inline-block }');
+				// 178723, Emulating IE's cssText property on style sheets
+		var getCssText = function() {
+			if (!this.href)	{
+				return this.ownerNode.textContent;
+			} else {
+				try {
+					var xhr = new XMLHttpRequest();
+					xhr.open('GET', this.href, false);
+					xhr.send();
+					return xhr.responseText;
+				} catch(e) {
+					return '';
+				}
+			}
+		};
+		if (window.__defineGetter__) {
+			CSSStyleSheet.prototype.__defineGetter__('cssText', getCssText);
+			CSSStyleSheet.prototype.__defineSetter__('cssText', function(v) {
+				if (!this.href) {
+					this.ownerNode.innerHTML = '';
+					return this.ownerNode.appendChild(document.createTextNode(v));
+				}
+			});
+		} else {
+			window.addEventListener('load', function(){
+				for( var i=0;i<document.styleSheets.length;i++ ){
+					if(document.styleSheets[i])
+						document.styleSheets[i].cssText = { _styleRef: document.styleSheets[i], toString:function(){
+					return this._styleRef.ownerNode.textContent}
+					};
+				}
+			},false);
+		}
+		
+				// PATCH-770, Fix minified jQuery on Hotmail
+		opera.addEventListener('BeforeScript', function (e) {
+			if (e.element.src.indexOf('fullex.js') > -1) {
+				e.element.text = e.element.text.replace('for(i.isArray(t)||(t in e?t=[t]:(t=i.camelCase(t),t=t in e?[t]:t.split(" "))),', 'if (!i.isArray(t))(t in e?t=[t]:(t=i.camelCase(t),t=t in e?[t]:t.split(" ")));for(');
+			}
+		}, false);
+		
+				// DSK-235885, Hotmail uses lookupGetter on prototypes, not instances
+		var styleSetterLookupMethod = document.createElement('span').style.__lookupSetter__;
+		 CSSStyleDeclaration.prototype.__lookupSetter__ = function(prop){
+			return styleSetterLookupMethod.call(document.createElement('span').style, prop);
+		 };
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix drag and drop in Hotmail\nMispositioned sprites due to missing CSS\nEmulating IE\'s cssText prope...). See browser.js for details');
+	} else if(hostname.endsWith('staples.com')){			// PATCH-769, Opera throws when XSL variable has disable-output-escaping attribute, breaks sorting on staples.com
+		(function(){
+			var xhrDocGetter=(new XMLHttpRequest).__lookupGetter__('responseXML');
+			XMLHttpRequest.prototype.__defineGetter__('responseXML', function(){
+				var doc=xhrDocGetter.call(this);
+				for(var elms=doc.getElementsByTagName('*'),elm,i=0;elm=elms[i];i++){
+					if(elm.hasAttribute('disable-output-escaping'))elm.removeAttribute('disable-output-escaping');
+				}
+				return doc;
+			});
+		})();
+		
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Opera throws when XSL variable has disable-output-escaping attribute, breaks sorting on staples.com). See browser.js for details');
 	} else if(hostname.indexOf("cang.baidu.com") != -1 ){			// OTW-4761, cang.baidu.com for Baidu SouCang can't display saved items, window.top
 		window.opera.defineMagicFunction(
 			"top",
@@ -1224,7 +1327,10 @@ function setTinyMCEVersion(e){
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Caja Madrid hides login form by CSS mistake). See browser.js for details');
 	} else if(hostname.indexOf('cambrian.mb.ca')>-1){			// PATCH-285, Enable log-in button on Cambrian bank
-		Element.prototype.__defineGetter__('all', function(){});
+		HTMLTableElement.prototype.__defineGetter__('all', function(){});
+		HTMLTableCellElement.prototype.__defineGetter__('all', function(){});
+		HTMLDivElement.prototype.__defineGetter__('all', function(){});
+		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Enable log-in button on Cambrian bank). See browser.js for details');
 	} else if(hostname.indexOf('capitecbank.co.za')>-1){			// PATCH-667, fake script @defer support on capitecbank.co.za
 		(function(){
@@ -1251,6 +1357,9 @@ function setTinyMCEVersion(e){
 			if(window.jsUtils&&window.jsUtils.bOpera)jsUtils.bOpera=false;
 		}, false);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Make BBCode editor buttons work by disabling Opera sniffing). See browser.js for details');
+	} else if(hostname.indexOf('credit-suisse.com')>-1 ){			// PATCH-762, Credit Suisse second-guesses GMaps GBrowserIsCompatible, adds extra Opera blocking
+		addPreprocessHandler(/GBrowserIsCompatible\(\)&&\!\$\.browser\.opera/, 'GBrowserIsCompatible()');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Credit Suisse second-guesses GMaps GBrowserIsCompatible, adds extra Opera blocking). See browser.js for details');
 	} else if(hostname.indexOf('cs.kddi.com')>-1){			// PATCH-656, Fix disabled buttons on KDDI Customer Support page
 		HTMLInputElement.prototype.__defineSetter__('disabled', function(){});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix disabled buttons on KDDI Customer Support page). See browser.js for details');
@@ -1310,6 +1419,14 @@ function setTinyMCEVersion(e){
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (etour.co.jp fix non-disappearing overlapping image). See browser.js for details');
 	} else if(hostname.indexOf('facebook.com')>-1){			// PATCH-714, facebook: prevent chat window overflow - Presto bug
 		addCssToDocument('div.fbNubFlyoutBody.scrollable{position:inherit}');
+				// PATCH-751, Work around cached value bug that makes JSON.stringify() remove one digit from input
+		(function(strfy){
+			JSON.stringify=function(){
+				parseInt("123");
+				return strfy.apply(this, arguments);
+			}
+		})(JSON.stringify);
+		
 				// PATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status
 		opera.addEventListener('BeforeEventListener.keypress', function(e){
 			if( e.event.ctrlKey && (e.event.keyCode==86 || e.event.keyCode==118 ) ){
@@ -1328,7 +1445,7 @@ function setTinyMCEVersion(e){
 			e.cssText = e.cssText.replace(/border-(top|bottom)-(right|left)-radius:3px/g, '');
 		}, false);
 		
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (facebook: prevent chat window overflow - Presto bug\nFacebook: fake paste event to make show preview...). See browser.js for details');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (facebook: prevent chat window overflow - Presto bug\nWork around cached value bug that makes JSON.st...). See browser.js for details');
 	} else if(hostname.indexOf('fintyre.it')>-1){			// PATCH-661, fintyre.it: work around sniffing
 		navigator.appName = "Netscape";
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (fintyre.it: work around sniffing). See browser.js for details');
@@ -1419,58 +1536,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('loyalbank.com')>-1){			// PATCH-707, loyalbank.com: prevent mousedown prevention
 		HTMLElement.prototype.onselectstart = true;
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (loyalbank.com: prevent mousedown prevention). See browser.js for details');
-	} else if(hostname.indexOf('mail.live.com')!=-1){			// CORE-17444, Fix drag and drop in Hotmail
-		function fixButton(e) {
-			if (e.button == 1) {
-				e.__defineGetter__('button', function() { return 0 });
-			}
-		};
-		window.addEventListener('mousedown', fixButton, true);
-		window.addEventListener('mousemove', fixButton, true);
-		window.addEventListener('mouseup', fixButton, true);
-		
-				// CORE-17447, Mispositioned sprites due to missing CSS
-		addCssToDocument('.c_is { display: inline-block }');
-				// 178723, Emulating IE's cssText property on style sheets
-		var getCssText = function() {
-			if (!this.href)	{
-				return this.ownerNode.textContent;
-			} else {
-				try {
-					var xhr = new XMLHttpRequest();
-					xhr.open('GET', this.href, false);
-					xhr.send();
-					return xhr.responseText;
-				} catch(e) {
-					return '';
-				}
-			}
-		};
-		if (window.__defineGetter__) {
-			CSSStyleSheet.prototype.__defineGetter__('cssText', getCssText);
-			CSSStyleSheet.prototype.__defineSetter__('cssText', function(v) {
-				if (!this.href) {
-					this.ownerNode.innerHTML = '';
-					return this.ownerNode.appendChild(document.createTextNode(v));
-				}
-			});
-		} else {
-			window.addEventListener('load', function(){
-				for( var i=0;i<document.styleSheets.length;i++ ){
-					if(document.styleSheets[i])
-						document.styleSheets[i].cssText = { _styleRef: document.styleSheets[i], toString:function(){
-					return this._styleRef.ownerNode.textContent}
-					};
-				}
-			},false);
-		}
-		
-				// DSK-235885, Hotmail uses lookupGetter on prototypes, not instances
-		var styleSetterLookupMethod = document.createElement('span').style.__lookupSetter__;
-		 CSSStyleDeclaration.prototype.__lookupSetter__ = function(prop){
-			return styleSetterLookupMethod.call(document.createElement('span').style, prop);
-		 };
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix drag and drop in Hotmail\nMispositioned sprites due to missing CSS\nEmulating IE\'s cssText prope...). See browser.js for details');
 	} else if(hostname.indexOf('mapion.co.jp')>-1){			// PATCH-649, Enable keyboard controls on Mapion
 		opera.addEventListener('BeforeScript',function(ev){
 			var name=ev.element.src; 
@@ -1750,6 +1815,11 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('westjet.com')>-1 ){			// PATCH-260,  Westjet browser sniffing warns against Opera
 		opera.defineMagicVariable('browser', function(o){ o.isSupported=true; return o; }, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( Westjet browser sniffing warns against Opera). See browser.js for details');
+	} else if(hostname.indexOf('wikisky.org')>-1){			// PATCH-756, wikisky.org - Fix mouse controls
+		Event.prototype.__defineGetter__('layerX',function(){ return this.offsetX; });
+		Event.prototype.__defineGetter__('layerY',function(){ return this.offsetY; });
+		
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (wikisky.org - Fix mouse controls). See browser.js for details');
 	} else if(hostname.indexOf('www.yoka.com')>-1){			// PATCH-238, Override minmax IE helper script
 		opera.defineMagicFunction('minmax_scan', function(){});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Override minmax IE helper script). See browser.js for details');
