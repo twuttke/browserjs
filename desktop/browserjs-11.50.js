@@ -1,4 +1,4 @@
-// dS3UECGc5sRX9OQyJpy6YzQJoG8hg7mmuu90wkeA3lowG+Wh0/yFAHW0bCj62pngh1M97ow4Y6lrdeCM6n9CuZrvz6ckavse2OS+mUmfE+uKU1zjPyBaP9XcxhxAcsnifdj+s0hQWbgVFm3YZAcdJxSMB/BGzWrWENn6rNfhv5/eUpxzsXrG++TpZnzW7URBMF0KMyOY55u0dinNZcVGTXyQJsThVNFjv1aazp1+MUha1y86jPd5+r3rB8NIrPm0i1AOTAIL8nvI4uvW00C7T2RZmOHqaa4M+by1SAPkA9urDHmPS7SFYBbjRaR6drFBvGqIUOosZWBQgibyPpkTuA==
+// UNcAN4l7E4co26wCv/XCNsiBTj4Khp16kKrLF/5PnOxictUUe1748Ii3syIkl7mHgQ+uhL3QRJR1x0N9GESh4WN4JyGA2sy0b34BKsSEVoDiawnzYlpKLFaTCCA9gb4gi+lrLBm86+4uqbKz1ZhxfdRSoiI6L4BYMSTAfelwckhjDHWTYfw7FW2coP88rkrZvMuMcFY4VuGdHIEqXGOvNgsAa+sgwkATbTb4+VlWZEA/wkpE2vnFF0iHGDL5sUzL7EkpLJeObfhBbDDgjmhxpChMfTEe+j6JNxJoHdBL+Nb4xiO6sTpY5rxhPrrc4ZgyJCCx4yzS2sXtPA5LmPOF/g==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,11 +18,19 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.50 core 2.9.168, July 17, 2012. Active patches: 233 ';
+	var bjsversion=' Opera Desktop 11.50 core 2.9.168, August 1, 2012. Active patches: 234 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
-	var hostname = location.hostname; // caching some strings for performance
+	var hostname = {
+		value:location.hostname, 
+		toString:function(){return this.value;},
+		valueOf:function(){return this.value;}, 
+		indexOf:function(str){return this.value.indexOf(str);},
+		match: function( rx ){ return this.value.match(rx); },
+		contains:function(str){ return this.value.indexOf(str)>-1; },
+		endsWith:function(str){ return this.value.length==this.value.indexOf(str)+str.length; }
+	}
 	var href = location.href;
 	var pathname=location.pathname;
 	var fixed = false; // magic fixes need only run once
@@ -295,6 +303,14 @@ function ignoreCancellationOfCertainKeyEvents(type, list){
 		}
 	},false );
 }
+function prestoVersionBelow(ver){
+	var parts=ver.split(/\./);
+	var current=navigator.userAgent.match(/Presto\/(\d+)\.(\d+)\.(\d+)/);
+	if(!current)return true;
+	if( parts[0] > current[1] )return true;
+	if( parts[0] < current[1] )return false;
+	return parseFloat(parts[1]+'.'+parts[2]) > parseFloat(current[2]+'.'+current[3]);
+}
 function sendOperaEvent(name, target){
 	initEvent.call=createEvent.call=dispatchEvent.call=call;
 	var evt=createEvent.call(document, 'Event');
@@ -476,8 +492,11 @@ function setTinyMCEVersion(e){
 			navRestore.userAgent = navigator.userAgent;
 			navigator.userAgent+=' Gecko';
 			shouldRestore=true;
-		}else if(indexOf.call(name,'.disqus.com')>-1 && indexOf.call(name,'lib.js')>-1){ //PATCH-724
-			addPreprocessHandler( /return a\.apply\(this,\n?arguments\)/g, 'this.toString()&&arguments.toString(); return a.apply(this,arguments)' );
+		}else if(indexOf.call(name, '.virtualearth.net/mapcontrol')>-1 && !fixed){ 
+			if(prestoVersionBelow('2.12.356')){// required up to 2.12.356
+				addCssToDocument('.MicrosoftMap button:first-child{display:none}');
+				fixed=!0;
+			}
 		}
 		if( typeof window._jive_plain_quote_text!='undefined' ){ // Jive forum embeds TinyMCE, possibly outdated versions - PATCH-248
 			opera.addEventListener('BeforeScript', function(e){
@@ -656,6 +675,82 @@ function setTinyMCEVersion(e){
 			},false);
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (tokyo.jp, lg.jp enable maps). See browser.js for details');
+	} else if(hostname.endsWith('mail.live.com')){			// CORE-17444, Fix drag and drop in Hotmail
+		function fixButton(e) {
+			if (e.button == 1) {
+				e.__defineGetter__('button', function() { return 0 });
+			}
+		};
+		window.addEventListener('mousedown', fixButton, true);
+		window.addEventListener('mousemove', fixButton, true);
+		window.addEventListener('mouseup', fixButton, true);
+		window.addEventListener('click', fixButton, true);
+				// CORE-17447, Mispositioned sprites due to missing CSS
+		addCssToDocument('.c_is { display: inline-block }');
+				// 178723, Emulating IE's cssText property on style sheets
+		var getCssText = function() {
+			if (!this.href)	{
+				return this.ownerNode.textContent;
+			} else {
+				try {
+					var xhr = new XMLHttpRequest();
+					xhr.open('GET', this.href, false);
+					xhr.send();
+					return xhr.responseText;
+				} catch(e) {
+					return '';
+				}
+			}
+		};
+		if (window.__defineGetter__) {
+			CSSStyleSheet.prototype.__defineGetter__('cssText', getCssText);
+			CSSStyleSheet.prototype.__defineSetter__('cssText', function(v) {
+				if (!this.href) {
+					this.ownerNode.innerHTML = '';
+					return this.ownerNode.appendChild(document.createTextNode(v));
+				}
+			});
+		} else {
+			window.addEventListener('load', function(){
+				for( var i=0;i<document.styleSheets.length;i++ ){
+					if(document.styleSheets[i])
+						document.styleSheets[i].cssText = { _styleRef: document.styleSheets[i], toString:function(){
+					return this._styleRef.ownerNode.textContent}
+					};
+				}
+			},false);
+		}
+		
+				// PATCH-441, Script sets window.event manually for other events but not for (all) click events, breaks attachment download
+		opera.addEventListener('BeforeEventListener.click', function(e){window.event=e.event;}, false);
+		
+				// PATCH-311, Hidden 'next page' links due to markup errors
+		document.addEventListener('DOMContentLoaded', function(){
+			var el=document.getElementById('firstPageLink');
+			if(el && el.parentNode.tagName=='LI'){
+				el=el.parentNode; /* this LI contains some children it shouldn't contain due to </div</li> markup */
+				for(var children=el.parentNode.getElementsByTagName('li'),child; child=children[children.length-1];){
+					el.parentNode.parentNode.appendChild(child);
+				}
+				var tmp=document.createElement('div');
+				var internalSetter=tmp.__lookupSetter__('innerHTML');
+				Element.prototype.__defineSetter__('innerHTML', function(html){
+					html=html.replace(/<\/div<\/li>/ig, '</div></li>');
+					return internalSetter.call(this, html);
+				});
+				var internalGetter=tmp.__lookupGetter__('innerHTML');
+				Element.prototype.__defineGetter__('innerHTML', function(){
+					return internalGetter.call(this);
+				});
+			}
+		}, false);
+		
+				// DSK-235885, Hotmail uses lookupGetter on prototypes, not instances
+		var styleSetterLookupMethod = document.createElement('span').style.__lookupSetter__;
+		 CSSStyleDeclaration.prototype.__lookupSetter__ = function(prop){
+			return styleSetterLookupMethod.call(document.createElement('span').style, prop);
+		 };
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix drag and drop in Hotmail\nMispositioned sprites due to missing CSS\nEmulating IE\'s cssText prope...). See browser.js for details');
 	} else if(hostname.indexOf(".americanexpress.")>-1){			// PATCH-446, Fix missing whitespace removal from script type attribute
 		(function(sa){
 			HTMLElement.prototype.setAttribute=function(n,v){
@@ -1342,7 +1437,10 @@ function setTinyMCEVersion(e){
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Caja Madrid hides login form by CSS mistake). See browser.js for details');
 	} else if(hostname.indexOf('cambrian.mb.ca')>-1){			// PATCH-285, Enable log-in button on Cambrian bank
-		Element.prototype.__defineGetter__('all', function(){});
+		HTMLTableElement.prototype.__defineGetter__('all', function(){});
+		HTMLTableCellElement.prototype.__defineGetter__('all', function(){});
+		HTMLDivElement.prototype.__defineGetter__('all', function(){});
+		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Enable log-in button on Cambrian bank). See browser.js for details');
 	} else if(hostname.indexOf('capital.gr')>-1){			// PATCH-479, capital.gr: avoid unintentional XHR abort() calls
 		XMLHttpRequest.prototype.abort=function(){};
@@ -1560,84 +1658,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('lottery.sina.2caipiao.com')>-1){			// PATCH-556, 2caipiao.com: fix iframe resize
 		fixIFrameSSIscriptII('dyniframesize');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (2caipiao.com: fix iframe resize). See browser.js for details');
-	} else if(hostname.indexOf('mail.live.com')!=-1){			// CORE-17444, Fix drag and drop in Hotmail
-		function fixButton(e) {
-			if (e.button == 1) {
-				e.__defineGetter__('button', function() { return 0 });
-			}
-		};
-		window.addEventListener('mousedown', fixButton, true);
-		window.addEventListener('mousemove', fixButton, true);
-		window.addEventListener('mouseup', fixButton, true);
-		
-				// CORE-17447, Mispositioned sprites due to missing CSS
-		addCssToDocument('.c_is { display: inline-block }');
-				// 178723, Emulating IE's cssText property on style sheets
-		var getCssText = function() {
-			if (!this.href)	{
-				return this.ownerNode.textContent;
-			} else {
-				try {
-					var xhr = new XMLHttpRequest();
-					xhr.open('GET', this.href, false);
-					xhr.send();
-					return xhr.responseText;
-				} catch(e) {
-					return '';
-				}
-			}
-		};
-		if (window.__defineGetter__) {
-			CSSStyleSheet.prototype.__defineGetter__('cssText', getCssText);
-			CSSStyleSheet.prototype.__defineSetter__('cssText', function(v) {
-				if (!this.href) {
-					this.ownerNode.innerHTML = '';
-					return this.ownerNode.appendChild(document.createTextNode(v));
-				}
-			});
-		} else {
-			window.addEventListener('load', function(){
-				for( var i=0;i<document.styleSheets.length;i++ ){
-					if(document.styleSheets[i])
-						document.styleSheets[i].cssText = { _styleRef: document.styleSheets[i], toString:function(){
-					return this._styleRef.ownerNode.textContent}
-					};
-				}
-			},false);
-		}
-		
-				// PATCH-441, Script sets window.event manually for other events but not for (all) click events, breaks attachment download
-		opera.addEventListener('BeforeEventListener.click', function(e){window.event=e.event;}, false);
-		
-				// PATCH-311, Hidden 'next page' links due to markup errors
-		document.addEventListener('DOMContentLoaded', function(){
-			var el=document.getElementById('firstPageLink');
-			if(el && el.parentNode.tagName=='LI'){
-				el=el.parentNode; /* this LI contains some children it shouldn't contain due to </div</li> markup */
-				for(var children=el.parentNode.getElementsByTagName('li'),child; child=children[children.length-1];){
-					el.parentNode.parentNode.appendChild(child);
-				}
-				var tmp=document.createElement('div');
-				var internalSetter=tmp.__lookupSetter__('innerHTML');
-				Element.prototype.__defineSetter__('innerHTML', function(html){
-					html=html.replace(/<\/div<\/li>/ig, '</div></li>');
-					return internalSetter.call(this, html);
-				});
-				var internalGetter=tmp.__lookupGetter__('innerHTML');
-				Element.prototype.__defineGetter__('innerHTML', function(){
-					return internalGetter.call(this);
-				});
-			}
-		}, false);
-		
-				// DSK-235885, Hotmail uses lookupGetter on prototypes, not instances
-		var styleSetterLookupMethod = document.createElement('span').style.__lookupSetter__;
-		 CSSStyleDeclaration.prototype.__lookupSetter__ = function(prop){
-			return styleSetterLookupMethod.call(document.createElement('span').style, prop);
-		 };
-				// PATCH-135, Live Mail Fix removing contacts from To field by clicking small X icon
+	} else if(hostname.indexOf('mail.live.com')!=-1){			// PATCH-135, Live Mail Fix removing contacts from To field by clicking small X icon
 		addCssToDocument('.ContactPicker_AutoComplete img{position:static!important;}');
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix drag and drop in Hotmail\nMispositioned sprites due to missing CSS\nEmulating IE\'s cssText prope...). See browser.js for details');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Live Mail Fix removing contacts from To field by clicking small X icon). See browser.js for details');
 	} else if(hostname.indexOf('mapion.co.jp')>-1){			// PATCH-649, Enable keyboard controls on Mapion
 		opera.addEventListener('BeforeScript',function(ev){
 			var name=ev.element.src; 
@@ -1926,6 +1949,11 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('westjet.com')>-1 ){			// PATCH-260,  Westjet browser sniffing warns against Opera
 		opera.defineMagicVariable('browser', function(o){ o.isSupported=true; return o; }, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( Westjet browser sniffing warns against Opera). See browser.js for details');
+	} else if(hostname.indexOf('wikisky.org')>-1){			// PATCH-756, wikisky.org - Fix mouse controls
+		Event.prototype.__defineGetter__('layerX',function(){ return this.offsetX; });
+		Event.prototype.__defineGetter__('layerY',function(){ return this.offsetY; });
+		
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (wikisky.org - Fix mouse controls). See browser.js for details');
 	} else if(hostname.indexOf('www.slideshare.net')>-1){			// PATCH-453, Slideshare: avoid plugin-triggered document.cookie setting script deadlock bug
 		(function(){
 			var actualGetter=document.__lookupGetter__('cookie');
