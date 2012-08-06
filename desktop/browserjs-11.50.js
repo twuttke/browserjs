@@ -1,4 +1,4 @@
-// i5+SxSS5afJq/hhFznRteveJqYPuQHcKqS1PDQYQTCNhVOnzolAcZPuyt9FiwCSSSF357Wdgc87h5nkrf7bgMMUeda3tXNJi4jYRVdsnWuwS84NyYklUnIoV3QUuxIn3qMmxiVVVot2swllAXnM6I9dl7Iugk+9zs2uzT0Eib1T0/1rkTtSNKtd0JRAK26FySdLyZzid4qFLc16lw8H2ZnngMRCwYUrUwSzcV4WjAONzQ1P2159R5MqoOU0dMNEZqKiPDMShM6bJGLq9I469mD17vuu7kQ1CNA1Sjk4Q9mHiu4ZLVUbuS9IQcQFDP+RORv31ZlGpTIR4lhZWjy/W5g==
+// dS3UECGc5sRX9OQyJpy6YzQJoG8hg7mmuu90wkeA3lowG+Wh0/yFAHW0bCj62pngh1M97ow4Y6lrdeCM6n9CuZrvz6ckavse2OS+mUmfE+uKU1zjPyBaP9XcxhxAcsnifdj+s0hQWbgVFm3YZAcdJxSMB/BGzWrWENn6rNfhv5/eUpxzsXrG++TpZnzW7URBMF0KMyOY55u0dinNZcVGTXyQJsThVNFjv1aazp1+MUha1y86jPd5+r3rB8NIrPm0i1AOTAIL8nvI4uvW00C7T2RZmOHqaa4M+by1SAPkA9urDHmPS7SFYBbjRaR6drFBvGqIUOosZWBQgibyPpkTuA==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.50 core 2.9.168, July 6, 2012. Active patches: 234 ';
+	var bjsversion=' Opera Desktop 11.50 core 2.9.168, July 17, 2012. Active patches: 233 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -397,13 +397,13 @@ function setTinyMCEVersion(e){
 		var name=ev.element.src; 
 		if( !name ){ return; } // no fixes required for SCRIPT xlink:href so far..
 		name=toLowerCase.call(name );// toLowerCase fixes sangjatten.se
-	      if ( indexOf.call(name, 'dqm_')>-1 || indexOf.call(name, 'dnm_')>-1 || indexOf.call(name, 'cbrowser_opera.js')>-1 ){ 
+		if ( indexOf.call(name, 'dqm_')>-1 || indexOf.call(name, 'dnm_')>-1 || indexOf.call(name, 'cbrowser_opera.js')>-1 ){
 			// OpenCube menu
 			if(fixOpenCube(name)){
 				postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (OpenCube fix). See browser.js for details.');
 			}
 			return;
-	      }else if(  indexOf.call(name, 'hm_loader')>-1  ){ 
+		}else if(  indexOf.call(name, 'hm_loader')>-1  ){
 			// HierMenus menu
 			// If we apply this fix to version 6.x the menu breaks.
 			// HM support recommends checking that HM_BrowserVersion is not defined
@@ -416,17 +416,18 @@ function setTinyMCEVersion(e){
 				removeEventListener.call(opera, 'BeforeScript', arguments.callee, false);
 			}, false);
 			return;
-	      }else if(  indexOf.call(name, 'mmenu')>-1 || indexOf.call(name, 'milonic')>-1  ){ 
+		}else if(  indexOf.call(name, 'mmenu')>-1 || indexOf.call(name, 'milonic')>-1  ){
 			// Milonic menu
 			fixMilonicMenu(name);
 			postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Milonic fix). See browser.js for details.');
 			return;
-			}else if(  match.call(name, /menu(\d*_(script|com|build|var|program|compact|animation)|e)\.js$/)  ){ 
+		}else if(  match.call(name, /menu(\d*_(script|com|build|var|program|compact|animation)|e)\.js$/)  ){
 			// HV menu
 			fixHVMenu(name);
 			postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (HVMenu fix). See browser.js for details.');
 			return;
-	      }else if(  match.call(name, /udm[_-]/)  || (  match.call(name, /(sniffer|control)\.js$/)   )    ){   if(hostname.indexOf('usatoday.com')>-1)return; // PATCH-465
+		}else if(  match.call(name, /udm[_-]/)  || (  match.call(name, /(sniffer|control)\.js$/)   )    ){
+			if(hostname.indexOf('usatoday.com')>-1)return; // PATCH-465
 			// UDM menu
 			addEventListener.call(opera, 'BeforeScript', function(ev){
 				match.call=postError.call=call;
@@ -475,7 +476,7 @@ function setTinyMCEVersion(e){
 			navRestore.userAgent = navigator.userAgent;
 			navigator.userAgent+=' Gecko';
 			shouldRestore=true;
-		}else if(indexOf.call(name,'.disqus.com') && indexOf.call(name,'lib.js')){ //PATCH-724
+		}else if(indexOf.call(name,'.disqus.com')>-1 && indexOf.call(name,'lib.js')>-1){ //PATCH-724
 			addPreprocessHandler( /return a\.apply\(this,\n?arguments\)/g, 'this.toString()&&arguments.toString(); return a.apply(this,arguments)' );
 		}
 		if( typeof window._jive_plain_quote_text!='undefined' ){ // Jive forum embeds TinyMCE, possibly outdated versions - PATCH-248
@@ -963,6 +964,10 @@ function setTinyMCEVersion(e){
 		}, true);	
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( video problems on T-online.de\n video problems on T-online.de, WMP license installation\nIndicate l...). See browser.js for details');
+	} else if(hostname.indexOf('.terra.c')>-1){			// PATCH-623, Terra music: work around browser sniffing
+		//terra.cl, terra.com.{ar,br,mx,co,pe}
+		opera.defineMagicVariable('SonoraBrowserDetect', function(obj){ obj.browser='Firefox'; return obj; }, null)
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Terra music: work around browser sniffing). See browser.js for details');
 	} else if(hostname.indexOf('.tv.com')>-1){			// PATCH-720, tv.com: workaround misuse of CSS generated content
 		opera.addEventListener('BeforeCSS', function(e){
 		  e.cssText = e.cssText.replace(/br{content:"&nbsp;";/g,'br{ ');
@@ -1157,7 +1162,7 @@ function setTinyMCEVersion(e){
 			null);
 				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Yahoo! Japan services block Opera from using Silverlight plugin). See browser.js for details');
 		}
-		if(self==top&&hostname.indexOf('.mail.yahoo.')>-1&&(href.indexOf( '/neo/launch' )>-1&&location.search.indexOf('?reason=ignore')!=0)){			// PATCH-325, Y!Mail work around browser blocking
+		if(self==top&&hostname.indexOf('.mail.yahoo.co.jp')>-1&&(href.indexOf( '/neo/launch' )>-1&&location.search.indexOf('?reason=ignore')!=0)){			// PATCH-325, Y!Mail work around browser blocking
 			location.href='/neo/launch?reason=ignore'+location.search.replace(/^\?/, '&');
 			
 				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Y!Mail work around browser blocking). See browser.js for details');
@@ -1837,16 +1842,13 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('social.')>-1&&hostname.indexOf('.microsoft.')>-1){			// PATCH-619, Emulating IE breaks Microsoft fora
 		document.getSelection=function(){return window.getSelection();}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Emulating IE breaks Microsoft fora). See browser.js for details');
-	} else if(hostname.indexOf('sonora.terra.com.br')>-1){			// PATCH-623, Terra music: work around browser sniffing
-		opera.defineMagicVariable('SonoraBrowserDetect', function(obj){ obj.browser='Firefox'; return obj; }, null)
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Terra music: work around browser sniffing). See browser.js for details');
 	} else if(hostname.indexOf('sslsecure.maybank.com')>-1){			// PATCH-415, Browser sniffing causes 404 page on login to Maybank
 		opera.defineMagicFunction('MM_checkBrowser', function(){});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Browser sniffing causes 404 page on login to Maybank). See browser.js for details');
 	} else if(hostname.indexOf('support.asus.com.tw')>-1){			// PATCH-459, Prevent Asus browser sniffing from breaking support site software download
 		navigator.appName='Netscape';
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Prevent Asus browser sniffing from breaking support site software download). See browser.js for details');
-	} else if(hostname.indexOf('suzuki.co.jp')){			// OTW-6442, Suzuki Japan - fix 3D car browser functionality
+	} else if(hostname.indexOf('suzuki.co.jp')>-1){			// PATCH-716, Suzuki Japan - fix 3D car browser functionality
 		opera.defineMagicFunction('browserCheck',function(){return true});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Suzuki Japan - fix 3D car browser functionality). See browser.js for details');
 	} else if(hostname.indexOf('sytadin.fr')!=-1){			// OTW-5415, Sytadin.fr IFRAME resize script detects Opera
@@ -1894,7 +1896,7 @@ function setTinyMCEVersion(e){
 		opera.defineMagicVariable('isSafari', function(){return true;}, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (TVGuide doesn\'t show program descriptions, due to browser sniffing). See browser.js for details');
 	} else if(hostname.indexOf('twitter.com')>-1){			// PATCH-671, Twitter: avoid ghost @ before username
-		addCssToDocument('strong.fullname + span:not([class]){content:""}')
+		addCssToDocument('strong.fullname + span:not([class]){content:""}');
 				// PATCH-561, Twitter: allow selection in TEXTAREA
 		HTMLTextAreaElement.prototype.setAttribute=(function(s){
 			return function(n, v){
@@ -1968,12 +1970,6 @@ function setTinyMCEVersion(e){
 			}
 		);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (xcweather: make sure the preference form is available when running script). See browser.js for details');
-	} else if(hostname.indexOf('yoyaku.rakubus.jp')>-1){			// PATCH-559, Browser sniffing on Raku Bus
-		navigator.appName = 'Microsoft '+navigator.appName;
-		navigator.appVersion = 'MSIE 9.0; '+navigator.appVersion;
-		navigator.userAgent = 'MSIE 9.0; '+navigator.userAgent;
-		
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Browser sniffing on Raku Bus). See browser.js for details');
 	} else if(hostname=='62.61.69.224'&&pathname.indexOf('/facebook')==0){			// PATCH-473, Nokia Ovi maps on Facebook wants to rewrite window.top
 		(function(){
 			var definedTop=window.top;
