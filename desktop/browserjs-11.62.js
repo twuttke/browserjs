@@ -1,4 +1,4 @@
-// w7HGEzMW37nRZpCHQfPI4jYB/RhbIe0gWRLGhn407fDoBNDqm7yDg/bM18YtPUmxUaVbV+pg3Zp/lt77QCzzzqgowvQtZn0QEd90Lc4W04bJ4RTZa7eFLqCJcv9kGHj1hxljDJhghsBfK+4KO1m34psv4FTROzeNgtH+RQ3VtZxoRhSXNQyUSsfoENOKqHQ89vrfFLEfGI9HqWHPLfsV+hH21BLlIqJD+wnSN4XAhSgUbaLAqd76aY2E+jfv2xdLwK6aUUZOnfRVOksm+XduEkhnFOaFvQ8RXYvz3P06DHqLvi0sDfiKiN60U5E1eUrLU5riO46SaLi8j4ok0IPwFA==
+// I9sbmiB+Daf27xXcV6RnFc4pfpXVlrWlxJa/rc/cyVmjPAjIVlzRtihTFbtJdTX7yL/JEBI9TF3u1Qj0vyu4OKi4vnoW07Xfu/1PHbcMNhQmeawz+Tx1t0QqR6ME1ltz1GqPqiOnWpkCjWYEQv8vkU4Z+CCbEtZFlrlv9WYEDUwD6kaP+r48AsbddkVVFeFXzGPRYljCY7TyGzLATgvOrASWvl1Zs7YnCh0rL45F4zL5lPPoPK0NoHmBs5KKsul0V9nxsGHDBgLdip3MctFzW9LpKhNKLRUvf8WiNdcRdNpIbCh5glUnuRnQ5OISW65eBwC+jQOP0Vddq/oTIORbWg==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.299, August 3, 2012. Active patches: 222 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, August 13, 2012. Active patches: 241 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -130,8 +130,8 @@ function avoidDocumentWriteAbuse(contentRegexp){
 	contentRegexp = contentRegexp || /(^<img .*?width=("|)1("|)\s+height=("|)1("|)\s+border=("|)0("|)\s+alt="".*?>$|^\[object Object\]$)/i;
 	document.write=function( s ){
 		if( String(s).match( contentRegexp ) ){
-			opera.postError('Warning: scripts on '+window.location+' were changed by the s_code patch. See browser.js for details.');
-		}else{//opera.postError(arguments);
+			log('The s_code patch prevented document.write()');
+		}else{
 			dw.apply(document, arguments);
 		}
 	};
@@ -171,6 +171,7 @@ function avoidDocumentWriteAbuse(contentRegexp){
 		defineMagicVariable.call(opera, 'HM_BrowserString', function(){ return 'DOM'}, function(){ return 'DOM' });
 		if(HTMLBodyElement.prototype.__defineGetter__)HTMLBodyElement.prototype.__defineGetter__('clientHeight', function(){return this.ownerDocument.documentElement.clientHeight;}); // PATCH-33
 		defineMagicVariable.call(opera, 'HM_GL_Filter', function(){ return undefined;},null); // PATCH-327
+		defineMagicVariable.call(opera, 'HM_Canvas', function(obj){obj.__defineGetter__('clientHeight', function(){return window.innerHeight});return obj;},null); // PATCH-785
 
 	}
 
@@ -336,25 +337,24 @@ function setTinyMCEVersion(e){
 
 
 
-	// Work around browser sniffing in old Macromedia menu script
-// lines reversed on enter by workaround against old Opera bug
-// TinyMCE 2.x uses document.selection in Opera
-// no code in TinyMCE 2.x HTML source editor because it expects a different order of load events
-// Generic JS library patches
-// Validate result from document.all.item
-// Prevent unsolicited access to Java's deploymenttoolkit
-// Jive forum software doesn't work in Opera
-// Working around Transmenu's browser sniffing
-// Hide broken implementation of showModalDialog to make object detection reliable
-// PDF security patch
-// Workaround for jquery.jsonp plugin's workaround against missing onerror support
-// Disable sniffing in old HTMLArea editors
-// Asia-region Generic Patches
-// Facebook: work around iframe load event issue
-// remove document.charset
-// Make document.attachEvent extra undefined for Dojo 1.7.x
-// TinyMCE double IFRAME init problem, some versions
-// Unblock iCongo Platform product image zoom
+	// PATCH-621, Work around browser sniffing in old Macromedia menu script
+// DSK-223254, lines reversed on enter by workaround against old Opera bug
+// PATCH-204, TinyMCE 2.x uses document.selection in Opera
+// DSK-199930, no code in TinyMCE 2.x HTML source editor because it expects a different order of load events
+// PATCH-139, Generic JS library patches
+// PATCH-452, Validate result from document.all.item
+// PATCH-248, Jive forum software doesn't work in Opera
+// PATCH-503, Working around Transmenu's browser sniffing
+// PATCH-261, Hide broken implementation of showModalDialog to make object detection reliable
+// 246299, PDF security patch
+// PATCH-554, Workaround for jquery.jsonp plugin's workaround against missing onerror support
+// PATCH-298, Disable sniffing in old HTMLArea editors
+// PATCH-138, Asia-region Generic Patches
+// PATCH-604, Facebook: work around iframe load event issue
+// PATCH-605, remove document.charset
+// PATCH-616, Make document.attachEvent extra undefined for Dojo 1.7.x
+// PATCH-373, TinyMCE double IFRAME init problem, some versions
+// PATCH-622, Unblock iCongo Platform product image zoom
 
 	opera.defineMagicFunction('mmLoadMenus', function(func, context){
 	  window.__defineSetter__('mmIsOpera', function(){});
@@ -394,7 +394,7 @@ function setTinyMCEVersion(e){
 
 	// Use an event listener to detect specific scripts
 	opera.addEventListener( 'BeforeExternalScript', function(ev){
-		match.call=replace.call=indexOf.call=toLowerCase.call=postError.call=addEventListener.call=removeEventListener.call=version.call=parseFloat.call=defineMagicVariable.call=preventDefault.call=call;
+		match.call=replace.call=indexOf.call=toLowerCase.call=addEventListener.call=removeEventListener.call=version.call=parseFloat.call=defineMagicVariable.call=preventDefault.call=call;
 		
 		var name=ev.element.src; 
 		if( !name ){ return; } // no fixes required for SCRIPT xlink:href so far..
@@ -402,7 +402,7 @@ function setTinyMCEVersion(e){
 		if ( indexOf.call(name, 'dqm_')>-1 || indexOf.call(name, 'dnm_')>-1 || indexOf.call(name, 'cbrowser_opera.js')>-1 ){
 			// OpenCube menu
 			if(fixOpenCube(name)){
-				postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (OpenCube fix). See browser.js for details.');
+				log('OpenCube fix');
 			}
 			return;
 		}else if(  indexOf.call(name, 'hm_loader')>-1  ){
@@ -410,10 +410,10 @@ function setTinyMCEVersion(e){
 			// If we apply this fix to version 6.x the menu breaks.
 			// HM support recommends checking that HM_BrowserVersion is not defined
 			addEventListener.call(opera, 'BeforeScript', function(ev){ 
-				match.call=removeEventListener.call=postError.call=call;
+				match.call=removeEventListener.call=call;
 				if( ev.element.text && ! match.call(ev.element.text, /hm_browserversion/i) ){
 					fixHierMenus(name);
-					postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (HierMenus fix). See browser.js for details.');
+					log('HierMenus fix');
 				}
 				removeEventListener.call(opera, 'BeforeScript', arguments.callee, false);
 			}, false);
@@ -421,21 +421,21 @@ function setTinyMCEVersion(e){
 		}else if(  indexOf.call(name, 'mmenu')>-1 || indexOf.call(name, 'milonic')>-1  ){
 			// Milonic menu
 			fixMilonicMenu(name);
-			postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Milonic fix). See browser.js for details.');
+			log('Milonic fix');
 			return;
 		}else if(  match.call(name, /menu(\d*_(script|com|build|var|program|compact|animation)|e)\.js$/)  ){
 			// HV menu
 			fixHVMenu(name);
-			postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (HVMenu fix). See browser.js for details.');
+			log('HVMenu fix');
 			return;
 		}else if(  match.call(name, /udm[_-]/)  || (  match.call(name, /(sniffer|control)\.js$/)   )    ){
 			if(hostname.indexOf('usatoday.com')>-1)return; // PATCH-465
 			// UDM menu
 			addEventListener.call(opera, 'BeforeScript', function(ev){
-				match.call=postError.call=call;
+				match.call=call;
 				if( match.call(name, /udm[_-]/)  || indexOf.call(ev.element.text, 'UDM')>-1 || indexOf.call(ev.element.text, 'um.ov=um.ov.split(/opera[\\/ ]7./);um.ov=um.pi(um.ov[1].charAt(0));')>-1 ){
 					fixUDM(name);
-					postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (UDM fix). See browser.js for details.');
+					log('UDM fix');
 				}
 			}, false);
 			return;
@@ -445,18 +445,19 @@ function setTinyMCEVersion(e){
 					document.documentElement.clientHeight=window.innerHeight;
 					oF.apply(oT, slice.call(arguments, 2));
 			});
-			postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Height function fix). See browser.js for details');
+			log('Novell Height function fix');
 		}else if( indexOf.call(name, 'awmlib')>-1 ){
 				opera.addEventListener('BeforeScript', fixLiknoAllWebMenus, false);
+				log('AllWebMenus fix');
 		}else if( indexOf.call(name, 'io-upload-iframe')>-1 ){ // PATCH-697, Moodle / YUI upload
 		  addEventListener.call(opera, 'BeforeEventListener.load', function(e){
 		    if(e.event.target.id && indexOf.call(e.event.target.id, 'io_iframe')==0){
 		      try{if( e.event.target.contentDocument.body.textContent=='' )preventDefault.call(e);}catch(e){}
 		    }
 		  }, false);
-		  postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (YUI upload fix). See browser.js for details');
+		  log('YUI upload fix');
 		}else if( indexOf.call( name, 'tiny_mce' )>-1 && 'designMode' in document && !fixed){
-				postError.call(opera, 'TinyMCE detected. Various fixes applied. See browser.js for details');
+				log('TinyMCE detected. Various fixes applied.');
 				addEventListener.call(opera, 'BeforeScript', function(e){
 					indexOf.call=removeEventListener.call=call;
 					if( indexOf.call(e.element.src, 'tiny_mce'>-1) ){
@@ -473,18 +474,20 @@ function setTinyMCEVersion(e){
 				}, false);
 				fixed=true;
 		}else if(indexOf.call(name,'s_code')>-1||indexOf.call(name,'omniture')>-1){ //PATCH-59
-			avoidDocumentWriteAbuse();
-		}else if(indexOf.call(name,'setdomain.js')>-1){ //PATCH-128
+			avoidDocumentWriteAbuse(); // calls log()
+		}else if(indexOf.call(name,'setdomain.js')>-1){
 			navRestore.userAgent = navigator.userAgent;
 			navigator.userAgent+=' Gecko';
 			shouldRestore=true;
-		}else if(indexOf.call(name, '.virtualearth.net/mapcontrol')>-1 && !fixed){ 
+			log('PATCH-128, Sun Webmail set domain fix');
+		}else if(indexOf.call(name, '.virtualearth.net/mapcontrol')>-1 && !fixed){
 			if(prestoVersionBelow('2.12.356')){// required up to 2.12.356
 				addCssToDocument('.MicrosoftMap button:first-child{display:none}');
 				fixed=!0;
+				log('PATCH-768, MS Virtual Earth workaround applied');
 			}
 		}
-		if( typeof window._jive_plain_quote_text!='undefined' ){ // Jive forum embeds TinyMCE, possibly outdated versions - PATCH-248
+		if( typeof window._jive_plain_quote_text!='undefined' ){
 			opera.addEventListener('BeforeScript', function(e){
 				indexOf.call=removeEventListener=call;
 				if(indexOf.call(e.element.text, 'tinymce=')>-1){
@@ -493,6 +496,7 @@ function setTinyMCEVersion(e){
 					removeEventListener.call(opera, 'BeforeScript',arguments.callee,false);
 				}
 			}, false);
+			log('PATCH-248, Jive forum embeds TinyMCE, possibly outdated versions');
 		}
 		// Creating event handler to restore any changed navigator properties
 		if( shouldRestore ){
@@ -534,12 +538,9 @@ function setTinyMCEVersion(e){
 	};
 	}}catch(e){}
 
-	HTMLObjectElement.prototype.__defineGetter__('installJRE', function(){opera.postError('browser.js prevented page from calling method installJRE on object');} );
-	HTMLEmbedElement.prototype.__defineGetter__('installJRE', function(){opera.postError('browser.js prevented page from calling method installJRE on embed');} );
-
 	opera.defineMagicVariable('jive', null, function(obj){
 		navigator.userAgent='Mozilla/5.0 (Windows; U; Windows NT 5.1; rv:1.9.2) Gecko/20100115 Firefox/3.6';
-		opera.postError('Opera has modified the JavaScript on '+hostname+' (Jive forums fix). See browser.js for details');
+		log('PATCH-248, Jive forums fix');
 		return obj;
 	});
 
@@ -571,7 +572,7 @@ function setTinyMCEVersion(e){
 		var onloadmethod;
 		obj.__defineSetter__('onload', function(func){ onloadmethod=func;});
 		obj.__defineGetter__('onload', function(){ return function(){ try{ onloadmethod.call(this);}catch(e){ var instance=this; setTimeout(function(){instance.onload();}, 150); }}});
-		opera.postError('Opera has modified the JavaScript on '+hostname+' (HTMLArea fix). See browser.js for details');
+		log('PATCH-298, HTMLArea fix');
 		return obj;
 	});
 	
@@ -580,23 +581,23 @@ function setTinyMCEVersion(e){
 		var name=ev.element.src; 
 		if(!name){return;}
 		if(name.indexOf('api.e-map.ne.jp/jsapi.cgi?')!=-1){
-			// Zenrin Datacom E-Map API, PATCH-115
+			log('PATCH-115, Zenrin Datacom E-Map API fix applied');
 			if (!Event.prototype.__lookupGetter__('layerX')&&!Event.prototype.__lookupGetter__('layerY')) {
 				Event.prototype.__defineGetter__('layerX',function(){ return this.offsetX; });
 				Event.prototype.__defineGetter__('layerY',function(){ return this.offsetY; });
 			}
 			ev.element.src += '&force=1';
 		}else if((name.indexOf('expapi/authentication')!=-1)||(name.indexOf('expapi/expmapinclude')!=-1)||(name.indexOf('rosen/authentication')!=-1)){
-			// Rosenzu ASP Map Service map, PATCH-122
+			log('PATCH-122, Rosenzu ASP Map Service map fix applied');
 			opera.defineMagicFunction('_ch',function(){return true;});
 		}else if((name.indexOf('expapi/suggest')!=-1)||(name.indexOf('rosen/suggest')!=-1)){
-			// Rosenzu ASP Map Service suggestions, PATCH-122
+			log('PATCH-122, Rosenzu ASP Map Service suggestions fix applied');
 			opera.defineMagicFunction('checkBrowser',function(){return true;});
 		}else if(name.indexOf('http://ebook.webcatalog.jp/engine/java/7net/common/sCommonLib.js')!=-1){ 
-			// Netfly TrueEBook, PATCH-125
+			log('PATCH-125, Netfly TrueEBook fix applied');
 			opera.defineMagicFunction('funcGetBrowser',function(){return 2;}); 
 		}else if(name.indexOf('_zap/')!=-1 && name.indexOf('source/js/script.js')!=-1){ 
-			// ZAPPALLAS Fortune _zap, PATCH-471
+			log('PATCH-471, ZAPPALLAS Fortune _zap fix applied');
 			opera.defineMagicFunction('checkNavigator',function(){return true;}); 
 		}
 	},false);
@@ -638,6 +639,7 @@ function setTinyMCEVersion(e){
 		navigator.userAgent='0pera';
 		oF.apply(oT, slice.call(arguments, 2));
 		navigator.userAgent=ua;
+	        log('PATCH-622, Unblock iCongo Platform product image zoom');
 	});
 
 
@@ -647,10 +649,13 @@ function setTinyMCEVersion(e){
 				return true;
 			},false);
 		}
-		log('tokyo.jp, lg.jp enable maps');
+		log('PATCH-186, tokyo.jp, lg.jp enable maps');
 	} else if(hostname.contains('sheet.zoho.com')){
 		MouseEvent.prototype.axis=2;
-		log('Make mouse scrolling work in Zoho spreadsheets');
+		log('PATCH-766, Make mouse scrolling work in Zoho spreadsheets');
+	} else if(hostname.endsWith('ebayclassifieds.com') && pathname.match(/\/PostAd/)){
+		navigator.userAgent = navigator.userAgent.replace(/Opera/g,'0pera');
+		log('PATCH-784, eBay Classifieds - disable block on image uploader');
 	} else if(hostname.endsWith('mail.live.com')){
 		function fixButton(e) {
 			if (e.button == 1) {
@@ -698,11 +703,58 @@ function setTinyMCEVersion(e){
 		}
 		
 	
+		opera.addEventListener('BeforeScript', function (e) {
+			if (e.element.src.indexOf('fullex.js') > -1) {
+				e.element.text = e.element.text.replace('for(i.isArray(t)||(t in e?t=[t]:(t=i.camelCase(t),t=t in e?[t]:t.split(" "))),', 'if (!i.isArray(t))(t in e?t=[t]:(t=i.camelCase(t),t=t in e?[t]:t.split(" ")));for(');
+			}
+		}, false);
+		
+	
 		var styleSetterLookupMethod = document.createElement('span').style.__lookupSetter__;
 		 CSSStyleDeclaration.prototype.__lookupSetter__ = function(prop){
 			return styleSetterLookupMethod.call(document.createElement('span').style, prop);
 		 };
-		log('Fix drag and drop in Hotmail\nMispositioned sprites due to missing CSS\nEmulating IE\'s cssText prope...');
+		log('CORE-17444, Fix drag and drop in Hotmail\nCORE-17447, Mispositioned sprites due to missing CSS\n178723, Emulating IE\'s cssText property on style sheets\nPATCH-770, Fix minified jQuery on Hotmail\nDSK-235885, Hotmail uses lookupGetter on prototypes, not instances');
+	} else if(hostname.endsWith('members.webs.com')){
+		opera.addEventListener('BeforeScript', function (e) {
+			if (e.element.src.indexOf('underscore-base.js') > -1) {
+				e.element.text = e.element.text.replace(/this\.document\.styleSheets/gi, 'this.styleSheets');
+			}
+		}, false);
+		
+		log('PATCH-743, webs.com - fix reference to stylesheet variable');
+	} else if(hostname.endsWith('pb.com')){
+		navigator.userAgent=navigator.userAgent.replace( /Opera/g, '0pera not Mozilla' );
+	
+		document.addEventListener('DOMContentLoaded', function(){
+			if( document.selectSingleNode('//img[contains(@src, "LabelCutLine.")]') ){
+				for(var frame,i=0; frame=parent.frames[i];i++){
+				 frame.print=makePrint(frame, frame.print);
+				}
+			}
+			function makePrint(frame,realPrint){
+				return function(){
+					var docClone=frame.document.documentElement.cloneNode(true);
+					docClone.appendChild(document.createElement('script')).appendChild(document.createTextNode("setTimeout(function(){var p,style; (p=document.body.appendChild(document.createElement('p'))).appendChild(document.createTextNode('Please close this tab when your label is finished printing'));p.className='noprint';p.setAttribute('style', 'text-align:center; font-weight:bold; font-size: 1.5em;color:red');(style=document.body.appendChild(document.createElement('style'))).appendChild(document.createTextNode('.noprint{display:none}'));style.media='print';}, 2000);"));
+					var win=window.open( '', '_blank', 'width=750,height='+(frame.document.body.offsetHeight+150));
+					try{
+						win.document.replaceChild(docClone, win.document.documentElement);
+					}catch(e){
+						win.close();
+						realPrint.call(frame);
+						return;
+					}
+					setTimeout(function(){
+						win.print();
+					}, 100);
+				}
+			}
+		}, false);
+		
+		log('PATCH-774, Fix postage label printing failure with eBay/PayPal: avoid browser sniffing\nPATCH-774, Fix postage label printing failure with eBay/PayPal: frame.print() bug workaround');
+	} else if(hostname.endsWith('shaw.ca')){
+		opera.defineMagicFunction('detectBrowserVersion',function(){return true})
+		log('PATCH-788, shaw.ca: work around browser sniff');
 	} else if(hostname.endsWith('staples.com')){
 		(function(){
 			var xhrDocGetter=(new XMLHttpRequest).__lookupGetter__('responseXML');
@@ -716,7 +768,7 @@ function setTinyMCEVersion(e){
 			});
 		})();
 		
-		log('Opera throws when XSL variable has disable-output-escaping attribute, breaks sorting on staples.com');
+		log('PATCH-769, Opera throws when XSL variable has disable-output-escaping attribute, breaks sorting on staples.com');
 	} else if(hostname.indexOf("cang.baidu.com") != -1 ){
 		window.opera.defineMagicFunction(
 			"top",
@@ -725,25 +777,25 @@ function setTinyMCEVersion(e){
 			}
 		);
 		
-		log('cang.baidu.com for Baidu SouCang can\'t display saved items, window.top');
+		log('OTW-4761, cang.baidu.com for Baidu SouCang can\'t display saved items, window.top');
 	} else if(hostname.indexOf('.aaa.com')>-1){
 		opera.defineMagicVariable('ttp_isFirefox', function(){return true;}, null);
-		log('Fix AAA TripTik sniffing');
+		log('PATCH-646, Fix AAA TripTik sniffing');
 	} else if(hostname.indexOf('.aol.') >-1){
 		/* AOL */
 	
 	
 		if(hostname.indexOf('.aol.fr')>-1){
 			document.addEventListener('DOMContentLoaded', function(){document.documentElement.className='SAF';}, false);
-			log('aol.fr: give Opera better styling');
+			log('PATCH-563, aol.fr: give Opera better styling');
 		}
 		if(hostname.indexOf('aol.com')>-1){
 			avoidDocumentWriteAbuse();
 		
 			addPreprocessHandler(/\|\|adsUA\.indexOf\(\'opera\'\)>-1/,'');
-			log('Making sure AOL pages are not overwritten by ad script\nAol.com: Avoid ad overwrite');
+			log('188197, Making sure AOL pages are not overwritten by ad script\nPATCH-608, Aol.com: Avoid ad overwrite');
 		}
-		log('AOL');
+		log('0, AOL');
 	} else if(hostname.indexOf('.apple.com')>-1){
 		if(hostname.indexOf('store.')>-1){
 		 addCssToDocument('#apple-header.enhanced .links li{width: auto !important}');
@@ -756,21 +808,21 @@ function setTinyMCEVersion(e){
 		if(hostname.indexOf('daw.')>-1){
 		 addCssToDocument('#globalheader #globalnav li{width: auto !important}');
 		}
-		log('Make Apple Store menu visible\nEnable menu on Apple support pages\nEnable menu on Apple community pa...');
+		log('PATCH-387, Make Apple Store menu visible\nPATCH-387, Enable menu on Apple support pages\nPATCH-387, Enable menu on Apple community pages');
 	} else if(hostname.indexOf('.bmo.com')>-1){
 		addPreprocessHandler(/return "\(\?:"\+([^+]+)\+([^+]+)\+([^+]+)\+"\)\?";/, 'return ($1+$2+$3=="") ? "(?:)" : "(?:"+$1+$2+$3+")?";' );
-		log('RegExp parsing exception confuses Dojo, breaks BMO.com interface');
+		log('PATCH-676, RegExp parsing exception confuses Dojo, breaks BMO.com interface');
 	} else if(hostname.indexOf('.cnet.com')>-1){
 		addCssToDocument('*{box-shadow:none!important;}');
-		log('cnet: remove box-shadow to improve scrolling performance');
+		log('PATCH-567, cnet: remove box-shadow to improve scrolling performance');
 	} else if(hostname.indexOf('.delta.com')>-1){
 		addCssToDocument('fieldset#content{clear: both;}');
-		log('Fixing misaligned fieldset on Delta itinerary page');
+		log('PATCH-627, Fixing misaligned fieldset on Delta itinerary page');
 	} else if(hostname.indexOf('.ebay.')>-1 || hostname.indexOf('.ebaydesc.')>-1){
 		/* eBay issues */
 	
 	
-		// Avoid IFRAME resize causing lots of empty space on auctions
+		// PATCH-195, Avoid IFRAME resize causing lots of empty space on auctions
 	
 		function resizeIframesAndPassSizeOn(e){
 			if(e && e.type==='message' && e.origin.indexOf('ebaydesc')>-1){
@@ -822,7 +874,7 @@ function setTinyMCEVersion(e){
 			if(hostname.indexOf('signin.ebay.')>-1){
 			 addCssToDocument('#but_sgnBt, #but_register_signin{margin-left:0;padding-left: 8px;}');
 			}
-			log('eBay: make spatnav in menu work\neBay mixes security origins, basic photo upload fails\nebay: make s...');
+			log('PATCH-550, eBay: make spatnav in menu work\nPATCH-268, eBay mixes security origins, basic photo upload fails\nPATCH-565, ebay: make sign in buttons accessible with spatnav');
 		}
 		if(hostname.indexOf('.ebaydesc.')>-1){
 			window.addEventListener('load', function(){ 
@@ -834,21 +886,21 @@ function setTinyMCEVersion(e){
 				if(top!=self)parent.postMessage(document.documentElement.scrollHeight, '*');
 			}, 600);
 			
-			log('Avoid IFRAME resize causing lots of empty space on auctions (the IFRAME part)');
+			log('PATCH-195, Avoid IFRAME resize causing lots of empty space on auctions (the IFRAME part)');
 		}
-		log('eBay');
+		log('0, eBay');
 	} else if(hostname.indexOf('.evaair.com')>-1){
 		navigator.appName='Netscape';
-		log('evaair.com: broken sniffing');
+		log('PATCH-688, evaair.com: broken sniffing');
 	} else if(hostname.indexOf('.geoaccess.com')>-1){
 		navigator.appName='Netscape';
 		opera.defineMagicVariable('is_nav6up', function(){return true},null);
-		log('PacifiCare doctor finder blocks Opera');
+		log('PATCH-314, PacifiCare doctor finder blocks Opera');
 	} else if(hostname.indexOf('.google.')>-1){
 		/* Google */
 	
 	
-		// IME input invisible and does not trigger Google Suggest due to missing events
+		// PATCH-480, IME input invisible and does not trigger Google Suggest due to missing events
 	
 		(function(){
 			if(! document instanceof HTMLDocument) return;
@@ -876,16 +928,23 @@ function setTinyMCEVersion(e){
 	
 		if(hostname.indexOf('adwords.google.') > -1){
 			window.navigator.product = 'Gecko';
-			log('Fix disabled charts on Google AdWords');
+			log(' PATCH-332, Fix disabled charts on Google AdWords');
 		}
 		if(hostname.indexOf('code.google.')>-1 && (pathname.indexOf('diff')>-1 || pathname.indexOf('detail')>-1 )){
 			addCssToDocument('div.diff>pre>table{white-space: normal;}div.diff>pre>table th, div.diff>pre>table td{white-space: pre-wrap;}');
-			log('Work around pre inheritance into tables on Google Code');
+			log('PATCH-321, Work around pre inheritance into tables on Google Code');
 		}
 		if(hostname.indexOf('docs.google.')>-1){
 			if(pathname.indexOf('spreadsheet')>-1){
 			 addCssToDocument('.row-header-wrapper {display:inline}');
 			}
+		
+			opera.addEventListener('AfterEventListener.mousedown', function(e){
+				if( e.event.target && e.event.target.tagName=='OBJECT' ){
+					var ts=(new Date()).getTime();
+					while( (new Date()).getTime() - ts < 50 ){}
+				}
+			}, false);
 		
 			addCssToDocument('td.doclist-td-checkbox, td.doclist-td-name, td.doclist-td-star {width:auto !important}');
 		
@@ -899,17 +958,17 @@ function setTinyMCEVersion(e){
 				}
 			}, true);
 			
-			log('Google Spreadsheets cell size and column label size mismatch\ndocs.google: make document names visib...');
+			log('PATCH-382, Google Spreadsheets cell size and column label size mismatch\nPATCH-482, Delay mousedown event on Flash file upload to make sure Flash sees it\nPATCH-517, docs.google: make document names visible\nPATCH-278, We should not send keypress events for navigation- and function keys');
 		}
 		if(hostname.indexOf('mail.google.')>-1){
 			addCssToDocument('div.wl{overflow:inherit}body.aam{position:inherit}');
 		
 			addCssToDocument('body.editable.LW-avf{font-size: small !important}');
-			log('GMail: override overflow and fixed position styles to improve scrolling performance\nGMail: override...');
+			log('PATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
 		}
 		if(hostname.indexOf('maps.google.')>-1 || hostname.indexOf('mapy.google.')>-1){
 			opera.addEventListener('BeforeEventListener.mousedown', function(e){if(e.event.target.tagName=='OPTION')e.preventDefault()}, false);
-			log('GMaps: avoid autoclose of problem reporting dialog');
+			log('PATCH-610, GMaps: avoid autoclose of problem reporting dialog');
 		}
 		if(hostname.indexOf('plus.google')>-1){
 			(function(ps){ 
@@ -929,16 +988,16 @@ function setTinyMCEVersion(e){
 			
 		
 			addCssToDocument('div.B-u-nd-nb, div.s-r-Ge-ec {display:block}');
-			log('Work around bug that disregards BASE href on G+\nG+: avoid tall narrow posts due to word-wrap in tab...');
+			log('PATCH-680, Work around bug that disregards BASE href on G+\nPATCH-526, G+: avoid tall narrow posts due to word-wrap in table ');
 		}
-		log('Google');
+		log('0, Google');
 	} else if(hostname.indexOf('.hbo.com')>-1){
 		opera.defineMagicFunction('olderBrowserUnsupported', function(){return false;});
 		opera.defineMagicFunction('browserVersionGood', function(){return true;});
-		log('Avoid browser detection on hbo.com');
+		log('PATCH-399, Avoid browser detection on hbo.com');
 	} else if(hostname.indexOf('.hotwire.com')>-1){
 		addCssToDocument('div.OldBrowserPopupComp, div.mask{display:none !important}');
-		log('Hide browser warning on hotwire');
+		log('PATCH-390, Hide browser warning on hotwire');
 	} else if(hostname.indexOf('.in.gr')>-1){
 		document.addEventListener('DOMContentLoaded', function(){
 		 elm = document.getElementById('ticker-area');
@@ -946,7 +1005,7 @@ function setTinyMCEVersion(e){
 		  elm.innerHTML=elm.innerHTML.replace(/&nbsp;/,'');
 		 }
 		},false);
-		log('Correct placement of marquee on in.gr');
+		log('PATCH-367, Correct placement of marquee on in.gr');
 	} else if(hostname.indexOf('.ing.nl')>-1){
 		if(hostname.indexOf('ideal.')==0)(function(ib){
 		  Element.prototype.insertBefore=function(newC, refC){
@@ -973,16 +1032,19 @@ function setTinyMCEVersion(e){
 				return null;
 			}
 		})(Element.prototype.getAttribute);
-		log('Postphone inserted script which confuses frame breaker if run immediately\nWork around sniffing in o...');
+		log('PATCH-690, Postphone inserted script which confuses frame breaker if run immediately\nPATCH-76, Work around sniffing in old BackBase library on ing.nl\nPATCH-76, Make sure getAttribute() does not confuse an old BackBase lib\'s code where it uses namespace-like syntax');
 	} else if(hostname.indexOf('.intel.com')>-1){
 		addCssToDocument('div#browserdetectid{display:none !important}');
-		log('intel.com: hide "old_browser" message');
+		log('PATCH-723, intel.com: hide "old_browser" message');
+	} else if(hostname.indexOf('.jcrew.com')>-1){
+		XMLHttpRequest.prototype.__defineSetter__('onload', function(){ throw 'unsupported'; });
+		log('PATCH-338, If XHR doesn\'t support EventTarget interface, setting onload should throw');
 	} else if(hostname.indexOf('.nab.com.au')>-1){
 		opera.defineMagicFunction('detectBrowser', function(){return 'correct';});
-		log('nab.com.au: avoid browser warning');
+		log('PATCH-643, nab.com.au: avoid browser warning');
 	} else if(hostname.indexOf('.sina.com.cn')>-1){
 		navigator.userAgent += ' not Gecko';
-		log('sina.com: video doesn\'t play due to missing script readystate support');
+		log('PATCH-614, sina.com: video doesn\'t play due to missing script readystate support');
 	} else if(hostname.indexOf('.t-online.de')>-1){
 		if(hostname.indexOf('unterhaltung')>-1){
 					//Fix browser detection
@@ -1038,32 +1100,32 @@ function setTinyMCEVersion(e){
 			}
 		}, true);	
 		}
-		log(' video problems on T-online.de\n video problems on T-online.de, WMP license installation\nIndicate l...');
+		log('225374,  video problems on T-online.de\n231082,  video problems on T-online.de, WMP license installation\nPATCH-458, Indicate loading state while a form submit is in progress, fixes attachment upload on T-Online\nPATCH-474, Avoid compose IFRAME resize (body.scrollHeight should be document\'s height)');
 	} else if(hostname.indexOf('.terra.c')>-1){
 		//terra.cl, terra.com.{ar,br,mx,co,pe}
 		opera.defineMagicVariable('SonoraBrowserDetect', function(obj){ obj.browser='Firefox'; return obj; }, null)
-		log('Terra music: work around browser sniffing');
+		log('PATCH-623, Terra music: work around browser sniffing');
 	} else if(hostname.indexOf('.traffic.com')>-1){
 		addPreprocessHandler('(C.Opera)?document.body["client"+B]:document.documentElement["client"+B]', '(C.Opera)?document.documentElement["client"+B]:document.documentElement["client"+B]');
 		
-		log('Work around browser sniffing that breaks traffic.com');
+		log('PATCH-742, Work around browser sniffing that breaks traffic.com');
 	} else if(hostname.indexOf('.treasury.gov')>-1){
 		window.__defineGetter__( 'opera', function(){
 			if( arguments.callee.caller && arguments.callee.caller.name==='PopOut_Position' )return undefined;
 			return opera;
 		} );
-		log('Menu misplaced on treasury.gov due to window.opera sniffing in .NET JS library');
+		log('PATCH-730, Menu misplaced on treasury.gov due to window.opera sniffing in .NET JS library');
 	} else if(hostname.indexOf('.tv.com')>-1){
 		opera.addEventListener('BeforeCSS', function(e){
 		  e.cssText = e.cssText.replace(/br{content:"&nbsp;";/g,'br{ ');
 		}, false);
-		log('tv.com: workaround misuse of CSS generated content');
+		log('PATCH-720, tv.com: workaround misuse of CSS generated content');
 	} else if(hostname.indexOf('.ulead.') >-1){
 		 fixMilonicMenu('mmenu.js');
-		log('Ulead.com old Milonic menu');
+		log('DSK-130832, Ulead.com old Milonic menu');
 	} else if(hostname.indexOf('.usps.com')>-1){
 		opera.defineMagicVariable('browserSupported',function(){return true},null);
-		log('USPS: work around old browser sniff');
+		log('PATCH-718, USPS: work around old browser sniff');
 	} else if(hostname.indexOf('.videoload.de')>-1){
 				if( hostname.indexOf('vod')>-1 ){ // 231082
 					navigator.userAgent+=' Firefox';
@@ -1072,12 +1134,12 @@ function setTinyMCEVersion(e){
 	
 		window.external=window.external||{};
 		
-		log(' video problems on T-online.de, VOD section\n video problems on T-online.de, no window.external dete...');
+		log('231082,  video problems on T-online.de, VOD section\n226414,  video problems on T-online.de, no window.external detection');
 	} else if(hostname.indexOf('.yahoo.')>-1){
 		/* Yahoo! */
 	
 	
-		// Yahoo!: Enable logging in with other auth services, work around cross-domain navigation block
+		// PATCH-510, Yahoo!: Enable logging in with other auth services, work around cross-domain navigation block
 	
 		if( location.hostname.indexOf('open.login.yahoo')>-1 && window.opener ){
 			opera.addEventListener('BeforeScript', function(e){
@@ -1101,7 +1163,7 @@ function setTinyMCEVersion(e){
 					}
 			}, false);
 			
-			log('Y!Mail: work around browser sniffing again');
+			log('PATCH-325, Y!Mail: work around browser sniffing again');
 		}
 		if(hostname.indexOf('.mail.yahoo.')>-1&& ( href.indexOf( '/neo/launch' )>-1 || href.indexOf( '/dc/launch' )>-1 )){
 			opera.addEventListener('BeforeEventListener.mousedown', function(e){
@@ -1131,31 +1193,31 @@ function setTinyMCEVersion(e){
 				if(document.getElementById('rtetext') && document.getElementById('rtetext').getElementsByTagName('iframe').length)
 					document.getElementById('rtetext').getElementsByTagName('iframe')[0].style.height = '97%';
 			}, true);
-			log('Y!Mail Allow focusing subject field by mouse click in\nY!Mail Fix inserting links in mail compose sc...');
+			log('PATCH-417, Y!Mail Allow focusing subject field by mouse click in\nPATCH-418, Y!Mail Fix inserting links in mail compose screen\nPATCH-460, Y!Mail Prevent hidden text when composing long e-mails');
 		}
 		if(hostname.indexOf('.mail.yahoo.')>-1&&(href.indexOf( '/dc/system_requirements?browser=blocked' )>-1||href.indexOf( '/dc/system_requirements?browser=unsupported' )>-1)){
 			location.href='/dc/launch?sysreq=ignore';
 			
-			log('Y!Mail work around browser blocking');
+			log('194334, Y!Mail work around browser blocking');
 		}
 		if(hostname.indexOf('.mail.yahoo.')>=0 && pathname.indexOf('/dc/')==0){
 			if( location.search.indexOf('sysreq=ignore')>-1 ){
 				Node.prototype.selectSingleNode=undefined;
 				Node.prototype.selectNodes=undefined;
 			}
-			log('Y!Mail remove selectSingleNode and selectNodes ("old new mail" only)');
+			log('194334, Y!Mail remove selectSingleNode and selectNodes ("old new mail" only)');
 		}
 		if(hostname.indexOf('.mail.yahoo.')>=0 && pathname.indexOf('/mc/')==0){
 			avoidDocumentWriteAbuse();
-			log('Y!Mail Avoid overwriting classic inbox');
+			log('PATCH-359, Y!Mail Avoid overwriting classic inbox');
 		}
 		if(hostname.indexOf('finance.yahoo.')>-1){
 			navigator.userAgent = 'Mozilla/5.0 (Windows NT 5.1; rv:6.0) Gecko/20100101 Firefox/6.0'; 
-			log('Fool browser sniffing that prevents stock ticker on Yahoo Finance');
+			log('PATCH-297, Fool browser sniffing that prevents stock ticker on Yahoo Finance');
 		}
 		if(hostname.indexOf('finance.yahoo.com')>-1){
 			opera.addEventListener('BeforeEventListener.focusout', function(e){e.preventDefault();}, false);
-			log('Prevent currency menu from closing too fast on Y!Finance');
+			log('PATCH-406, Prevent currency menu from closing too fast on Y!Finance');
 		}
 		if(hostname.indexOf('mail.yahoo')>-1){
 			opera.addEventListener('BeforeEvent.keypress', function(e){
@@ -1163,9 +1225,10 @@ function setTinyMCEVersion(e){
 					e.event.charCode=0;
 				}
 			}, false);
-			log('Y!Mail Keyboard navigation of autocomplete menu fails');
+			log('DSK-263826, Y!Mail Keyboard navigation of autocomplete menu fails');
 		}
 		if(hostname.indexOf('yahoo.co.jp')>-1){
+			opera.defineMagicVariable('judgeMethod',function(curVal){if(curVal && curVal.indexOf('genOSError')<0 && curVal.indexOf('genBrowserError')<0){return(curVal)}return null},null);	// Player.js
 			opera.defineMagicFunction('isCommonEnvCheck',function(){return true});	// JudgeCommonEnv.js
 			opera.defineMagicFunction('isSilverLightEnvCheck',function(){return true});	// checkenv-min.js
 			opera.defineMagicVariable('Silverlight',function(obj){	// Silverlight.supportedUserAgent.js
@@ -1175,15 +1238,17 @@ function setTinyMCEVersion(e){
 				}catch(e){return undefined;}
 			},
 			null);
-			log('Yahoo! Japan services block Opera from using Silverlight plugin');
+			log('PATCH-498, Yahoo! Japan services block Opera from using Silverlight plugin');
 		}
 		if(self==top&&hostname.indexOf('.mail.yahoo.co.jp')>-1&&(href.indexOf( '/neo/launch' )>-1&&location.search.indexOf('?reason=ignore')!=0)){
 			location.href='/neo/launch?reason=ignore'+location.search.replace(/^\?/, '&');
 			
-			log('Y!Mail work around browser blocking');
+			log('PATCH-325, Y!Mail work around browser blocking');
 		}
-		log('Yahoo!');
+		log('0, Yahoo!');
 	} else if(hostname.indexOf('.yammer.com')>-1){
+		if(hostname.indexOf('ymodules')>-1)addPreprocessHandler(/return!window\.JQUERY_ADDRESS_INFRAME&&top\.document!==UNDEFINED\?top:window;/, 'return!window.JQUERY_ADDRESS_INFRAME&&top.document!==UNDEFINED&&top.document.URL?top:window;');
+	
 		window.addEventListener('message', function(e){
 			if(e.data=='{"__opera_bjs_getURL":""}' && e.origin.match(/https:\/\/(www|ymodules)\.yammer\.com/)){
 				e.source.postMessage('{"__opera_bjs_getURLResponse": "'+location.href+'"}', '*');
@@ -1202,13 +1267,33 @@ function setTinyMCEVersion(e){
 				parent.postMessage('{"__opera_bjs_getURL":""}', '*');
 			}catch(e){}
 		}
-		log('Yammer: work around limitation on setting document.referrer inside https IFRAME');
+		log('PATCH-512, Yammer: work around missing exception when strictly comparing doc from other origin with undefined\nPATCH-512, Yammer: work around limitation on setting document.referrer inside https IFRAME');
+	} else if(hostname.indexOf('.youtube.com')>-1){
+		if (pathname.indexOf('/leanback')>-1) {
+			var tmp=document.createElement('svg');
+			var str=tmp.__lookupSetter__('className');
+			SVGSVGElement.prototype.__defineSetter__('className',function(val){
+				try { return str.call(this, val); } catch(e) { }
+			});
+		}
+	
+		if(hostname.indexOf('upload.')==0){
+		 navigator.plugins["Silverlight Plug-In"]=null;
+		}
+		log('PATCH-478, Fix annotations and advance to next video on YouTube leanback\nPATCH-506, YouTube: avoid Silverlight uploader');
 	} else if(hostname.indexOf('265.com')>-1){
 		addCssToDocument('#coolSites .body li, #coolSites .body li a{line-height:2em !important}')
-		log('Avoid overflowing text on 265.com');
+		log('PATCH-475, Avoid overflowing text on 265.com');
 	} else if(hostname.indexOf('aeonretail.jp')>-1){
 		addPreprocessHandler(/var el = win \? \$\.browser\.opera \? document\.body : document\.documentElement : elem;/, 'var el = win ? document.documentElement : elem;', true, function(elm){ return elm.src&&elm.src.indexOf('scroll.js')>-1&&elm.text.indexOf('Opera 9.22')>-1; });
-		log('Make links work on Aeonretail (outdated jQuery plugin detects Opera and scrolls up)');
+		log('PATCH-88, Make links work on Aeonretail (outdated jQuery plugin detects Opera and scrolls up)');
+	} else if(hostname.indexOf('aireuropa.com')>-1){
+		window.addEventListener('load', function(){
+		  for(var elms=document.getElementsByTagName('form'),el,i=0; el=elms[i]; i++){
+		    if(el.name)document[el.name]=el;
+		  }
+		}, false);
+		log('PATCH-647, Named form elements not creating document properties in XSLT-generated page');
 	} else if(hostname.indexOf('alfresco.com')>-1){
 		if(hostname.indexOf('alfresco.com')>-1){
 			if(pathname.indexOf('help/')>-1){
@@ -1216,7 +1301,7 @@ function setTinyMCEVersion(e){
 				window.opera = null;
 			}
 		}
-		log('Get rid of browser warning on Alfresco help pages');
+		log('PATCH-467, Get rid of browser warning on Alfresco help pages');
 	} else if(hostname.indexOf('amazon.')>-1){
 		window.opera.addEventListener('BeforeScript', function (ev) {
 			var name=ev.element.src; 
@@ -1229,28 +1314,28 @@ function setTinyMCEVersion(e){
 		if (navigator.appName!=='Opera'){
 			document.documentElement.style.MozAppearance = 'Opera';
 		}
-		log('Fix displaying recommended items in Amazon\nAdd more spoofing when masking as another browser on Ama...');
+		log('PATCH-652, Fix displaying recommended items in Amazon\nPATCH-527, Add more spoofing when masking as another browser on Amazon');
 	} else if(hostname.indexOf('ameba.jp')!=-1){
 		addPreprocessHandler(/editor\.insertNodeAtSelection\(link\);\s*editor\.insertNodeAtSelection\(document\.createElement\('br'\)\);/, 'editor.insertNodeAtSelection(link);');
-		log('Work around Opera bug where second BR tag overwrites newly inserted IMG');
+		log('331093, Work around Opera bug where second BR tag overwrites newly inserted IMG');
 	} else if(hostname.indexOf('archives.aisne.fr')>-1){
 		defineMagicVariable.call(opera, 'isNS', function(){ return true }, null);
-		log('Fix document viewer on Archives départementales de l\'Aisne');
+		log('PATCH-682, Fix document viewer on Archives départementales de l\'Aisne');
 	} else if(hostname.indexOf('area-11.com')>-1){
 		window.constructor={};
 		window.constructor.prototype={};
-		log('area-11.com: prevent high CPU usage');
+		log('PATCH-695, area-11.com: prevent high CPU usage');
 	} else if(hostname.indexOf('argos.co.uk')>-1){
 		if(HTMLBodyElement.prototype.__defineGetter__)HTMLBodyElement.prototype.__defineGetter__('clientHeight', function(){return this.ownerDocument.documentElement.clientHeight;});
-		log('argos.co.uk: work around old jQuery/Opera clientHeight issue');
+		log('PATCH-583, argos.co.uk: work around old jQuery/Opera clientHeight issue');
 	} else if(hostname.indexOf('athome.co.jp') > -1){
 		opera.defineMagicFunction('checkTargetBrowser',function(){});
 		opera.defineMagicFunction('checkTargetCookie',function(){});
-		log('athome.co.jp Hide warning messages because of Browser UA');
+		log('PATCH-147, athome.co.jp Hide warning messages because of Browser UA');
 	} else if(hostname.indexOf('b9dm.com')>-1){
 		window.constructor={};
 		window.constructor.prototype={};
-		log('b9dm.com: prevent high CPU usage');
+		log('PATCH-694, b9dm.com: prevent high CPU usage');
 	} else if(hostname.indexOf('balkanweb.com')>-1){
 		opera.defineMagicFunction('ticker_start', function(oRealFunc, oThis){
 			var ua=navigator.userAgent;
@@ -1258,17 +1343,17 @@ function setTinyMCEVersion(e){
 			oRealFunc.call(oThis);
 			navigator.userAgent=ua;
 		});
-		log('Enable news ticker on Balkanweb');
+		log('PATCH-421, Enable news ticker on Balkanweb');
 	} else if(hostname.indexOf('bankofamerica.com')>-1){
 		opera.defineMagicFunction('getVersionString', function(){ return ''+parseFloat(opera.version()); });
-		log('Broken browser sniffing prevents SafePass login on Bank of America site');
+		log('PATCH-668, Broken browser sniffing prevents SafePass login on Bank of America site');
 	} else if(hostname.indexOf('bcbssc.com')>-1){
 		(function(gEBI) { 
 		  document.getElementById = function(idOrName) { 
 		    return gEBI.call(document, arguments) || document.getElementsByName(idOrName)[0] || null; 
 		  }; 
 		})(document.getElementById);
-		log('Blue Cross SC looks up named elements with getElementById()');
+		log('PATCH-93, Blue Cross SC looks up named elements with getElementById()');
 	} else if(hostname.indexOf('bing.com')>-1 && pathname.indexOf('/images/')>-1){
 		var locationReplace = Location.prototype.replace;
 		Location.prototype.replace=function(uri){
@@ -1278,7 +1363,7 @@ function setTinyMCEVersion(e){
 			if (olduri == newuri) history.replaceState({}, document.title, uri);		
 			else locationReplace.call( this, uri );
 		}
-		log('Bing Image Search adds history entries when scrolling results');
+		log('PATCH-545, Bing Image Search adds history entries when scrolling results');
 	} else if(hostname.indexOf('bing.com')>-1 && pathname.indexOf('/maps')>-1){
 		if(navigator.mimeTypes['application/x-silverlight-2'] &&
 			navigator.mimeTypes['application/x-silverlight-2'].enabledPlugin)(function(){
@@ -1292,22 +1377,22 @@ function setTinyMCEVersion(e){
 			});
 		})();
 		
-		log('Bing Maps deadlock on accessing document.cookie from Silverlight');
+		log('PATCH-534, Bing Maps deadlock on accessing document.cookie from Silverlight');
 	} else if(hostname.indexOf('boards.4chan.org')>-1){
 		addCssToDocument('td.reply blockquote, td.replyhl blockquote{margin-bottom: 1em}');
-		log('4chan: add bottom margin to blockquote for better readability');
+		log('PATCH-585, 4chan: add bottom margin to blockquote for better readability');
 	} else if(hostname.indexOf('bolsamadrid.es')>-1){
 		opera.defineMagicVariable('is', function(obj){obj.ns6=true;return obj}, null);
-		log('Work around browser sniffing that hides Spain\'s stock exchange\'s menu');
+		log('PATCH-736, Work around browser sniffing that hides Spain\'s stock exchange\'s menu');
 	} else if(hostname.indexOf('boortz.com')>-1){
 		opera.addEventListener('BeforeCSS', function(e){
 		  e.cssText = e.cssText.replace(/#cmArticleWell q:before,#cmArticleWell blockquote,.cmStaffBioContent q:before,.cmStaffBioContent blockquote{ content:open-quote}/g,'#cmArticleWell q:before,.cmStaffBioContent q:before{content:open-quote}')
 		  .replace(/#cmArticleWell q:after,#cmArticleWell blockquote,.cmStaffBioContent q:after,.cmStaffBioContent blockquote{content:close-quote}/g,'#cmArticleWell q:after,.cmStaffBioContent q:after{content:close-quote}');
 		}, false);
-		log('boortz.com: override abuse of CSS content on real elements');
+		log('PATCH-665, boortz.com: override abuse of CSS content on real elements');
 	} else if(hostname.indexOf('britannica.com')>-1){
 		avoidDocumentWriteAbuse();
-		log('Prevent overwriting document with stats graphic on britannica.com');
+		log('332948, Prevent overwriting document with stats graphic on britannica.com');
 	} else if(hostname.indexOf('cajamadrid.es')!=-1){
 		document.addEventListener( 'DOMContentLoaded', function(){
 			for(var collection=document.getElementsByClassName('clearfix'), el; el=collection[0];){
@@ -1315,13 +1400,13 @@ function setTinyMCEVersion(e){
 			}
 		}, false );
 		
-		log('Caja Madrid hides login form by CSS mistake');
+		log('PATCH-208, Caja Madrid hides login form by CSS mistake');
 	} else if(hostname.indexOf('cambrian.mb.ca')>-1){
 		HTMLTableElement.prototype.__defineGetter__('all', function(){});
 		HTMLTableCellElement.prototype.__defineGetter__('all', function(){});
 		HTMLDivElement.prototype.__defineGetter__('all', function(){});
 		
-		log('Enable log-in button on Cambrian bank');
+		log('PATCH-285, Enable log-in button on Cambrian bank');
 	} else if(hostname.indexOf('capitecbank.co.za')>-1){
 		(function(){
 		  var scriptQ=[];
@@ -1335,37 +1420,37 @@ function setTinyMCEVersion(e){
 		  }, false);
 		})();
 		
-		log('fake script @defer support on capitecbank.co.za');
+		log('PATCH-667, fake script @defer support on capitecbank.co.za');
 	} else if(hostname.indexOf('cdec-sic.cl')!=-1){
 		fixHierMenus();
-		log('Old HierMenus on cdec-sic.cl');
+		log('365516, Old HierMenus on cdec-sic.cl');
 	} else if(hostname.indexOf('cnnturk.com')>-1){
 		addCssToDocument('#fbtm div.dtc{bottom:-170px !important;}#fbtm div.dtc ul{position: static !important; display:inline !important}');
-		log('cnnturk: work around CSS bug that causes footer content to float upwards');
+		log('PATCH-509, cnnturk: work around CSS bug that causes footer content to float upwards');
 	} else if(hostname.indexOf('computerra.ru')>-1){
 		document.addEventListener('DOMContentLoaded', function(){
 			if(window.jsUtils&&window.jsUtils.bOpera)jsUtils.bOpera=false;
 		}, false);
-		log('Make BBCode editor buttons work by disabling Opera sniffing');
+		log('PATCH-267, Make BBCode editor buttons work by disabling Opera sniffing');
 	} else if(hostname.indexOf('credit-suisse.com')>-1 ){
 		addPreprocessHandler(/GBrowserIsCompatible\(\)&&\!\$\.browser\.opera/, 'GBrowserIsCompatible()');
-		log('Credit Suisse second-guesses GMaps GBrowserIsCompatible, adds extra Opera blocking');
+		log('PATCH-762, Credit Suisse second-guesses GMaps GBrowserIsCompatible, adds extra Opera blocking');
 	} else if(hostname.indexOf('cs.kddi.com')>-1){
 		HTMLInputElement.prototype.__defineSetter__('disabled', function(){});
-		log('Fix disabled buttons on KDDI Customer Support page');
+		log('PATCH-656, Fix disabled buttons on KDDI Customer Support page');
 	} else if(hostname.indexOf('danawa.com')!=-1 && href.indexOf('danawa.com/product/item.html')!=-1){
 		HTMLBodyElement.prototype.__defineGetter__('offsetHeight', function(){
 			return  (this.scrollHeight);
 		});
 		
-		log('Iframe content height is too small and not expanded on danawa.com');
+		log('PATCH-14, Iframe content height is too small and not expanded on danawa.com');
 	} else if(hostname.indexOf('dell.com')>-1){
 		if(pathname.indexOf('/support/')==0){
 		 opera.addEventListener('BeforeCSS', function(e){
 		  e.cssText = e.cssText.replace(/white-space: -o-pre-wrap;/g,'');
 		 }, false);
 		}
-		log('dell.com: work around misguided use of prefixed white-space CSS property');
+		log('PATCH-710, dell.com: work around misguided use of prefixed white-space CSS property');
 	} else if(hostname.indexOf('di.jal.co.jp')>-1){
 		var dw=document.write;
 		var MapViewer_dw;
@@ -1382,31 +1467,31 @@ function setTinyMCEVersion(e){
 		window.addEventListener('load',function(e){
 			document.getElementById('MapViewer_holder').outerHTML = MapViewer_dw;
 		},false)
-		log('Delay script execution on JAL map');
+		log('PATCH-237, Delay script execution on JAL map');
 	} else if(hostname.indexOf('directv.com')>-1){
 		opera.defineMagicFunction('printContingencyWarningMessage',function(){});
-		log('directv.com: suppress old browser message');
+		log('PATCH-721, directv.com: suppress old browser message');
 	} else if(hostname.indexOf('e-pagofacil.com')>-1){
 		opera.defineMagicFunction('PNG_loader', function(){return false});
 		
-		log('Avoid IE PNG transparency bug workaround that hides submit button');
+		log('PATCH-734, Avoid IE PNG transparency bug workaround that hides submit button');
 	} else if(hostname.indexOf('easycruit.com')>-1){
 		fixIFrameSSIscriptII('resizeIframe');
-		log('Fujitsu recruitment page on EasyCruit hides content due to browser sniffing');
+		log('PATCH-219, Fujitsu recruitment page on EasyCruit hides content due to browser sniffing');
 	} else if(hostname.indexOf('engfilms.ru')>-1){
 		navigator.product = "Gecko";
-		log('engfilms.ru: needs navigator.product to work');
+		log('PATCH-699, engfilms.ru: needs navigator.product to work');
 	} else if(hostname.indexOf('enter.nifmail.jp') > -1){
 		opera.defineMagicFunction('checkBrowser',function(){
 			return 1;
 		},false);
-		log('Nifmail web mail bypass browser blocking');
+		log('OTW-4878, Nifmail web mail bypass browser blocking');
 	} else if(hostname.indexOf('espn.go.com')>-1){
 		navigator.appName="netscape";
-		log('Make sure the ESPN polls work');
+		log('PATCH-375, Make sure the ESPN polls work');
 	} else if(hostname.indexOf('etour.co.jp') > -1){
 		navigator.appName='Netscape';
-		log('etour.co.jp fix non-disappearing overlapping image');
+		log('PATCH-152, etour.co.jp fix non-disappearing overlapping image');
 	} else if(hostname.indexOf('facebook.com')>-1){
 		if( top==self && location.href.indexOf('www.facebook.com/dialog/')>-1 && location.protocol==='https:' ){
 			var buggy=false;
@@ -1456,30 +1541,53 @@ function setTinyMCEVersion(e){
 	
 		addCssToDocument('div.fbNubFlyoutBody.scrollable{position:inherit}');
 	
+		opera.addEventListener('BeforeEventListener.keypress', function(e){
+			if( e.event.ctrlKey && (e.event.keyCode==86 || e.event.keyCode==118 ) ){
+				var trgt=e.event.target;
+				setTimeout(
+					function(){ 
+						var evt=document.createEvent('Event');
+						evt.initEvent('paste', true, true);
+						trgt.dispatchEvent(evt);
+					}, 10
+				);
+			}
+		}, false);
+	
+		addPreprocessHandler(/else CSS\.hide\(this\._gripper\);this\._checkContentBoundaries\(\);return this;\}/,'else CSS.hide(this._gripper);return this;}');
+	
 		opera.addEventListener('BeforeCSS', function(e){
 			e.cssText = e.cssText.replace(/border-(top|bottom)-(right|left)-radius:3px/g, '');
 		}, false);
 		
-		log('facebook: work around Opera\'s too strict origin checks on https for https -> http(s) other site -> h...');
+		log('PATCH-630, facebook: work around Opera\'s too strict origin checks on https for https -> http(s) other site -> https IFRAME communication\nPATCH-714, facebook: prevent chat window overflow - Presto bug\nPATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status\nPATCH-558, Facebook avoid chat list scroll\nPATCH-573, Facebook\'s border-radius triggers hyperactive reflow bug, performance suffers');
 	} else if(hostname.indexOf('fintyre.it')>-1){
 		navigator.appName = "Netscape";
-		log('fintyre.it: work around sniffing');
+		log('PATCH-661, fintyre.it: work around sniffing');
 	} else if(hostname.indexOf('forever21.co.jp') > -1){
 		if (pathname.indexOf('QuickView.aspx')>-1) {
 			addCssToDocument('html{background:#fff}');
 		}
-		log('missing QuickView background color on Forever21.co.jp');
+		log('PATCH-617, missing QuickView background color on Forever21.co.jp');
 	} else if(hostname.indexOf('frys.com')>-1){
 		addPreprocessHandler('self.parent.location=document.location;','if(self!=top)self.parent.location=document.location;');
-		log('frys.com: avoid racy framebuster due to lack of script async');
+		log('PATCH-638, frys.com: avoid racy framebuster due to lack of script async');
+	} else if(hostname.indexOf('g4tv.com')>-1){
+		window.addEventListener('DOMContentLoaded', function(e){
+			var el;
+			if(el=document.getElementsByClassName('content-list editorial variation-2')[0]){
+				el.style.width='634px';
+			}
+		}, false);
+		log('PATCH-281, messed up layout in lower part of page due to wrong percentage rounding');
 	} else if(hostname.indexOf('geforce.com')>-1&&pathname.toLowerCase().indexOf('/drivers')>-1){
 		addCssToDocument('div.main,div.mainContent,div.rightNav,div.middle,div.contentMiddle,div.innerBox,div.innerMiddle{position:static !important;}');
 		
-		log('geforce.com: fix unclickable options on custom select box');
+		log('PATCH-521, geforce.com: fix unclickable options on custom select box');
 	} else if(hostname.indexOf('geoaccess.com')!=-1){
 		opera.defineMagicVariable('is_nav', function(){return true;}, null);
 		
-		log(' BlueCross browser sniffing prevents insurance search');
+		log('318050,  BlueCross browser sniffing prevents insurance search');
 	} else if(hostname.indexOf('goo.ne.jp')>-1){
 		HTMLElement.prototype.__defineGetter__('currentStyle', function(){})
 		document.addEventListener('DOMContentLoaded',function(e){
@@ -1487,10 +1595,10 @@ function setTinyMCEVersion(e){
 				createSuggest();
 			}
 		},false);
-		log('Fix search suggestions on Goo search engine');
+		log('PATCH-650, Fix search suggestions on Goo search engine');
 	} else if(hostname.indexOf('googletv.blogspot.')>-1){
 		addCssToDocument('div.post-body div{text-align:inherit !important}');
-		log('GoogleTV: fix broken word spacing - Opera bug');
+		log('PATCH-603, GoogleTV: fix broken word spacing - Opera bug');
 	} else if(hostname.indexOf('hk.centamap.com')>-1){
 		document.addEventListener('DOMContentLoaded',function(evt){
 			parent.document.body.__defineGetter__('offsetHeight',function(){ return parent.window.innerHeight; });
@@ -1498,55 +1606,55 @@ function setTinyMCEVersion(e){
 		},false);
 		
 		
-		log('Fix missing menu and misplaced highlights on hk.centamap.com');
+		log('PATCH-318, Fix missing menu and misplaced highlights on hk.centamap.com');
 	} else if(hostname.indexOf('huffingtonpost.com')>-1){
 		addPreprocessHandler(/\|\|adsUA\.indexOf\(\'opera\'\)>-1/,'');
-		log('Huffingtonpost: Avoid ad overwrite');
+		log('PATCH-601, Huffingtonpost: Avoid ad overwrite');
 	} else if(hostname.indexOf('huntington.com')>-1){
 		opera.defineMagicVariable('browserOkay',function(){return true},null);
-		log('huntington.com: work around browser sniff');
+		log('PATCH-712, huntington.com: work around browser sniff');
 	} else if(hostname.indexOf('inetdec.nra.bg')>-1){
 		addPreprocessHandler( /if\(newiframe&&!window.opera\)/g, 'if(newiframe)', true, function(el){return el.src.indexOf('scripts.js')>-1;} );
-		log('nra.bg: work around captcha load issue');
+		log('PATCH-537, nra.bg: work around captcha load issue');
 	} else if(hostname.indexOf('infinitiusa.com')>-1 || hostname.indexOf('nissanusa.com')>-1){
 		opera.addEventListener('BeforeScript', function(e){
 			if (e.element.src.indexOf('codepack.incGlobPaths.true.content.js')>-1){
 				e.element.text = e.element.text.replace(/function\(un\){s\.un=un;/,"function(un){var s=this;s.un=un;");
 			}
 		}, false);
-		log('Fix SiteCatalyst H.9 code on Nissan/Infiniti USA');
+		log('PATCH-529, Fix SiteCatalyst H.9 code on Nissan/Infiniti USA');
 	} else if(hostname.indexOf('insubuy.com')>-1){
 		HTMLElement.prototype.onselectstart = true;
-		log('insubuy.com: don\'t prevent mouse click');
+		log('PATCH-703, insubuy.com: don\'t prevent mouse click');
 	} else if(hostname.indexOf('internetbank.swedbank.se')>-1){
 		Event.prototype.__defineGetter__('charCode', function(){if( this.keyCode>=48 && this.keyCode<=57  )return this.keyCode;});
-		log('SwedBank: temporary work around for mismatch between window.event support and charcode support');
+		log('PATCH-611, SwedBank: temporary work around for mismatch between window.event support and charcode support');
 	} else if(hostname.indexOf('investordaily.com.au')>-1){
 		opera.defineMagicFunction('minmax_scan', function(){});
-		log('Override minmax IE helper script');
+		log('PATCH-238, Override minmax IE helper script');
 	} else if(hostname.indexOf('jabong.com')>-1){
 		opera.addEventListener('BeforeCSS', function(e){
 		  e.cssText = e.cssText.replace(/.clearfix:after,#content,#content:after,/g,'.clearfix:after,#content:after,');
 		}, false);
-		log('jabong.com: override usage of CSS content property on element content');
+		log('PATCH-658, jabong.com: override usage of CSS content property on element content');
 	} else if(hostname.indexOf('journalism.org')>-1){
 		fixIFrameSSIscriptII('resizeIframe');
-		log('journalism.org: fix old IFrame SSI script');
+		log('PATCH-523, journalism.org: fix old IFrame SSI script');
 	} else if(hostname.indexOf('kort.arealinfo.dk')>-1){
 		opera.defineMagicVariable('op', function(){return false}, null);
-		log('Disable Opera detection that causes hidden content');
+		log('PATCH-348, Disable Opera detection that causes hidden content');
 	} else if(hostname.indexOf('latenightwithjimmyfallon.com')>-1){
 		window.addEventListener('load', function(){
 			if(window.DPSVPlayer && window.DPSVPlayer.onReady)DPSVPlayer.onReady.call(window);
 		}, false);
 		
-		log('Unexpected script loading order breaks video player ready check');
+		log('PATCH-615, Unexpected script loading order breaks video player ready check');
 	} else if(hostname.indexOf('lottery.sina.2caipiao.com')>-1){
 		fixIFrameSSIscriptII('dyniframesize');
-		log('2caipiao.com: fix iframe resize');
+		log('PATCH-556, 2caipiao.com: fix iframe resize');
 	} else if(hostname.indexOf('loyalbank.com')>-1){
 		HTMLElement.prototype.onselectstart = true;
-		log('loyalbank.com: prevent mousedown prevention');
+		log('PATCH-707, loyalbank.com: prevent mousedown prevention');
 	} else if(hostname.indexOf('mapion.co.jp')>-1){
 		opera.addEventListener('BeforeScript',function(ev){
 			var name=ev.element.src; 
@@ -1562,20 +1670,20 @@ function setTinyMCEVersion(e){
 				e.preventDefault();
 			}
 		},false);
-		log('Enable keyboard controls on Mapion');
+		log('PATCH-649, Enable keyboard controls on Mapion');
 	} else if(hostname.indexOf('mb.softbank.jp')!=-1){
 		window.opera.addEventListener('BeforeScript', function (e) {
 			if (e.element.src.indexOf('history.js') > -1) {
 				e.element.text = e.element.text.replace(/if \(!this.is_op && hash\)/gi, 'if (hash)');
 			}
 		}, false);
-		log('SoftBank Mobile History Plugin browser sniffing');
+		log('PATCH-588, SoftBank Mobile History Plugin browser sniffing');
 	} else if(hostname.indexOf('merriam-webster.com')>-1){
 		addCssToDocument('embed[hidden=true]{display:inline;width:0;height:0;}');
-		log('Merriam-Webster: override embed with hidden attribute. Conflicts with HTML global hidden attribute.');
+		log('PATCH-540, Merriam-Webster: override embed with hidden attribute. Conflicts with HTML global hidden attribute.');
 	} else if(hostname.indexOf('myspace.com')>-1){
 		addCssToDocument('.punymce iframe{display:inline!important}');
-		log('MySpace: fix smiley insertion in mail and blog editor');
+		log('PATCH-487, MySpace: fix smiley insertion in mail and blog editor');
 	} else if(hostname.indexOf('nbc.com')>-1){
 		navigator.userAgent += " Chrome/5.0.375.9 Safari/533.4";
 	
@@ -1583,10 +1691,10 @@ function setTinyMCEVersion(e){
 			if(window.DPSVPlayer && window.DPSVPlayer.onReady)DPSVPlayer.onReady.call(window);
 		}, false);
 		
-		log('Make NBC videos work\nUnexpected script loading order breaks video player ready check');
+		log('PATCH-236, Make NBC videos work\nPATCH-577, Unexpected script loading order breaks video player ready check');
 	} else if(hostname.indexOf('nbs.rs')>-1){
 		fixIFrameSSIscriptII('dyniframesize');
-		log('nbs.rs: fix iframe resize');
+		log('PATCH-704, nbs.rs: fix iframe resize');
 	} else if(hostname.indexOf('news.qq.com')>-1){
 		var gEBI=document.getElementById;
 		document.getElementById=function(){
@@ -1596,15 +1704,15 @@ function setTinyMCEVersion(e){
 		}
 	
 		fakeCSSFilters();
-		log('weather.news.qq.com expects getElementById() to find named elements\nqq.com uses IE-style CSS filter...');
+		log('PATCH-112, weather.news.qq.com expects getElementById() to find named elements\nOTW-4861, qq.com uses IE-style CSS filters');
 	} else if(hostname.indexOf('oakley.com')>-1){
 		opera.addEventListener('BeforeCSS', function(e){
 		  e.cssText = e.cssText.replace(/#nav ul#nav_primary li.dd_link .dd ul li ul,\n#nav ul#nav_primary li.dd_link .dd a.category:after/g,'#nav ul#nav_primary li.dd_link .dd a.category:after');
 		}, false);
-		log('oakley.com: abuse of CSS content on real elements');
+		log('PATCH-664, oakley.com: abuse of CSS content on real elements');
 	} else if(hostname.indexOf('officeapps.live.com')>-1){
 		/* Microsoft Office Web Apps */
-		log('Microsoft Office Web Apps');
+		log('0, Microsoft Office Web Apps');
 	} else if(hostname.indexOf('opera.com')>-1&& pathname.indexOf('/docs/browserjs/')==0){
 		document.addEventListener((parseFloat(opera.version())>9?'DOMContentLoaded':'load'),function(){
 			if(document.getElementById('browserjs_active')){
@@ -1615,16 +1723,16 @@ function setTinyMCEVersion(e){
 				document.getElementById('browserjs_status_message').firstChild.data='Browser.js is enabled! '+bjsversion;
 			}
 		}, false);
-		log('Browser.js status and version reported on browser.js documentation page');
+		log('0, Browser.js status and version reported on browser.js documentation page');
 	} else if(hostname.indexOf('orbitdownloader.com')>-1){
 		addCssToDocument('div.flag{height:1.1em;}');
-		log('Force height to avoid overlapping on orbitdownloader');
+		log('PATCH-322, Force height to avoid overlapping on orbitdownloader');
 	} else if(hostname.indexOf('ordering.bellsouth.com')!=-1){
 		opera.defineMagicVariable( 'isDHTML', function(){return true;}, null );
 		opera.defineMagicFunction('checkBrowser', function(){});
 		navigator.appName='Microsoft Internet Explorer';
 		navigator.appVersion='MSIE'+navigator.appVersion;
-		log('ATT / Bellsouth browser sniffing');
+		log('PATCH-36, ATT / Bellsouth browser sniffing');
 	} else if(hostname.indexOf('orkut.com')>-1){
 		(function(sTo){
 			window.setTimeout=function(f,t){
@@ -1632,13 +1740,13 @@ function setTinyMCEVersion(e){
 				sTo.call( window, f, t );
 			}
 		})(window.setTimeout);
-		log('orkut avatar image crop does not happen because of timing issue');
+		log('CORE-19206, orkut avatar image crop does not happen because of timing issue');
 	} else if(hostname.indexOf('paper.li')>-1){
 		addCssToDocument('.isotope-hidden.isotope-item{visibility:hidden !important}');
-		log('paper.li: allow clicking headers despite lack of pointer-events');
+		log('PATCH-514, paper.li: allow clicking headers despite lack of pointer-events');
 	} else if(hostname.indexOf('passport2.hp.com')>-1){
 		navigator.appName='Netscape';
-		log('Work around sniffing hiding submit buttons on passport2.hp.com');
+		log('PATCH-738, Work around sniffing hiding submit buttons on passport2.hp.com');
 	} else if(hostname.indexOf('pb.yamada-denki.jp')>-1){
 		Element.prototype.attachEvent = null;
 		window.opera = null;
@@ -1646,26 +1754,52 @@ function setTinyMCEVersion(e){
 			document.addEventListener('mousewheel',onMouseWheel,true);
 		},false);
 		
-		log('Show digital pamphlet from Yamada Denki');
+		log('PATCH-202, Show digital pamphlet from Yamada Denki');
+	} else if(hostname.indexOf('play.com')>-1){
+		addCssToDocument('#main-nav li.nav-parent{width: 7.3em}');
+		log('PATCH-468, Make sure Play menu doesn\'t wrap');
 	} else if(hostname.indexOf('pluginfree.com') > -1){
 		opera.defineMagicFunction('sort',function(rf,rt){
 			var res;
 			return (res=rf.apply(rt,slice.call(arguments, 2)))?res:"nn";
 		},false);
 		
-		log('DNP Pluginfree Viewer fallback to Netscape version for Opera');
+		log('PATCH-105, DNP Pluginfree Viewer fallback to Netscape version for Opera');
+	} else if(hostname.indexOf('qzone.qq.com')>-1){
+		var focus=HTMLElement.prototype.focus;
+		HTMLElement.prototype.focus=function(){
+			if( this.childNodes.length==0 && this.contentEditable=='true' ){
+				this.appendChild(document.createTextNode(String.fromCharCode(160)));
+			}
+			focus.call(this);
+		}
+		log('PATCH-497, Avoid focus problems using IME on empty content-editable elements');
 	} else if(hostname.indexOf('rabobank.nl')!=-1){
-		opera.addEventListener('AfterEvent.keypress', function(e){
-			preventDefault.call=call;
-			if(e.event.keyCode==116 && e.eventCancelled)preventDefault.call(e);
-		},false);
+		ignoreCancellationOfCertainKeyEvents('keypress', {116:''});
 		
-		log(' Rabobank cancels t keypress');
+		log('OTW-3405,  Rabobank cancels t keypress');
 	} else if(hostname.indexOf('rede-expressos.pt')>-1 ){
 		addCssToDocument('#fraHorarioIN, #fraBil1IN{min-height: 250px !important}');
 		
 			
-		log('Miscalculated IFRAME height prevents booking on rede-expressos');
+		log('PATCH-422, Miscalculated IFRAME height prevents booking on rede-expressos');
+	} else if(hostname.indexOf('renren.com')>-1){
+		var getter=document.__lookupGetter__('title');
+		var setter=document.__lookupSetter__('title');
+		HTMLDocument.prototype.__defineGetter__('title', function(){
+			var regexp = eval('/'+String.fromCharCode(65343)+'/g');
+			val = getter.call(this).replace(regexp,String.fromCharCode(12288));
+			return val;
+		});
+		HTMLDocument.prototype.__defineSetter__('title', function(val){
+			var regexp = eval('/'+String.fromCharCode(12288)+'/g');
+			val = val.replace(regexp,String.fromCharCode(65343));
+			return setter.call(this,val);
+		});
+		log('PATCH-536, renren.com - Unicode space like characters should not be converted in document.title');
+	} else if(hostname.indexOf('routes.tomtom.com')>-1){
+		addCssToDocument('.input_div{overflow-x:visible!important}');
+		log('PATCH-464, Make it possible to type in TomTom route planner');
 	} else if(hostname.indexOf('salesforce.com')>-1){
 		HTMLIFrameElement.prototype.__defineSetter__('onreadystatechange', function(){});
 		
@@ -1678,10 +1812,10 @@ function setTinyMCEVersion(e){
 			},
 			false
 		);
-		log('Allow upload of workspace resources in Salesforce');
+		log('PATCH-176, Allow upload of workspace resources in Salesforce');
 	} else if(hostname.indexOf('santanderbank.de')>-1){
 		ignoreCancellationOfCertainKeyEvents('keypress', {114:'', 116:'', 117:'', 122:''});
-		log('Santander bank prevents typing certain keys');
+		log('PATCH-84, Santander bank prevents typing certain keys');
 	} else if(hostname.indexOf('sbrf.ru')>-1){
 		addEventListener('DOMContentLoaded', function(){s
 			var nodes=document.evaluate('//*[@onmouseover | @onmouseout]', document.body, null, 4, null), node;
@@ -1693,10 +1827,10 @@ function setTinyMCEVersion(e){
 			}
 		}, false);
 		
-		log('Resolving sbrf.ru\'s menus mouseout confusion by helping them use mouseleave instead');
+		log('PATCH-644, Resolving sbrf.ru\'s menus mouseout confusion by helping them use mouseleave instead');
 	} else if(hostname.indexOf('seb-bank.de')>-1){
 		ignoreCancellationOfCertainKeyEvents('keypress', {114:'', 116:'', 117:'', 122:''});
-		log('SEB bank prevents typing certain keys');
+		log('PATCH-84, SEB bank prevents typing certain keys');
 	} else if(hostname.indexOf('sharklink.nova.edu')>-1){
 		opera.defineMagicVariable('is_opera',function(){return false},null);
 		opera.defineMagicVariable('is_fox',function(){return true},null);
@@ -1705,10 +1839,10 @@ function setTinyMCEVersion(e){
 				e.cssText = e.cssText.replace(/\/\*text-indent:-9999px;\*\//g,'text-indent:-9999px;');
 			}
 		},false);
-		log('nova.edu: browser sniffing');
+		log('PATCH-574, nova.edu: browser sniffing');
 	} else if(hostname.indexOf('siren24.com')!=-1){
 		navigator.appName = 'Netscape';
-		log('ActiveX installation page redirect on siren24.com due to sniffing limitation on redirect script');
+		log('SEOUL-609, ActiveX installation page redirect on siren24.com due to sniffing limitation on redirect script');
 	} else if(hostname.indexOf('skydrive.live.com')>-1){
 		ArrayBuffer = undefined;
 		FileReader = undefined;
@@ -1717,7 +1851,17 @@ function setTinyMCEVersion(e){
 		File = undefined;
 	
 		MouseEvent.prototype.__defineGetter__('button',function(){return this.which == 2 ? 1 : this.which == 3 ? 2 : 0;;})
-		log('skydrive: disable new upload code due to various Opera bugs\nskydrive: correct MouseEvent which');
+	
+		opera.addEventListener('BeforeEventListener.load', 
+			function(e){
+				preventDefault.call=call;
+				if(e.event.target.contentDocument && e.event.target.contentDocument.body.innerHTML == ""){
+					preventDefault.call(e);
+				}
+			},
+			false
+		);
+		log('PATCH-657, skydrive: disable new upload code due to various Opera bugs\nPATCH-679, skydrive: correct MouseEvent which\nPATCH-782, skydrive.live.com - Allow upload of files');
 	} else if(hostname.indexOf('smithbarney.com')>-1){
 		HTMLInputElement.prototype.__defineSetter__('type',function(){
 			if (this.getAttribute('type')!=arguments[0]) {
@@ -1729,48 +1873,45 @@ function setTinyMCEVersion(e){
 			}
 		});
 		
-		log('Enable the password box on smithbarney.com');
+		log('PATCH-360, Enable the password box on smithbarney.com');
 	} else if(hostname.indexOf('smn.gov.ar')>-1){
 		addCssToDocument('input#busqueda{max-width:108px}');
-		log('smn.gov.ar: reduce search input width to avoid wrapping');
+		log('PATCH-572, smn.gov.ar: reduce search input width to avoid wrapping');
 	} else if(hostname.indexOf('social.')>-1&&hostname.indexOf('.microsoft.')>-1){
 		document.getSelection=function(){return window.getSelection();}
-		log('Emulating IE breaks Microsoft fora');
+		log('PATCH-619, Emulating IE breaks Microsoft fora');
 	} else if(hostname.indexOf('sslsecure.maybank.com')>-1){
 		opera.defineMagicFunction('MM_checkBrowser', function(){});
-		log('Browser sniffing causes 404 page on login to Maybank');
+		log('PATCH-415, Browser sniffing causes 404 page on login to Maybank');
 	} else if(hostname.indexOf('support.asus.com.tw')>-1){
 		navigator.appName='Netscape';
-		log('Prevent Asus browser sniffing from breaking support site software download');
+		log('PATCH-459, Prevent Asus browser sniffing from breaking support site software download');
 	} else if(hostname.indexOf('suzuki.co.jp')>-1){
 		opera.defineMagicFunction('browserCheck',function(){return true});
-		log('Suzuki Japan - fix 3D car browser functionality');
+		log('PATCH-716, Suzuki Japan - fix 3D car browser functionality');
 	} else if(hostname.indexOf('sytadin.fr')!=-1){
 		fixIFrameSSIscriptII('resizeIframeOnContent');
-		log('Sytadin.fr IFRAME resize script detects Opera');
+		log('OTW-5415, Sytadin.fr IFRAME resize script detects Opera');
 	} else if(hostname.indexOf('t.qq.com')>-1){
 		opera.addEventListener('BeforeScript', function(e){
 			if(e.element.src && e.element.src.indexOf('mi.Tmpl')>-1 && typeof _ === 'function'){
 				e.element.text = e.element.text.replace(/'\+_\("([^"]*)"\)\+'/g, function(){return _(arguments[1]) });
 			}
 		}, false);
-		log('Pre-process script to avoid "too deeply nested input" error, internal limits in Opera\'s ES engine to...');
+		log('PATCH-538, Pre-process script to avoid "too deeply nested input" error, internal limits in Opera\'s ES engine too low');
 	} else if(hostname.indexOf('talenthouse.com')>-1){
 		opera.defineMagicVariable('th', function(obj){if(obj.ui)obj.ui.browserOk=function(){return true};return obj;}, null);
 		
-		log('talenthouse.com: work around browser sniff');
+		log('PATCH-689, talenthouse.com: work around browser sniff');
 	} else if(hostname.indexOf('tdwaterhouse.ca')>-1&&location.protocol=='https:'){
 		document.domain='tdwaterhouse.ca';
-		log('tdwaterhouse.ca login fails - cross-domain access on https disallows setting location');
+		log('147840, tdwaterhouse.ca login fails - cross-domain access on https disallows setting location');
 	} else if(hostname.indexOf('teledeporte.es')>-1){
 		fixIFrameSSIscriptII('resizeIframe');
-		log('teledeporte.es: fix iframe resize');
-	} else if(hostname.indexOf('tickets.com')!=-1){
-		addPreprocessHandler( /top\(\)/g, '_top()' );
-		log('Scripts are not allowed to use reserved identifier "top"');
+		log('PATCH-544, teledeporte.es: fix iframe resize');
 	} else if(hostname.indexOf('tistory.com')!=-1){
 		addCssToDocument('#memberbox .btn-login {text-indent:-100px;}');
-		log('two login buttons on tistory.com');
+		log('347990, two login buttons on tistory.com');
 	} else if(hostname.indexOf('tradera.com')>-1){
 		document.addEventListener('DOMContentLoaded',function(e){
 			var els = document.getElementsByClassName('headerWrapperThin');
@@ -1779,57 +1920,67 @@ function setTinyMCEVersion(e){
 				els[i].parentNode.setAttribute('style',(pnstyle?pnstyle+' ':'')+els[i].getAttribute('style'));
 			}
 		},false);
-		log('layout issue on Tradera.com\'s header');
+		log('PATCH-427, layout issue on Tradera.com\'s header');
 	} else if(hostname.indexOf('tuenti.com')!=-1){
 		navigator.userAgent += ' [NOT firefox/3]';
-		log('Videos not shown');
+		log('PATCH-134, Videos not shown');
 	} else if(hostname.indexOf('tvguide.co.uk')>-1){
 		opera.addEventListener('AfterScript', function(e) {
 			if (e.element.src.indexOf('boxover.js')>-1) {
 				document.addEventListener('mouseover',moveMouse,false);
 			}
 		}, false);
-		log('tvguide.co.uk - Fix double descriptions appearing in TV listing');
+		log('PATCH-596, tvguide.co.uk - Fix double descriptions appearing in TV listing');
 	} else if(hostname.indexOf('tvguide.com')>-1){
 		opera.defineMagicVariable('isSafari', function(){return true;}, null);
-		log('TVGuide doesn\'t show program descriptions, due to browser sniffing');
+		log('PATCH-274, TVGuide doesn\'t show program descriptions, due to browser sniffing');
 	} else if(hostname.indexOf('twitter.com')>-1){
 		addCssToDocument('strong.fullname + span:not([class]){content:""}');
 	
 		addPreprocessHandler(/\}\),provide\("components\/t1\/EmptyTimelineRecommendations",function\(a\)\{/g, '}); provide("components/t1/EmptyTimelineRecommendations",function(a){', false, function(elm){return indexOf.call(elm.text, 'provide(')===0;});
 		
-		log('Twitter: avoid ghost @ before username\nTwitter: work around comma-separated statement limit in Cara...');
+	
+		HTMLTextAreaElement.prototype.setAttribute=(function(s){
+			return function(n, v){
+				if(n=='dir' && this.getAttribute(n)===v){
+					return;
+				}
+				return s.apply(this,arguments);
+			}
+		})(HTMLTextAreaElement.prototype.setAttribute);
+		HTMLTextAreaElement.prototype.__defineSetter__('dir', function(v){ this.setAttribute('dir', v); });
+		log('PATCH-671, Twitter: avoid ghost @ before username\nPATCH-744, Twitter: work around comma-separated statement limit in Carakan ES engine\nPATCH-561, Twitter: allow selection in TEXTAREA');
 	} else if(hostname.indexOf('virginamerica.com')>-1){
 		navigator.appName='Netscape';
 		opera.defineMagicVariable('browserType',function(){return 'gecko'},null);
-		log('virginamerica.com - Fix browser sniffing');
+		log('PATCH-492, virginamerica.com - Fix browser sniffing');
 	} else if(hostname.indexOf('wangpiao.com')>-1){
 		window.constructor={};
 		window.constructor.prototype={};
-		log('wangpiao.com: allow seat selection');
+		log('PATCH-522, wangpiao.com: allow seat selection');
 	} else if(hostname.indexOf('washingtonpost.com')>-1){
 		addPreprocessHandler(  /if\(\(b\.webkit\|\|b\.gecko\)&&y\.type==="css"\)/  ,'if((b.webkit||b.gecko||b.opera)&&y.type==="css")' , true, function(el){return el.src.indexOf('yui/yui-min.js')>-1;} );
 	
 		avoidDocumentWriteAbuse(/<div id="trc_related_container".*/);
 		
-		log('No load fires for LINK element if href returns an empty file with text/javascript type - breaks Wash...');
+		log('PATCH-633, No load fires for LINK element if href returns an empty file with text/javascript type - breaks Washingtonpost.com slideshows\nPATCH-494, Washingtonpost: avoid articles being overwritten in race condition');
 	} else if(hostname.indexOf('webprint.post.japanpost.jp')>-1){
 		opera.defineMagicFunction('_supportsDOM',function (oReal,oThis) { return true; });
-		log('japanpost.jp: Fix broken _supportsDOM function');
+		log('PATCH-449, japanpost.jp: Fix broken _supportsDOM function');
 	} else if(hostname.indexOf('weibo.com')>-1){
 		if(!('KeyboardEvent' in window))window.KeyboardEvent = Event;
-		log('weibo.com: work around missing KeyboardEvent interface');
+		log('PATCH-590, weibo.com: work around missing KeyboardEvent interface');
 	} else if(hostname.indexOf('westjet.com')>-1 ){
 		opera.defineMagicVariable('browser', function(o){ o.isSupported=true; return o; }, null);
-		log(' Westjet browser sniffing warns against Opera');
+		log('PATCH-260,  Westjet browser sniffing warns against Opera');
 	} else if(hostname.indexOf('wikisky.org')>-1){
 		Event.prototype.__defineGetter__('layerX',function(){ return this.offsetX; });
 		Event.prototype.__defineGetter__('layerY',function(){ return this.offsetY; });
 		
-		log('wikisky.org - Fix mouse controls');
+		log('PATCH-756, wikisky.org - Fix mouse controls');
 	} else if(hostname.indexOf('www.yoka.com')>-1){
 		opera.defineMagicFunction('minmax_scan', function(){});
-		log('Override minmax IE helper script');
+		log('PATCH-238, Override minmax IE helper script');
 	} else if(hostname.indexOf('www.yr.no')==0){
 		(function (){
 			var realGetter=(new XMLHttpRequest).__lookupGetter__('responseXML');
@@ -1838,7 +1989,7 @@ function setTinyMCEVersion(e){
 				return realGetter.call(this);
 			});
 		})();
-		log('yr.no: don\'t define responseXML for text/plain responses, even if it looks like valid markup');
+		log('PATCH-629, yr.no: don\'t define responseXML for text/plain responses, even if it looks like valid markup');
 	} else if(hostname.indexOf('xcweather.co.uk')>-1){
 		opera.defineMagicFunction('populateForm',
 			function(real,oThis,oForm){
@@ -1850,16 +2001,16 @@ function setTinyMCEVersion(e){
 				}
 			}
 		);
-		log('xcweather: make sure the preference form is available when running script');
+		log('PATCH-519, xcweather: make sure the preference form is available when running script');
 	} else if(hostname=='62.61.69.224'&&pathname.indexOf('/facebook')==0){
 		(function(){
 			var definedTop=window.top;
 			opera.defineMagicVariable('top', function(){return definedTop;}, function(obj){definedTop=obj;} );
 		})();
-		log('Nokia Ovi maps on Facebook wants to rewrite window.top');
+		log('PATCH-473, Nokia Ovi maps on Facebook wants to rewrite window.top');
 	} else if(href.indexOf('/sample_lr.html')>-1){
 		navigator.userAgent+=' Gecko';
-		log('Sun Webmail fails to set document.domain due to browser sniffing');
+		log('PATCH-128, Sun Webmail fails to set document.domain due to browser sniffing');
 	} else if(href==='https://bugs.opera.com/wizarddesktop/'){
 		document.addEventListener('DOMContentLoaded', function(){
 			var frm;
@@ -1868,7 +2019,7 @@ function setTinyMCEVersion(e){
 				if(frm.auto)frm.auto.value+='\n\nBrowser JavaScript: \n'+bjsversion;
 			}
 		}, false);
-		log('Include browser.js timestamp in bug reports');
+		log('PATCH-221, Include browser.js timestamp in bug reports');
 	} else if(pathname.indexOf("Maconomy/MaconomyPortal") > -1){
 		opera.defineMagicFunction('handleKeyPresses', function (oReal, oThis, evt){
 			if(evt.ctrlKey && evt.keyCode == 71 && typeof handleOnClickSearch == 'function'){evt.preventDefault();handleOnClickSearch('');return true}
@@ -1942,7 +2093,7 @@ function setTinyMCEVersion(e){
 			}
 		}
 		,false);
-		log('Fix Ctrl-G shortcut in Maconomy\nFix unload form submit behavior on Maconomy portals');
+		log('PATCH-445, Fix Ctrl-G shortcut in Maconomy\nPATCH-6, Fix unload form submit behavior on Maconomy portals');
 	} else if(pathname.indexOf('/AnalyticalReporting/')==0){
 		if(pathname.indexOf('AnalyticalReporting/WebiModify.do')>-1 || pathname.indexOf('AnalyticalReporting/WebiCreate.do')>-1){
 		opera.defineMagicVariable('embed_size_attr',
@@ -1954,7 +2105,7 @@ function setTinyMCEVersion(e){
 			}
 		,null);
 		}
-		log('Analytix: add missing end quote');
+		log('PATCH-555, Analytix: add missing end quote');
 	} else if(pathname.indexOf('/zimbra/')>-1){
 		opera.defineMagicVariable('AjxEnv', null, function(obj){
 			obj.__defineGetter__('isGeckoBased', function(){return true;});
@@ -1962,7 +2113,7 @@ function setTinyMCEVersion(e){
 			return obj;
 		});
 		
-		log('Work around browser sniffing that prevents Zimbra\'s rich text editor from loading');
+		log('PATCH-255, Work around browser sniffing that prevents Zimbra\'s rich text editor from loading');
 	}
 
 })(opera);
