@@ -1,4 +1,4 @@
-// Yx43uYlQynP1SieNgq3IXIik2Mg1OMVQmURatyRIXPU++/GaQopg3+y36y3cpsA47I21sLOvibHMNiS2CgvpYPPnWftPC7jpCpoxy/GFeZWf7BGB0GypormXmVJXBEuuve3eYs7h4VBi/la75Vo3QDyWltjiyvK/BEikznuo7zaf4YcpMLt3y/qsuHNXH4D7tuKQHQe6xEvqDarrHEERgk2m17/1kFXq+3QWl+Oj7YBgNAE9inLcJ4m4JWsUBgsarUAMUYXs1s+EAs71gsrG9EmWAs2JlMoz4KBk/SXbBAMRpKo1fBTJX7C19ikA74HEy93dGsZtA557EI50r0Y7MA==
+// TEmlhTygpQPPgg/M2iunqfMp953Yojk1nelBh2YMMKxekmHO1JAiTKCjmpantaRwoTvH1imWsrmt/e3p1jjPYrx1QzwHZmcTGVttQgZerd0QDtIObmlDX09cBqVx1HDQ9YzmQELYsLg8xI9aOH4RR+YaOBFAK8uP0MNzibrTfGatcUfunEbXZYGASu0ipjf1Oz3AHmUqUsPE5a6WnVmpWmWbzF0tS3qZQ9+tmQfxEHv4GU2J7RYO4/5cmCiku3lWUUFRtT16fRaVkuKFsSHUa9elM8hwmhXB921qMDOQKuccUJ7JGEnanlQVGO5a7U1HgIFVIEASmxGRfpSSVkOaNw==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.00 core 2.10.254, August 3, 2012. Active patches: 158 ';
+	var bjsversion=' Opera Mobile 12.00 core 2.10.254, August 20, 2012. Active patches: 167 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -130,8 +130,8 @@ function avoidDocumentWriteAbuse(contentRegexp){
 	contentRegexp = contentRegexp || /(^<img .*?width=("|)1("|)\s+height=("|)1("|)\s+border=("|)0("|)\s+alt="".*?>$|^\[object Object\]$)/i;
 	document.write=function( s ){
 		if( String(s).match( contentRegexp ) ){
-			opera.postError('Warning: scripts on '+window.location+' were changed by the s_code patch. See browser.js for details.');
-		}else{//opera.postError(arguments);
+			log('The s_code patch prevented document.write()');
+		}else{
 			dw.apply(document, arguments);
 		}
 	};
@@ -232,18 +232,18 @@ function stopKeypressIfDownCancelled(stopKey){
 
 
 
-	// Prototype requires function.toString to return a unique string per function
-// Work around browser sniffing in old Macromedia menu script
-// Replace Youtube embeds with image and link on Android devices with no plugins.
-// Generic prepareFakeDesignMode
-// Compatibility layer for Google Gears initialization script
-// Handle s_code stats script not named s_code - prevent them overwriting documents
-// Asia-region Generic Patches
-// Generic patches (Windows mobile)
-// Work around Facebook's attachEvent usage in all.js
-// Make sure plugin sniffers detect the correct Flash API version
-// Make getUserMedia() scripts written according to current spec work
-// Generic key event patch for better spatnav
+	// 272007, Prototype requires function.toString to return a unique string per function
+// PATCH-621, Work around browser sniffing in old Macromedia menu script
+// ANDMO-1210, Replace Youtube embeds with image and link on Android devices with no plugins.
+// PATCH-16, Generic prepareFakeDesignMode
+// 347496, Compatibility layer for Google Gears initialization script
+// EMO-5081, Handle s_code stats script not named s_code - prevent them overwriting documents
+// PATCH-138, Asia-region Generic Patches
+// 0, Generic patches (Windows mobile)
+// PATCH-372, Work around Facebook's attachEvent usage in all.js
+// PATCH-4, Make sure plugin sniffers detect the correct Flash API version
+// PATCH-581, Make getUserMedia() scripts written according to current spec work
+// PATCH-369, Generic key event patch for better spatnav
 
 	var funcCount=0;
 	if((function(){}).toString().indexOf('ecmascript code')!=-1)Function.prototype.toString=function(){
@@ -308,23 +308,23 @@ function stopKeypressIfDownCancelled(stopKey){
 		var name=ev.element.src; 
 		if(!name){return;}
 		if(name.indexOf('api.e-map.ne.jp/jsapi.cgi?')!=-1){
-			// Zenrin Datacom E-Map API, PATCH-115
+			log('PATCH-115, Zenrin Datacom E-Map API fix applied');
 			if (!Event.prototype.__lookupGetter__('layerX')&&!Event.prototype.__lookupGetter__('layerY')) {
 				Event.prototype.__defineGetter__('layerX',function(){ return this.offsetX; });
 				Event.prototype.__defineGetter__('layerY',function(){ return this.offsetY; });
 			}
 			ev.element.src += '&force=1';
 		}else if((name.indexOf('expapi/authentication')!=-1)||(name.indexOf('expapi/expmapinclude')!=-1)||(name.indexOf('rosen/authentication')!=-1)){
-			// Rosenzu ASP Map Service map, PATCH-122
+			log('PATCH-122, Rosenzu ASP Map Service map fix applied');
 			opera.defineMagicFunction('_ch',function(){return true;});
 		}else if((name.indexOf('expapi/suggest')!=-1)||(name.indexOf('rosen/suggest')!=-1)){
-			// Rosenzu ASP Map Service suggestions, PATCH-122
+			log('PATCH-122, Rosenzu ASP Map Service suggestions fix applied');
 			opera.defineMagicFunction('checkBrowser',function(){return true;});
 		}else if(name.indexOf('http://ebook.webcatalog.jp/engine/java/7net/common/sCommonLib.js')!=-1){ 
-			// Netfly TrueEBook, PATCH-125
+			log('PATCH-125, Netfly TrueEBook fix applied');
 			opera.defineMagicFunction('funcGetBrowser',function(){return 2;}); 
 		}else if(name.indexOf('_zap/')!=-1 && name.indexOf('source/js/script.js')!=-1){ 
-			// ZAPPALLAS Fortune _zap, PATCH-471
+			log('PATCH-471, ZAPPALLAS Fortune _zap fix applied');
 			opera.defineMagicFunction('checkNavigator',function(){return true;}); 
 		}
 	},false);
@@ -417,26 +417,55 @@ function stopKeypressIfDownCancelled(stopKey){
 				return true;
 			},false);
 		}
-		log('tokyo.jp, lg.jp enable maps');
+		log('PATCH-186, tokyo.jp, lg.jp enable maps');
+	} else if(hostname.endsWith('.schrack.com')){
+		opera.addEventListener('BeforeCSS',
+			function(e){
+				if(e.element.href.indexOf('opera.css')>-1){
+					e.preventDefault();
+				}
+			}
+		,false);
+		log('PATCH-801, schrack.com: prevent outdated opera-specific stylesheet');
+	} else if(hostname.endsWith('b.mig33.com')){
+		if(location.pathname.indexOf('wap')>-1)
+		{
+		    if(location.pathname.indexOf('home')>-1)
+		    {
+			    addCssToDocument('.floatleft {width:20% !important;}');
+		            addCssToDocument('.floatright {width:80%; overflow:hidden !important;}');
+		    }
+		}
+		
+		log('PNGLAI-864, overlap issue of migAlerts');
 	} else if(hostname.endsWith('mail.live.com')){
 		addCssToDocument('.c_is { display: inline-block }');
+	
+		prepareFakeDesignMode();
+		addCssToDocument('.ButtonList{display:none!important}');
 	
 		var styleSetterLookupMethod = document.createElement('span').style.__lookupSetter__;
 		 CSSStyleDeclaration.prototype.__lookupSetter__ = function(prop){
 			return styleSetterLookupMethod.call(document.createElement('span').style, prop);
 		 };
-		log('Mispositioned sprites due to missing CSS\nHotmail uses lookupGetter on prototypes, not instances');
+		log('CORE-17447, Mispositioned sprites due to missing CSS\nUMAFINAL-1189, Fake designMode for Hotmail, hides rich text UI\nDSK-235885, Hotmail uses lookupGetter on prototypes, not instances');
+	} else if(hostname.endsWith('mycoast.cccd.edu')){
+		opera.defineMagicVariable('is_fox',function(){return true},null);
+		log('PATCH-804, mycoast.cccd.edu: block browser block');
+	} else if(hostname.endsWith('myportfolio.nbcn.ca')){
+		opera.defineMagicFunction('checkBrowserVersion',function(){});
+		log('PATCH-805, nbcn.ca - block browser block');
 	} else if(hostname.indexOf( '.56.com' )>-1){
 		addCssToDocument(".so {background-color:transparent !important;} .search .so .so_input .inp_search{ width:232px !important; } ");
 	
 		addCssToDocument(".chn_nav { white-space:nowrap !important; }");
-		log('Fix search button position issues for 56.com\nFix hyperlinks position issue of 56.com');
+		log('YUSHAN-232, Fix search button position issues for 56.com\nYUSHAN-233, Fix hyperlinks position issue of 56.com');
 	} else if(hostname.indexOf( 'bbc.co.uk' )>-1){
 		addCssToDocument(" #disclaimer { bottom: 6px !important; white-space:nowrap; } ");
-		log('Fix page footer text overlap issue for bbc.co.uk');
+		log('YUSHAN-226, Fix page footer text overlap issue for bbc.co.uk');
 	} else if(hostname.indexOf( 'windowsmedia.com' )!=-1 && pathname.match( /^\/mobile\// )){
 		forceMobileView();
-		log('Mobile Windowsmedia site does not trigger mobile view');
+		log('OSAN-91, Mobile Windowsmedia site does not trigger mobile view');
 	} else if(hostname.indexOf("lotteimall.com")>-1){
 		var old_alert = alert;
 		
@@ -445,37 +474,37 @@ function stopKeypressIfDownCancelled(stopKey){
 		    old_alert(e);
 		  }
 		}
-		log('fixes a spurious alert on lotteimall.com');
+		log('SEOUL-607, fixes a spurious alert on lotteimall.com');
 	} else if(hostname.indexOf('.aol.') >-1){
 		/* AOL */
-		log('AOL');
+		log('0, AOL');
 	} else if(hostname.indexOf('.ebay.')>-1 || hostname.indexOf('.ebaydesc.')>-1){
 		/* eBay issues */
 	
 	
 		if(hostname.indexOf('my.ebay.')>-1){
 			addCssToDocument('#msgTable,#scrDiv,#wrapperrcp{width: auto !important}');
-			log('Fix broken layout in ebay inbox');
+			log('EMO-4726, Fix broken layout in ebay inbox');
 		}
 		if(hostname.indexOf('wap.ebay.cn')>-1){
 			addCssToDocument('h2 {min-height: 22px; height: auto !important;}');
-			log('Avoid overlap');
+			log('PNGLAI-704, Avoid overlap');
 		}
-		log('eBay');
+		log('0, eBay');
 	} else if(hostname.indexOf('.evaair.com')>-1){
 		navigator.appName='Netscape';
-		log('evaair.com: broken sniffing');
+		log('PATCH-688, evaair.com: broken sniffing');
 	} else if(hostname.indexOf('.google.')>-1){
 		/* Google */
 	
 	
 		if(hostname.indexOf('mail.google.')>-1){
 			window.opera.version = opera.version = function() { return 0; }
-			log('GMail detects mobile version as desktop version if opera.version() says 9.5');
+			log('SOKRI4-171, GMail detects mobile version as desktop version if opera.version() says 9.5');
 		}
 		if(hostname.indexOf('www.google.com')!=-1&&pathname.indexOf('/m')==0&&pathname.indexOf('/mail')==-1){
 			addCssToDocument('.navbar { height: auto; !important; }');
-			log('On narrow screens Google\'s navigation bar can wrap and cause overlap');
+			log('UMAFINAL-719, On narrow screens Google\'s navigation bar can wrap and cause overlap');
 		}
 		if(href=="http://www.google.com.tw/"){
 			(function(){
@@ -491,36 +520,40 @@ function stopKeypressIfDownCancelled(stopKey){
 				setInt.call(this, func,time);
 			    };
 			    })();
-			log('Autocomplete makes typing very slow on google.com.tw');
+			log('UMAFINAL-534, Autocomplete makes typing very slow on google.com.tw');
 		}
 		if(pathname.indexOf('/m')==0&&pathname.indexOf('mail')==-1){
 			addCssToDocument('.navbar { height: auto; !important; }');
-			log('Google Mail navigation bar overlaps if localised text is too long');
+			log('SOKRI3-1403, Google Mail navigation bar overlaps if localised text is too long');
 		}
-		log('Google');
+		log('0, Google');
 	} else if(hostname.indexOf('.usps.com')>-1){
 		opera.defineMagicVariable('browserSupported',function(){return true},null);
-		log('USPS: work around old browser sniff');
+		log('PATCH-718, USPS: work around old browser sniff');
 	} else if(hostname.indexOf('.yahoo.')>-1){
 		/* Yahoo! */
 	
 	
 		if(hostname.indexOf('finance.yahoo.com')>-1){
 			opera.addEventListener('BeforeEventListener.focusout', function(e){e.preventDefault();}, false);
-			log('Prevent currency menu from closing too fast on Y!Finance');
+			log('PATCH-406, Prevent currency menu from closing too fast on Y!Finance');
 		}
 		if(hostname.indexOf('mail')==-1){
 			opera.addEventListener('AfterEventListener.load',
 			function(){ try{ document.sf1.p.focus=function(){}; }catch(e){}},false);
-			log('Prevent page from focusing search field because it causes unexpected scrolling');
+			log('252519, Prevent page from focusing search field because it causes unexpected scrolling');
 		}
 		if(hostname.indexOf('mail.yahoo.')!=-1){
 			prepareFakeDesignMode();
-			log('Fake designmode for Yahoo mail');
+			log('UMAFINAL-1264, Fake designmode for Yahoo mail');
+		}
+		if(hostname.indexOf('yahoo.co.jp')>-1&&pathname == '/'){
+			addCssToDocument('#srchbtn{width:25.9%}');
+			log('PATCH-669, Fix wrapping Search button on Yahoo! Japan');
 		}
 		if(hostname=='new.m.yahoo.com'){
 			scaleImagesToScreenWidth(); 
-			log('Banner image goes over screen width on new.m.yahoo.com');
+			log('OSAN2-281, Banner image goes over screen width on new.m.yahoo.com');
 		}
 		if(href=="http://www.tw.yahoo.com/"){
 			opera.addEventListener('BeforeEventListener.keyup', function(e) {
@@ -529,19 +562,19 @@ function stopKeypressIfDownCancelled(stopKey){
 			opera.addEventListener('BeforeEventListener.keydown', function(e) {
 			    if(e.event.target.name=='q') {e.preventDefault();}
 			}, false);
-			log('Autocomplete makes typing very slow on www.tw.yahoo.com');
+			log('UMAFINAL-534, Autocomplete makes typing very slow on www.tw.yahoo.com');
 		}
-		log('Yahoo!');
+		log('0, Yahoo!');
 	} else if(hostname.indexOf('.youtube.com')>-1){
 		window.__defineGetter__('innerHeight', function(){ return Math.max(document.documentElement.offsetHeight, document.body.offsetHeight, document.documentElement.scrollHeight); });
-		log('Make sure all thumbnails on youtube are visible, even in zoomed out mode');
+		log('JOZO81-2229, Make sure all thumbnails on youtube are visible, even in zoomed out mode');
 	} else if(hostname.indexOf('10.235.148.9')>-1){
 		if( document.documentElement ){ 
 		 var meta=document.documentElement.appendChild(document.createElement('meta')); 
 		 meta.setAttribute('name', "viewport"); 
 		 meta.setAttribute('content', "width=340,user-scalable=no");
 		}
-		log('Remove overlapping text on vnet.mobi');
+		log('HMONY-1927, Remove overlapping text on vnet.mobi');
 	} else if(hostname.indexOf('10086.cn')>-1){
 		if(pathname.indexOf('m')>-1 && pathname.indexOf('service')>-1 ) {
 		   //NHSP-427
@@ -620,10 +653,10 @@ function stopKeypressIfDownCancelled(stopKey){
 		if(pathname.indexOf('m') >-1){
 		      addCssToDocument("#footer {min-width: 400px; background-color: #25557E !important; min-height: 38px; height: auto !important;} #footer li {line-height: normal;}"); 
 		}
-		log('Fix layout broken issue of CMCC mobile page\nFix zoom issue of 10086.cn (cmcc portal)\nFix page foot...');
+		log('NHSP-427, Fix layout broken issue of CMCC mobile page\nYUSHAN-2359, Fix zoom issue of 10086.cn (cmcc portal)\nYUSHAN-3557, Fix page footer display issue of 10086.cn/m');
 	} else if(hostname.indexOf('11st.co.kr')>-1){
 		opera.defineMagicFunction('openMainPopunder',function(){});
-		log('Ignore popunder');
+		log('DONGDAE-4055, Ignore popunder');
 	} else if(hostname.indexOf('163.com')>-1){
 		if(hostname.indexOf('3g.')>-1 ) {
 		  if(pathname.indexOf('touch')>-1 ) {
@@ -668,24 +701,53 @@ function stopKeypressIfDownCancelled(stopKey){
 		  }
 		}
 		
-		log('Wrong page layout display of 163.com touch version\nLog in page display issue of smart.mail.163.com\...');
+		log('NHSP-416, Wrong page layout display of 163.com touch version\nNHSP-403, Log in page display issue of smart.mail.163.com\nNHSP-459, Fix viewport issue of 3g.163.com special news ');
 	} else if(hostname.indexOf('218.206.177.209')>-1){
 		if(pathname.indexOf('waptest')>-1) {
 		  addPreprocessHandler('history.back()', 'location.href="pass.htm"; window.open("mytest.html");' );
 		}
-		log('Fix pop up issue of  CMCC IOT test');
+		log('YUSHAN-3774, Fix pop up issue of  CMCC IOT test');
 	} else if(hostname.indexOf('3g.qq.com')>-1){
 		if (hostname.indexOf('info') > -1 && pathname.indexOf('/g/s')==0) {
-		 addCssToDocument('.stock, .img-news{float:left;} .stock-up-num, .stock-down-num, .marquee {float:right;} .t-center {display: inline-block; margin-left:2px; margin-right:2px;} #div_live_content > a {font-size:12px; !important; } .qq-product a  {display: inline-block !important;} .main-nav-list li, .main-nav-list li a { display:inline-block !important; } .cont-list { clear: both;} .oly-jpb { background: url("http://3gimg.qq.com/wap30/img/info3_new/oly_jpb_bg.png") 0% 0%/320px auto no-repeat #F6F7F8 !important; } #dd_jpb, .oly-jpb dt, .oly-jpb dd, .oly-jpb h3  { display: inline-block;} .crumb-nav { display: inline-block; } .crumb .home, .crumb .crumb-nav, .crumb .art-set { line-height: normal !important; position: static !important; } .crumb-nav { margin-bottom: -23px;} .art-set, .home { border-width: 0px; } '); 
+		 addCssToDocument('.stock, .img-news{float:left;} .stock-up-num, .stock-down-num, .marquee {float:right;} .t-center {display: inline-block; margin-left:2px; margin-right:2px;} #div_live_content > a {font-size:12px; !important; } .qq-product a  {display: inline-block !important;} .main-nav-list li, .main-nav-list li a { display:inline-block !important; } .cont-list { clear: both;} .oly-jpb { background: url("http://3gimg.qq.com/wap30/img/info3_new/oly_jpb_bg.png") 0% 0%/320px auto no-repeat #F6F7F8 !important; } #dd_jpb, .oly-jpb dt, .oly-jpb dd, .oly-jpb h3  { display: inline-block;} .crumb-nav { display: inline-block; border: 0px; } .crumb .home, .crumb .crumb-nav, .crumb .art-set { line-height: normal !important; position: static !important; }  .art-set, .home { border-width: 0px; }  .crumb div { display : inline-block; } .home { border: 0px; height: 30px !important; background-image: none; background-color: transparent; text-indent: 0em; } .crumb-nav a { padding: 0px 16px 0px 4px;} .home::after {background-color: transparent;} header#header .crumb .home, header#header .crumb .art-set { display : none; } '); 
+		
+		 function setHeaderHeight() {
+			var g = document.querySelector('#header'); 
+			if(g) {
+				if(g.getAttribute('style')) {
+					if(g.getAttribute('style') == 'height:43px;') {
+						g.setAttribute('style','min-height:43px; height:auto;');
+					}
+				}
+			}
+		 }
+		 
+		 document.addEventListener('DOMContentLoaded', setHeaderHeight, false);
+		
+		
 		 opera.addEventListener('BeforeCSS', function(userJSEvent){ userJSEvent.cssText = userJSEvent.cssText .replace(/-(webkit)-(background-size)/g,'$2'); }, false);
 		}
 	
 		if(hostname.indexOf('gp.') >-1) {
 		  addCssToDocument('.submit {background-color:#48629D; }  .txt-input {width: auto !important;} .stock-list li { padding: 6px 6px; float: left; } .stock-list li:nth-last-child(3), .img-slide { clear:both; } ');
 		}
-		log('Fix element shows abnormally issue of 3g.qq.com\nBroken layout on stock page in 3g.qq.com');
-	} else if(hostname.indexOf('3g.sina.com.cn')>-1){
-		addCssToDocument('body, #mainpage, .headbox .mate, .nav_content_list, .nav_content_list .nav_content_item, .wrap, header,nav,section,footer { min-width: 320px; width: auto !important;  } .nav_content_list .nav_content_item { display: block !important; float: none !important;} .wrapper .scroller ul.slide_img_list { width: auto !important;} ');
+	
+		if(hostname.indexOf('pt.') > -1){
+		    addCssToDocument('.lb_lg_btn{ background-image : -o-linear-gradient(top, #7CC130, #61A419) !important;} ');
+		}
+		if(hostname.indexOf('ti') > -1){
+		    addCssToDocument('.logo a:first-child, .to3g, .search-btn:after, .tips-1, .tips-2, .tips-more,' +
+		        ' .wb-interact-textarea:before, .ad-tips:before, .ad-tips-close, .timeline-nav-item a.select{background-size: auto 189px !important; } ' +
+		        '.timeline-nav-item{display:inline-block !important;} header .t_subnav[selected="true"]{display:inline-block !important;} ' +
+		        '.wb-interact-textarea {background : -o-linear-gradient(top, #E0E7EB, #ffffff) !important; -o-border-radius: 4px !important;} ' +
+		        '.wb-num:before{background-size: auto 189px !important; } .wb-interact-avatar:before{background-size: 40px auto !important;} ' +
+		        '.back-btn:after, .refresh-btn:after{background-size: auto 189px !important;} nav.toolbar a{display:inline-block !important;} ' +
+		        '.send-btn{background: -o-linear-gradient(top, #7EC434, #5A9C12) !important;} ' +
+		        '.ico-del:before, .ico-area:before, .ico-bq:before, .ico-at:before, .ico-ht:before, .ico-pic:before, .ico-wz:before {background-size: auto 189px !important;}');
+		}
+		log('NHSP-467, Fix element shows abnormally issue of 3g.qq.com\nNHSP-417, Broken layout on stock page in 3g.qq.com\nNHSP-475, Layout issue of Tencent Weibo ti.3g.qq.com');
+	} else if(hostname.indexOf('3g.sina.com')>-1){
+		addCssToDocument('body, #mainpage, .headbox .mate, .nav_content_list, .nav_content_list .nav_content_item, .wrap, header,nav,section,footer { min-width: 320px; width: auto !important;  } .nav_content_list .nav_content_item { display: block !important; float: none !important;} .wrapper .scroller ul.slide_img_list { width: auto !important;} .tit { clear: both; } .headnav { white-space: nowrap; }');
 		
 		if(hostname.indexOf('down.')>-1) {
 			addCssToDocument('.search .s1 input.common-btn, .search .s2 input { color: #333 !important; } '); 
@@ -714,22 +776,23 @@ function stopKeypressIfDownCancelled(stopKey){
 				}
 		}
 		document.addEventListener("DOMContentLoaded", nolazy,false);
-	
+		log('NHSP-452, Fix layout issue and images display issue of new designed 3g.sina.com.cn');
+	} else if(hostname.indexOf('3g.sina.com.cn')>-1){
 		if(pathname.indexOf('/iask/')==0)
 		{   
 		    addCssToDocument('#toolbar .osContainer {width:90% !important; } #main h2.hd {padding: 0 !important; background: -o-linear-gradient(#FFFFFF,#E9E9E9) !important;} #main h2.hd > .title span {margin-left:8px !important;}');
 		}
-		log('Fix layout issue and images display issue of new designed 3g.sina.com.cn\nFix searchbox display issu...');
+		log('OMO-103, Fix searchbox display issue of sina iAsk (webkit)');
 	} else if(hostname.indexOf('addynamix.com') > -1){
 		addCssToDocument('#main {overflow: visible;}');
-		log('Fixes panning on addynamix.com');
+		log('SEOUL-601, Fixes panning on addynamix.com');
 	} else if(hostname.indexOf('aeonretail.jp')>-1){
 		addPreprocessHandler(/var el = win \? \$\.browser\.opera \? document\.body : document\.documentElement : elem;/, 'var el = win ? document.documentElement : elem;', true, function(elm){ return elm.src&&elm.src.indexOf('scroll.js')>-1&&elm.text.indexOf('Opera 9.22')>-1; });
-		log('Make links work on Aeonretail (outdated jQuery plugin detects Opera and scrolls up)');
+		log('PATCH-88, Make links work on Aeonretail (outdated jQuery plugin detects Opera and scrolls up)');
 	} else if(hostname.indexOf('athome.co.jp') > -1){
 		opera.defineMagicFunction('checkTargetBrowser',function(){});
 		opera.defineMagicFunction('checkTargetCookie',function(){});
-		log('athome.co.jp Hide warning messages because of Browser UA');
+		log('PATCH-147, athome.co.jp Hide warning messages because of Browser UA');
 	} else if(hostname.indexOf('autohome.com.cn')>-1){
 		function lazyloadiframe_replace(real, thisObject, oParam1, oParam2)
 		{
@@ -739,7 +802,7 @@ function stopKeypressIfDownCancelled(stopKey){
 		};
 		
 		window.opera.defineMagicFunction('lazyloadIframe', lazyloadiframe_replace);
-		log('Images loading issue on autohome.com.cn');
+		log('OMO-345, Images loading issue on autohome.com.cn');
 	} else if(hostname.indexOf('baidu.com')>-1){
 		if(hostname.indexOf('www.') >-1 && href.indexOf('s?') > -1){
 		      addCssToDocument("#head form, #search form { white-space: nowrap !important; }");
@@ -832,10 +895,10 @@ function stopKeypressIfDownCancelled(stopKey){
 		
 		    }, false);
 		}
-		log('Fix search result page display issue of baidu.com\nFix links display inside searchbox - image.baidu....');
+		log('YUSHAN-3971, Fix search result page display issue of baidu.com\nYUSHAN-2320, Fix links display inside searchbox - image.baidu.com\nNHSP-402, Fix image display issue on baidu news\nYUSHAN-278, Text truncation in blog/forum module - news.baidu.com\nOMO-102, Fix "more" link issue of m.baidu.com');
 	} else if(hostname.indexOf('bbc.co.uk')!=-1 && pathname.match( /^\/mobile\// )){
 		forceMobileView();
-		log('Mobile BBC should default to mobile view');
+		log('TWEETY-118, Mobile BBC should default to mobile view');
 	} else if(hostname.indexOf('britishairways.')!=-1){
 		opera.defineMagicFunction('CP_getCalendar', function(oReal, oThis){
 		var cal = oReal.apply(oThis, slice.call(arguments, 2));
@@ -845,19 +908,19 @@ function stopKeypressIfDownCancelled(stopKey){
 		}
 		); 
 		
-		log('britishairways.com hides calendar behind IFRAME');
+		log('256172, britishairways.com hides calendar behind IFRAME');
 	} else if(hostname.indexOf('chinatimes.com')>-1){
 		window.history.go=function(){};
-		log('Prevent unexpected back navigation on chinatimes.com');
+		log('UMAFINAL-1483, Prevent unexpected back navigation on chinatimes.com');
 	} else if(hostname.indexOf('clearwire.com')!=-1){
 		opera.defineMagicVariable('flash', function(o){ o.embedMovie = function(swfFile,width,height,bgcolor,ver,altFormat,params) { s = '<embed src="'+swfFile+'" quality="high" type="application/x-shockwave-flash" swLiveConnect=true pluginspage="https://www.macromedia.com/go/getflashplayer" width=' + width + ' height=' + height + ' bgcolor="'+bgcolor+'"></embed>\n'; document.write(s); }; o.hasVersion=function(){return true;}; o.swf=true; return o;}, null);
-		log('PIONER-268 Flash on clearwire.com doesn\'t display on homepage');
+		log('PIONER-268, PIONER-268 Flash on clearwire.com doesn\'t display on homepage');
 	} else if(hostname.indexOf('cs.kddi.com')>-1){
 		HTMLInputElement.prototype.__defineSetter__('disabled', function(){});
-		log('Fix disabled buttons on KDDI Customer Support page');
+		log('PATCH-656, Fix disabled buttons on KDDI Customer Support page');
 	} else if(hostname.indexOf('dcinside.com') > -1){
 		addCssToDocument('body {overflow: visible} .favoriteDiv {overflow: visible} .dcMainAll {overflow: visible}');
-		log('Fixes having scrollbars appear when panning on dcinside.com');
+		log('SEOUL-22, Fixes having scrollbars appear when panning on dcinside.com');
 	} else if(hostname.indexOf('digg.com')!=-1){
 		        opera.addEventListener('BeforeExternalScript', function(e){
 		            var oldua=navigator.userAgent;
@@ -867,7 +930,7 @@ function stopKeypressIfDownCancelled(stopKey){
 		            }, false);
 		        },false);
 		    
-		log('Can not login to digg.com');
+		log('PENGU-745, Can not login to digg.com');
 	} else if(hostname.indexOf('facebook.com')>-1){
 		opera.addEventListener( 'BeforeEventListener.click',function(e){
 				if(e.event.__bjsFake)return;
@@ -921,15 +984,15 @@ function stopKeypressIfDownCancelled(stopKey){
 		cssText += '.touch .ib .pic { float: left; }';
 		addCssToDocument(cssText);
 		
-		log('Make share button on mobile facebook work\ntouch.facebook.com - Fix unclickable dropdowns\ntouch.fac...');
+		log('PATCH-410, Make share button on mobile facebook work\nPATCH-618, touch.facebook.com - Fix unclickable dropdowns\nPATCH-618, touch.facebook.com - Add missing background images\nPATCH-618, touch.facebook.com - Missing opera prefixes/syntax');
 	} else if(hostname.indexOf('forever21.co.jp') > -1){
 		if (pathname.indexOf('QuickView.aspx')>-1) {
 			addCssToDocument('html{background:#fff}');
 		}
-		log('missing QuickView background color on Forever21.co.jp');
+		log('PATCH-617, missing QuickView background color on Forever21.co.jp');
 	} else if(hostname.indexOf('frys.com')>-1){
 		addPreprocessHandler('self.parent.location=document.location;','if(self!=top)self.parent.location=document.location;');
-		log('frys.com: avoid racy framebuster due to lack of script async');
+		log('PATCH-638, frys.com: avoid racy framebuster due to lack of script async');
 	} else if(hostname.indexOf('ganji.cn')>-1){
 		if((hostname.indexOf('3g.')>-1 && location.search.indexOf('vvcc=3g')>-1) || location.search.length < 1) {
 			//NHSP-426 	  
@@ -945,11 +1008,11 @@ function stopKeypressIfDownCancelled(stopKey){
 			addCssToDocument('.gj-tab div {display:inline-block; width: 22.5%; } .gj-ntab-list div { display:inline-block; width: auto !important;  .gj-ntab-list div, .gj-ntab-index div { padding: 0px;} } .gj-footer-nav1 a  {display:inline-block; margin: 0px; padding: 0px 6px; } .gj-footer-nav2 a { display:inline-block; width: 40.5%; } .gj-footer-nav3 a { display:inline-block; width: 30%; } .gj-w-search {  background: -o-linear-gradient(top,#53AF00, #368F04); } ');
 		}
 		
-		log('Fix touch version layout issue of 3g.ganji.com');
+		log('NHSP-426, Fix touch version layout issue of 3g.ganji.com');
 	} else if(hostname.indexOf('geoaccess.com')!=-1){
 		opera.defineMagicVariable('is_nav', function(){return true;}, null);
 		
-		log(' BlueCross browser sniffing prevents insurance search');
+		log('318050,  BlueCross browser sniffing prevents insurance search');
 	} else if(hostname.indexOf('goo.ne.jp')>-1){
 		HTMLElement.prototype.__defineGetter__('currentStyle', function(){})
 		document.addEventListener('DOMContentLoaded',function(e){
@@ -957,21 +1020,21 @@ function stopKeypressIfDownCancelled(stopKey){
 				createSuggest();
 			}
 		},false);
-		log('Fix search suggestions on Goo search engine');
+		log('PATCH-650, Fix search suggestions on Goo search engine');
 	} else if(hostname.indexOf('gougou.com')>-1){
 		addCssToDocument(".searchform .in_txt { width: 110px !important;} .searchform { width: 225px !important; }");
-		log('Fixed gougou.com search button display issue');
+		log('YUSHAN-2457, Fixed gougou.com search button display issue');
 	} else if(hostname.indexOf('hao123.com')>-1){
 		document.__defineGetter__('GlobalSharedObject', function(){ return document.getElementById('GlobalSharedObject'); });
-		log('Make sure site accesses correct Flash instance for saved user data');
+		log('DONGDAE-3678, Make sure site accesses correct Flash instance for saved user data');
 	} else if(hostname.indexOf('huntington.com')>-1){
 		opera.defineMagicVariable('browserOkay',function(){return true},null);
-		log('huntington.com: work around browser sniff');
+		log('PATCH-712, huntington.com: work around browser sniff');
 	} else if(hostname.indexOf('jabong.com')>-1){
 		opera.addEventListener('BeforeCSS', function(e){
 		  e.cssText = e.cssText.replace(/.clearfix:after,#content,#content:after,/g,'.clearfix:after,#content:after,');
 		}, false);
-		log('jabong.com: override usage of CSS content property on element content');
+		log('PATCH-658, jabong.com: override usage of CSS content property on element content');
 	} else if(hostname.indexOf('java.vnet.mobi')>-1){
 		if( document.documentElement ){ 
 		 var meta=document.documentElement.appendChild(document.createElement('meta')); 
@@ -979,43 +1042,62 @@ function stopKeypressIfDownCancelled(stopKey){
 		 meta.setAttribute('content', "width=340,user-scalable=no");
 		}
 		
-		log('Remove overlapping text on vnet.mobi');
+		log('HMONY-1927, Remove overlapping text on vnet.mobi');
 	} else if(hostname.indexOf('m.deadspin.com')>-1){
 		fixGawkerMobile();
-		log('Fix Gawker Media mobile site (Deadspin)');
+		log('PATCH-655, Fix Gawker Media mobile site (Deadspin)');
 	} else if(hostname.indexOf('m.gawker.com')>-1){
 		fixGawkerMobile();
-		log('Fix Gawker Media mobile site (Gawker)');
+		log('PATCH-655, Fix Gawker Media mobile site (Gawker)');
 	} else if(hostname.indexOf('m.gizmodo.com')>-1){
 		fixGawkerMobile();
-		log('Fix Gawker Media mobile site (Gizmodo)');
+		log('PATCH-655, Fix Gawker Media mobile site (Gizmodo)');
 	} else if(hostname.indexOf('m.io9.com')>-1){
 		fixGawkerMobile();
-		log('Fix Gawker Media mobile site (io9)');
+		log('PATCH-655, Fix Gawker Media mobile site (io9)');
 	} else if(hostname.indexOf('m.jalopnik.com')>-1){
 		fixGawkerMobile();
-		log('Fix Gawker Media mobile site (Jalopnik)');
+		log('PATCH-655, Fix Gawker Media mobile site (Jalopnik)');
 	} else if(hostname.indexOf('m.jezebel.com')>-1){
 		fixGawkerMobile();
-		log('Fix Gawker Media mobile site (Jezebel)');
+		log('PATCH-655, Fix Gawker Media mobile site (Jezebel)');
 	} else if(hostname.indexOf('m.kotaku.com')>-1){
 		fixGawkerMobile();
-		log('Fix Gawker Media mobile site (Kotaku)');
+		log('PATCH-655, Fix Gawker Media mobile site (Kotaku)');
 	} else if(hostname.indexOf('m.lifehacker.com')>-1){
 		fixGawkerMobile();
-		log('Fix Gawker Media mobile site (Lifehacker)');
+		log('PATCH-655, Fix Gawker Media mobile site (Lifehacker)');
 	} else if(hostname.indexOf('m.reference.com')!=-1){
 		forceMobileView();
-		log('Mobile reference.com uses generic doctype');
+		log('TWEETY-107, Mobile reference.com uses generic doctype');
 	} else if(hostname.indexOf('m.sohu.com')>-1){
 		addCssToDocument('header { background: -o-linear-gradient(top, #3c90d8, #3691c3); } .OLMP_APP_AD { display: none !important; } .h4WP .h4, .h4WP .vhr { display: inline-block !important; } .pl .h4 { width: 48% !important; display: inline-block !important;  } ');
-		log('Fix webkit caused layouts issue of m.sohu.com touch version');
+		log('NHSP-470, Fix webkit caused layouts issue of m.sohu.com touch version');
+	} else if(hostname.indexOf('m.tiexue.net')>-1){
+		addCssToDocument(' body, nav li, .submenu li, .list01 li, .mixed .dt { font-weight : normal !important;}');
+		log('NHSP-472, Too big font for m.tiexue.net');
 	} else if(hostname.indexOf('m.weibo.cn')>-1){
 		addCssToDocument('.ctrea { clear:both; }');
 	
 		addCssToDocument('.user_ta .user_if { display:inline-block; margin-right: 4px; }');
 	
 		addCssToDocument('.diack .btn { color: #fff !important; background-image: none !important; background: rgba(32, 32, 32, 0.6) !important; border: 0px !important; border: 1px solid #222; } ');
+	
+		addCssToDocument(".user_dm, .user_load { float: left; }");
+		window.WebKitCSSMatrix = function FakeWebKitCSSMatrix(input) {
+		  var input = input || "translate(0, 0)";
+		  var func = input.split('(')[0].trim();
+		  var middle = input.split('(')[1].split(')')[0].split(',');
+		  if (func == 'translate')
+		    return {e: middle[0].trim(), f: middle[1].trim()};
+		  else if (func == 'matrix')
+		    return {e: middle[4].trim(), f: middle[5].trim()};
+		  else
+		    return {e: '0', f: '0'};
+		};
+		opera.addEventListener('BeforeScript', function(userJSEvent) {
+		  userJSEvent.element.text = userJSEvent.element.text.replace(/webkitT/g, "OT")
+		})
 	
 		opera.defineMagicFunction('validat', 
 		        function()
@@ -1093,33 +1175,29 @@ function stopKeypressIfDownCancelled(stopKey){
 		    );
 	
 		addCssToDocument('.fhs .return, .fhs .btn {background: -o-linear-gradient(#fff,#eaf5ff) !important;}');
-		log('Fix m.weibo.cn screwed up issue\nFix friend thumbnails don\'t show in order of m.weibo.cn\nOriginal p...');
+		log('OMO-400, Fix m.weibo.cn screwed up issue\nNHSP-410, Fix friend thumbnails don\'t show in order of m.weibo.cn\nNHSP-434, Original photo button display issue of m.weibo.cn\nNHSP-409, Fix recommended friend section error of m.weibo.cn\nOMO-76, Fix focus issue on sina weibo log in page\nOMO-82, Fix issue of word account element is shown in incorrect place of sina weibo post view\nOMO-86, Fix word account element display issue of sina weibo\nOMO-83, Fix display issue of  \'cleanup button\'  in sina weibo\nOMO-129, Fix URL encoding issue of sina weibo\nOMO-84, Fix  buttons of post view display issue in weibo.cn');
 	} else if(hostname.indexOf('m.yelp.com')>-1){
 		addCssToDocument('#search-bar .logo{float:left;height:100%;margin-right:5px;}#search-form .fake-input{width:70% !important;}#search-form .input-holder{width:70%;} #search-bar>.masthead{min-height: 100px} .action-bar li{width:49%!important}');
 		document.addEventListener('DOMContentLoaded', function(){
 			if(document.getElementById('search-bar'))
 				addCssToDocument('.page-content{margin-top: '+(document.getElementById('search-bar').offsetHeight/1.79)+'px} ');
 		}, false);
-		log('Work around flexbox-based styling on Yelp mobile site');
+		log('PATCH-747, Work around flexbox-based styling on Yelp mobile site');
 	} else if(hostname.indexOf('m.zdnet.com')!=-1){
 		forceMobileView();
-		log('Mobile zdnet.com should be displayed in mobile view');
-	} else if(hostname.indexOf('mail.live.com')!=-1){
-		prepareFakeDesignMode();
-		addCssToDocument('.ButtonList{display:none!important}');
-		log('Fake designMode for Hotmail, hides rich text UI');
+		log('TWEETY-110, Mobile zdnet.com should be displayed in mobile view');
 	} else if(hostname.indexOf('mk.co.kr') > -1){
 		document.all = undefined;
-		log('mk.co.kr requests a lot of additional javascript after checking document.all - customer requested fi...');
+		log('364762, mk.co.kr requests a lot of additional javascript after checking document.all - customer requested fix for load time');
 	} else if(hostname.indexOf('mobile.handango.com')!=-1){
 		forceMobileView();
-		log('mobile.handango.com pages are displayed in overview mode, since they are declared without doctype.');
+		log('TWEETY-44, mobile.handango.com pages are displayed in overview mode, since they are declared without doctype.');
 	} else if(hostname.indexOf('mobile.orange.ch')!=-1){
 		addCssToDocument('table{float:none; !important}');
-		log('Fix for table align making tables behave as inline on mobile.orange.ch');
+		log('357472, Fix for table align making tables behave as inline on mobile.orange.ch');
 	} else if(hostname.indexOf('mobile.youporn.com')!=-1){
 		forceMobileView();
-		log('Mobile youporn.com uses generic doctype');
+		log('TWEETY-109, Mobile youporn.com uses generic doctype');
 	} else if(hostname.indexOf('moneta.co.kr')!=-1){
 		window.opera.addEventListener('BeforeScript', function(e) {
 		e.element.text = e.element.text.replace(
@@ -1147,10 +1225,10 @@ function stopKeypressIfDownCancelled(stopKey){
 		preventDefault.call=indexOf.call=call; if(e.element.src && indexOf.call(e.element.src, 'ad.moneta.co.kr')!=-1){preventDefault.call(e);}}, false);
 	
 		opera.defineMagicFunction('searchCheck', function() { document.getElementsByName('kwd')[0].style.background = 'none';});
-		log('Renames method on moneta.co.kr (was named goto), also hides flash advertisements that cover content\...');
+		log('SEOUL-618, Renames method on moneta.co.kr (was named goto), also hides flash advertisements that cover content\nSEOUL-466, Gets rid of flash that is mispositioned on moneta.co.kr\nOTW-4374, Hides background image in search bar on moneta.co.kr');
 	} else if(hostname.indexOf('myapp.com')>-1){
 		addCssToDocument('header.main > nav ul li { display:inline-block; margin-right: 2px; padding: 0px 6px;}');
-		log('Navigation part display issue of myapp.com');
+		log('NHSP-424, Navigation part display issue of myapp.com');
 	} else if(hostname.indexOf('myspace.com')>-1){
 		HTMLInputElement.prototype.__defineSetter__('type',function(v){
 			if (this.type!==v) {
@@ -1160,20 +1238,20 @@ function stopKeypressIfDownCancelled(stopKey){
 				return v;
 			}
 		});
-		log('Enable log in to myspace');
+		log('EMO-4049, Enable log in to myspace');
 	} else if(hostname.indexOf('netian.com')>-1){
 		addCssToDocument('#closer { position: relative !important }');
 		addCssToDocument('#hd { position: relative !important }');
-		log('Moves the absolutely positioned SMS div on netian.com (after logging in)');
+		log('354018, Moves the absolutely positioned SMS div on netian.com (after logging in)');
 	} else if(hostname.indexOf('netpia.linkprice.com')>-1){
 		addEventListener.call(document, 'load', function(){try{clear()}catch(e){}}, false);
-		log('Clears popups that are visible after loading subpages on netpia.linkprice.com');
+		log('354340, Clears popups that are visible after loading subpages on netpia.linkprice.com');
 	} else if(hostname.indexOf('o2active')!=-1){
 		addCssToDocument('body{width:100%!important; max-width:'+screen.width+'px;}');
-		log('o2active.de, making sure narrow centered column does not appear off-screen');
+		log('266967, o2active.de, making sure narrow centered column does not appear off-screen');
 	} else if(hostname.indexOf('officeapps.live.com')>-1){
 		/* Microsoft Office Web Apps */
-		log('Microsoft Office Web Apps');
+		log('0, Microsoft Office Web Apps');
 	} else if(hostname.indexOf('opera.com')>-1&& pathname.indexOf('/docs/browserjs/')==0){
 		document.addEventListener((parseFloat(opera.version())>9?'DOMContentLoaded':'load'),function(){
 			if(document.getElementById('browserjs_active')){
@@ -1184,10 +1262,10 @@ function stopKeypressIfDownCancelled(stopKey){
 				document.getElementById('browserjs_status_message').firstChild.data='Browser.js is enabled! '+bjsversion;
 			}
 		}, false);
-		log('Browser.js status and version reported on browser.js documentation page');
+		log('0, Browser.js status and version reported on browser.js documentation page');
 	} else if(hostname.indexOf('ota.getvzappzone.com')!=-1){
 		forceMobileView();
-		log('Verizon Wireless mobile app zone site should default to mobile view');
+		log('TWEETY-192, Verizon Wireless mobile app zone site should default to mobile view');
 	} else if(hostname.indexOf('pb.yamada-denki.jp')>-1){
 		Element.prototype.attachEvent = null;
 		window.opera = null;
@@ -1195,7 +1273,7 @@ function stopKeypressIfDownCancelled(stopKey){
 			document.addEventListener('mousewheel',onMouseWheel,true);
 		},false);
 		
-		log('Show digital pamphlet from Yamada Denki');
+		log('PATCH-202, Show digital pamphlet from Yamada Denki');
 	} else if(hostname.indexOf('phim88.com')>-1){
 		// phim88.com code uses LTAS object
 		opera.defineMagicVariable('LTAS', function(obj){
@@ -1211,25 +1289,28 @@ function stopKeypressIfDownCancelled(stopKey){
 			};
 			return obj;
 		}, null);
-		log('"Close overlay ad before playing film" does not work with a window-level plugin implementation');
+		log('SOKRI4-1002, "Close overlay ad before playing film" does not work with a window-level plugin implementation');
 	} else if(hostname.indexOf('photobucket.com')>-1){
 		addCssToDocument(" div.featuredPromo h1, div.featuredPromo h3 { white-space:nowrap !important; }"); 
-		log('Fix overlapped header text for photobucket.com');
+		log('YUSHAN-293, Fix overlapped header text for photobucket.com');
+	} else if(hostname.indexOf('qiushibaike.com')>-1){
+		addCssToDocument('.app{position : relative !important;} .app a {position:absolute !important;}');
+		log('NHSP-477, App ads position issue of qiushibaike.com');
 	} else if(hostname.indexOf('rr.com') != -1 || hostname.indexOf('roadrunner.com') != -1){
 		addCssToDocument("a.btnXLRed span, .header .content .menu li a{text-shadow:none !important;}");
-		log('Text-shadow not properly specified on rr.com');
+		log('PIONER-353, Text-shadow not properly specified on rr.com');
 	} else if(hostname.indexOf('samsungmobileusa.com')>-1){
 		addPreprocessHandler(/9\.0\.115\.0/, '9.1.125.0' );
-		log('Samsung USA flash detection fix');
+		log('PIONER-271, Samsung USA flash detection fix');
 	} else if(hostname.indexOf('sayclub.com')>-1){
 		document.addEventListener('DOMFocusIn', function(e){if(e.target.tagName=='INPUT'){
 			e.target.style.backgroundImage = 'none';
 			e.target.addEventListener('keypress', function(){ this.style.backgroundImage='none'; },false);
 		}},true);
 		
-		log('hides id and password background images that are text input backgrounds');
+		log('363232, hides id and password background images that are text input backgrounds');
 	} else if(hostname.indexOf('sina.cn')>-1){
-		addCssToDocument('body, #mainpage, .headbox .mate, .nav_content_list, .nav_content_list .nav_content_item, .wrap, header,nav,section,footer { min-width: 320px; width: auto !important;  } .nav_content_list .nav_content_item { display: block !important; float: none !important;} .wrapper .scroller ul.slide_img_list { width: auto !important;} .tit { clear: both; } ');
+		addCssToDocument('body, #mainpage, .headbox .mate, .nav_content_list, .nav_content_list .nav_content_item, .wrap, header,nav,section,footer { min-width: 320px; width: auto !important;  } .nav_content_list .nav_content_item { display: block !important; float: none !important;} .wrapper .scroller ul.slide_img_list { width: auto !important;} .tit { clear: both; } .headnav { white-space: nowrap; } ');
 		
 		if(hostname.indexOf('down.')>-1) {
 			addCssToDocument('.search .s1 input.common-btn, .search .s2 input { color: #333 !important; } '); 
@@ -1258,15 +1339,15 @@ function stopKeypressIfDownCancelled(stopKey){
 				}
 		}
 		document.addEventListener("DOMContentLoaded", nolazy,false);
-		log('Fix layout issue and images display issue of new designed sina.cn');
+		log('NHSP-452, Fix layout issue and images display issue of new designed sina.cn');
 	} else if(hostname.indexOf('sinaapp.com') > -1){
 		if (hostname.indexOf('iavadraw') > -1 && pathname.indexOf('draw') >-1) {
 		 addCssToDocument('.gamelistb2in { width: 96px !important; }'); 
 		}
-		log('Draw game contents missing issue of sinaapp.com');
+		log('NHSP-425, Draw game contents missing issue of sinaapp.com');
 	} else if(hostname.indexOf('siren24.com')!=-1){
 		navigator.appName = 'Netscape';
-		log('ActiveX installation page redirect on siren24.com due to sniffing limitation on redirect script');
+		log('SEOUL-609, ActiveX installation page redirect on siren24.com due to sniffing limitation on redirect script');
 	} else if(hostname.indexOf('smithbarney.com')>-1){
 		HTMLInputElement.prototype.__defineSetter__('type',function(){
 			if (this.getAttribute('type')!=arguments[0]) {
@@ -1278,13 +1359,13 @@ function stopKeypressIfDownCancelled(stopKey){
 			}
 		});
 		
-		log('Enable the password box on smithbarney.com');
+		log('PATCH-360, Enable the password box on smithbarney.com');
 	} else if(hostname.indexOf('sperrysoftware.com')!=-1){
 		addCssToDocument('td{vertical-align:top}');
-		log('Nested tables with 100% height are not laid out as expected, menu is pushed down');
+		log('309189, Nested tables with 100% height are not laid out as expected, menu is pushed down');
 	} else if(hostname.indexOf('sports.donga.com')>-1){
 		addCssToDocument('#FloatLayer1{visibility:hidden!important}');
-		log('Blocks floating flash ad on sports.donga.com that cannot be closed');
+		log('354059, Blocks floating flash ad on sports.donga.com that cannot be closed');
 	} else if(hostname.indexOf('star.moneytoday.co.kr')>-1){
 		try {
 		    addEventListener.call(document, 'DOMContentLoaded', function(){
@@ -1294,7 +1375,7 @@ function stopKeypressIfDownCancelled(stopKey){
 		        }
 		    }, false);
 		} catch(e) {}
-		log('Clicks on a link to display the front page story in an iframe on star.moneytoday.co.kr');
+		log('348222, Clicks on a link to display the front page story in an iframe on star.moneytoday.co.kr');
 	} else if(hostname.indexOf('t.yuuquu.com')>-1){
 		if(pathname.toLowerCase().indexOf('tologin')>-1){
 		document.addEventListener('DOMContentLoaded', function(){
@@ -1306,7 +1387,7 @@ function stopKeypressIfDownCancelled(stopKey){
 					}			
 				}, false);	
 		}
-		log('Fix log in issue of t.yuuquu.com');
+		log('OMO-104, Fix log in issue of t.yuuquu.com');
 	} else if(hostname.indexOf('taobao.com')>-1){
 		if(hostname.indexOf('m.')>-1 || hostname.indexOf('wap.')>-1 || hostname.indexOf('3g.')>-1) {
 			if(location.search.indexOf('v=1')<=-1 && (pathname.length <2 && (location.search.length <2 || location.search.indexOf('sprefer=sypc00')>-1))) {
@@ -1329,13 +1410,13 @@ function stopKeypressIfDownCancelled(stopKey){
 				addCssToDocument('.login .login-form li {height:auto !important;} .common-btn-full {background: -o-linear-gradient(#F94920,#EB3E13) !important;}');
 			}
 		}
-		log('Fix layout messing up issue of m.taobao.com touch screen version\nFix input box and layout display i...');
+		log('NHSP-435, Fix layout messing up issue of m.taobao.com touch screen version\nOMO-267, Fix input box and layout display issue of login.m.taobao.com');
 	} else if(hostname.indexOf('time.com')>-1){
 		navigator.userAgent=navigator.userAgent.replace( /windows ce/i, '' );
-		log('time.com script causes reload loop if UA contains "Windows CE"');
+		log('229826, time.com script causes reload loop if UA contains "Windows CE"');
 	} else if(hostname.indexOf('tistory.com')!=-1){
 		addCssToDocument('#memberbox .btn-login {text-indent:-100px;}');
-		log('two login buttons on tistory.com');
+		log('347990, two login buttons on tistory.com');
 	} else if(hostname.indexOf('travel.rakuten.co.jp')>-1){
 		var cssText = '.headLink{background: -o-linear-gradient(top, #666666, #000000 45%);}';
 		cssText += '#searchArea #map{background: -o-linear-gradient(top, #FFFFFF, #9CE2EB);}';
@@ -1343,16 +1424,16 @@ function stopKeypressIfDownCancelled(stopKey){
 		cssText += '.headLink p.btTop{background: -o-linear-gradient(top, #84AAED, #2B78E4 50%, #2B78E4);}' ;
 		cssText += '#searchArea #search input.submit{background: -o-linear-gradient(top, #F6731C, #E15A00 45%);}' ;
 		addCssToDocument(cssText);
-		log('travel.rakuten.co.jp - add missing gradients');
+		log('PATCH-773, travel.rakuten.co.jp - add missing gradients');
 	} else if(hostname.indexOf('twitter.com')>-1 && pathname.length <2){
 		addCssToDocument("#home_search p { white-space:nowrap !important;  }"); 
-		log('Fix search button and search box overlap issue for twitter.com');
+		log('YUSHAN-294, Fix search button and search box overlap issue for twitter.com');
 	} else if(hostname.indexOf('viacom.com')!=-1){
 		opera.defineMagicVariable('plugin', function(curVal) { return true; }, null);
-		log('Tweaked SWFObject on viacom.com creates constant document reflows');
+		log('SEOUL-616, Tweaked SWFObject on viacom.com creates constant document reflows');
 	} else if(hostname.indexOf('wap.flycell.com.br')!=-1){
 		addCssToDocument('input[type=hidden], input[type=submit]{-wap-input-format: "*m" !important;}');
-		log('Avoid CSS input validation of hidden inputs');
+		log('SOKRI3-1432, Avoid CSS input validation of hidden inputs');
 	} else if(hostname.indexOf('wap.playboy.com')==0){
 		addCssToDocument( 'img{max-width: '+(screen.width)+'px; }' );
 		document.addEventListener('DOMContentLoaded', function(){
@@ -1364,47 +1445,47 @@ function stopKeypressIfDownCancelled(stopKey){
 			}
 		}, false);
 		
-		log('Resize home banner and other wide images');
+		log('SOKRI4-1550, Resize home banner and other wide images');
 	} else if(hostname.indexOf('wap.sina.com')>-1){
 		addCssToDocument("body {line-height: 1.5em;}");
-		log('Fix line-height issue of wap.sina.com.cn');
+		log('YUSHAN-2339, Fix line-height issue of wap.sina.com.cn');
 	} else if(hostname.indexOf('wap.smartone-vodafone.com')>-1){
 		opera.setOverrideHistoryNavigationMode('compatible');
-		log('Re-initialize page on back to make plugins work correctly');
+		log('SOKRI3-1645, Re-initialize page on back to make plugins work correctly');
 	} else if(hostname.indexOf('wap.vnet.mobi')>-1){
 		if( document.documentElement ){ 
 		 var meta=document.documentElement.appendChild(document.createElement('meta')); 
 		 meta.setAttribute('name', "viewport"); 
 		 meta.setAttribute('content', "width=340,user-scalable=no");
 		}
-		log('Remove overlapping text on vnet.mobi');
+		log('HMONY-1927, Remove overlapping text on vnet.mobi');
 	} else if(hostname.indexOf('wapp.verizon.net')!=-1){
 		forceMobileView();
-		log('Verizon mobile webmail service should default to mobile view');
+		log('OSAN-11, Verizon mobile webmail service should default to mobile view');
 	} else if(hostname.indexOf('webprint.post.japanpost.jp')>-1){
 		opera.defineMagicFunction('_supportsDOM',function (oReal,oThis) { return true; });
-		log('japanpost.jp: Fix broken _supportsDOM function');
+		log('PATCH-449, japanpost.jp: Fix broken _supportsDOM function');
 	} else if(hostname.indexOf('westjet.com')>-1 ){
 		opera.defineMagicVariable('browser', function(o){ o.isSupported=true; return o; }, null);
-		log(' Westjet browser sniffing warns against Opera');
+		log('PATCH-260,  Westjet browser sniffing warns against Opera');
 	} else if(hostname.indexOf('www.answers.com')>-1){
 		addCssToDocument('body{background-image: -o-linear-gradient(top,rgba(74,114,193,0.98),rgba(31,56,105,0.98)), url(http://en.site2.answcdn.com/templates/images/stripe.png?v=49d225d);}');
-		log('answers.com: add background gradient');
+		log('PATCH-719, answers.com: add background gradient');
 	} else if(hostname.indexOf('xuan.3g.cn')>-1){
 		addCssToDocument('.navMain p a {width:16% !important; } .screen-gt320 h1, .screen-gt320 h1 a { font-size: 16px !important;  }');
-		log('Fix page layout issues on 3G.cn');
+		log('OMO-89, Fix page layout issues on 3G.cn');
 	} else if(hostname=='live.vodafone.com'&&pathname.indexOf('/jumppage')==0){
 		forceMobileView();
-		log('Display Vodafone\'s Google search site in Normal Zoom by default');
+		log('362160, Display Vodafone\'s Google search site in Normal Zoom by default');
 	} else if(hostname=='m.espn.go.com'){
 		scaleImagesToScreenWidth();
 		forceWordWrapping();
-		log('Content goes over screen width on m.espn.go.com');
+		log('OSAN2-282, Content goes over screen width on m.espn.go.com');
 	} else if(hostname=='mobile.vzwapp.com' || hostname=='mobile.vzw.com' || hostname=='start.vzw.com'){
 		if(location.pathname=='/')addCssToDocument('span{background: none !important;}');
 	
 		forceMobileView();
-		log('VZW mobile start page has colored span elements that overlap images\nVZW mobile portal does not trig...');
+		log('OSAN-227, VZW mobile start page has colored span elements that overlap images\n356069, VZW mobile portal does not trigger mobile view');
 	} else if(hostname=='wap.smart.com.ph'){
 		document.addEventListener('DOMContentLoaded',function (){
 			if(!document.body && document.documentElement.nodeName == 'html' && document.documentElement.namespaceURI == null){
@@ -1416,16 +1497,16 @@ function stopKeypressIfDownCancelled(stopKey){
 		document.addEventListener('DOMContentLoaded', function(e){
 			if(document.links[0].href=='opera:forcehtml'){ document.links[0].click(); }
 		}, false);
-		log(' WAP site on smart.com.ph serves XHTML content without xmlns\nAutomatically re-parse XHTML content w...');
+		log('327422,  WAP site on smart.com.ph serves XHTML content without xmlns\n331879, Automatically re-parse XHTML content with parse errors as HTML');
 	} else if(hostname=='weather-mobile.weatherbug.com'){
 		scaleImagesToScreenWidth(); 
-		log('Banner goes over screen width on weather-mobile.weatherbug.com');
+		log('OSAN2-283, Banner goes over screen width on weather-mobile.weatherbug.com');
 	} else if(hostname=='xhtml.emome.net'){
 		forceMobileView();
-		log('emome.net wap portal does not trigger mobile view');
+		log('328103, emome.net wap portal does not trigger mobile view');
 	} else if(href == 'http://www.dowwallpaper.com/index.htm'){
 		window.location.replace("home.php");
-		log('redirect to frame content to prevent rendering error for small buffer size');
+		log('UMAFINAL-1521, redirect to frame content to prevent rendering error for small buffer size');
 	}
 
 })(opera);
