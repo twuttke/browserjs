@@ -1,0 +1,738 @@
+<?xml version="1.0"?>
+<preferences clean_all="1">
+<host name="juroku.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="kum.gov.hu">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="amazon.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="tuenti.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="sayclub.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="3"/>
+	</section>
+</host>
+<host name="jp.sonystyle.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="fitness-superstore.co.uk">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="e-map.ne.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="first-direct.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="firstdirect.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="hsbc.co.uk">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="mfa.gov.hu">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="trkcnfrm1.smi.usps.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+</host>
+<host name="rikai.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="kum.hu">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="news.walla.co.il">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="3"/>
+	</section>
+</host>
+<host name="wellsfargo.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="weightwatchers.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="tangowire.net">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="slownik-online.pl">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+	<section name="User Prefs">
+		<pref name="CompatMode Override" value="2"/>
+	</section>
+</host>
+<host name="booking.aul.gl">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="5"/>
+	</section>
+</host>
+<host name="www.ing.nl">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="netflix.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="sss-web.usps.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+</host>
+<host name="peoplefirst.myflorida.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="3"/>
+	</section>
+</host>
+<host name="mizuhobank.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="ib.daishi-bank.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="bkinformatica.com.br">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="fnb.co.za">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="direct.chugin.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="qvc.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="mail.nate.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="ib.awabank.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="thrifty.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="fjallfoss.fcc.gov">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="sparebank1.no">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+	<section name="Performance">
+		<pref name="Enable Pipelining" value="0"/>
+	</section>
+</host>
+<host name="ib.aozorabank.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="a1.net">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+	<section name="Performance">
+		<pref name="Enable Pipelining" value="0"/>
+	</section>
+</host>
+<host name="php.net">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+	<section name="Performance">
+		<pref name="Enable Pipelining" value="0"/>
+	</section>
+</host>
+<host name="gamevideos.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+	<section name="Performance">
+		<pref name="Enable Pipelining" value="0"/>
+	</section>
+</host>
+<host name="rabobank.nl">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+	<section name="Performance">
+		<pref name="Enable Pipelining" value="0"/>
+	</section>
+</host>
+<host name="mapa.co.il">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="direct.ryugin.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="bancopopular.pt">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="slacker.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="nike.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="ib.kantotsukuba-bank.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="ib.surugabank.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+</host>
+<host name="mib.miyagin.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="musashinobank.ib.cyber-biz.ne.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="shinwabank.ib.cyber-biz.ne.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+</host>
+<host name="ynb.yamagatabank.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="kulugyminiszterium.hu">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="vocuspr.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="e-portal.eon-hungaria.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="adwords.google.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="learning.emc.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="viktvaktarna.se">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="busnavi.net">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="elanit.ch">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="elanit.co.uk">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="directline.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="boingboing.net">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+	<section name="Performance">
+		<pref name="Enable Pipelining" value="0"/>
+	</section>
+</host>
+<host name="sonysonpo.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="huffingtonpost.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+	<section name="Performance">
+		<pref name="Enable Pipelining" value="0"/>
+	</section>
+</host>
+<host name="randstad.nl">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="tempo-team.nl">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="tangowire.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="germansinglesonline.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="biggerisbetterdating.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="scouting.org">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="nzone.download.nvidia.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="webcenter.peelschools.org">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="sbisonpo.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="zensus2011-gwz.de">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="sompo-japan.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="3"/>
+	</section>
+</host>
+<host name="credit-tk.nhk.or.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="hsbc.com.pa">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="dexia.be">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="amazon.co.uk">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="amazon.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="amazon.de">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="amazon.fr">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="amazon.it">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="amazon.es">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="amazon.cn">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="amazon.ca">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="hsbc.com.hk">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="citroen.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="flyasiana.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="ccb.com.cn">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="locator.chase.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="lake.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="shinseifinancial.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="tsukubabank.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="82bank.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="shigagin.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="ncbank.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="higobank.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="hokuyobank.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="keiyobank.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="337.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="vod.ntv.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="dotzshop.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="realtor.ca">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="neostreams.info">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="otccomp.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="ugda.lu">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="cafbank.org.uk">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="cafbank.org">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="idbibank.co.in">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="citrus3.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="travel.yahoo.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="mcafee.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="coupons.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="finansbank.com.tr">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="lds.no">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="sberbank.ru">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+	<section name="Performance">
+		<pref name="Enable Pipelining" value="0"/>
+	</section>
+</host>
+<host name="sbrf.ru">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+	<section name="Performance">
+		<pref name="Enable Pipelining" value="0"/>
+	</section>
+</host>
+<host name="timewarnercable.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="bioplanet.be">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="sas.se">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+	<section name="Performance">
+		<pref name="Enable Pipelining" value="0"/>
+	</section>
+</host>
+<host name="sas.dk">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+	<section name="Performance">
+		<pref name="Enable Pipelining" value="0"/>
+	</section>
+</host>
+<host name="sas.no">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+	<section name="Performance">
+		<pref name="Enable Pipelining" value="0"/>
+	</section>
+</host>
+<host name="flysas.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+	<section name="Performance">
+		<pref name="Enable Pipelining" value="0"/>
+	</section>
+</host>
+<host name="scandinavian.net">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+	<section name="Performance">
+		<pref name="Enable Pipelining" value="0"/>
+	</section>
+</host>
+<host name="secure.ally.ca">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="secure.ally.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="edfenergy.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="mysites.usf.edu">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="gumail.georgetown.edu">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="travelhoken.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="ms-ins.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="ntt-east.co.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="client.axa.fr">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="login.oracle.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="mynook.barnesandnoble.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="5"/>
+	</section>
+</host>
+<host name="linkedin.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+</preferences>
