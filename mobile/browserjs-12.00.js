@@ -1,4 +1,4 @@
-// TEmlhTygpQPPgg/M2iunqfMp953Yojk1nelBh2YMMKxekmHO1JAiTKCjmpantaRwoTvH1imWsrmt/e3p1jjPYrx1QzwHZmcTGVttQgZerd0QDtIObmlDX09cBqVx1HDQ9YzmQELYsLg8xI9aOH4RR+YaOBFAK8uP0MNzibrTfGatcUfunEbXZYGASu0ipjf1Oz3AHmUqUsPE5a6WnVmpWmWbzF0tS3qZQ9+tmQfxEHv4GU2J7RYO4/5cmCiku3lWUUFRtT16fRaVkuKFsSHUa9elM8hwmhXB921qMDOQKuccUJ7JGEnanlQVGO5a7U1HgIFVIEASmxGRfpSSVkOaNw==
+// XJyw0L6Bo6NeMd+PAVaLB+Rd4EXSNRClMjBlkiSlLPyI8XMqi8fSiUbJJofWpA8zKahUqG3W02EUPSjgrcyDSbuI4Cc1XxGbXarfC9ZfWOKBhjbbwq+RPsCrIJb5mjeoLRKaGZVQ38k5TTc8Ki5GqNb+aIRdzVauSHnt2DvRAJYL201alf3fY5Ch5vAOcm7XHQLVc24lKcqsqhgKTn7CXKHvki/t2SqJmsytMByS4BNypXYF3ZhQ/ny5naDQj89YzLHPLyi4oPDK/54OmCmBhq+a4YFtNqeplJOBiRWSdHBKWulaiPTxipVB2NsspX4N6LR2TkoS6gfjBIVxStmdSw==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.00 core 2.10.254, August 20, 2012. Active patches: 167 ';
+	var bjsversion=' Opera Mobile 12.00 core 2.10.254, August 27, 2012. Active patches: 170 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -418,15 +418,6 @@ function stopKeypressIfDownCancelled(stopKey){
 			},false);
 		}
 		log('PATCH-186, tokyo.jp, lg.jp enable maps');
-	} else if(hostname.endsWith('.schrack.com')){
-		opera.addEventListener('BeforeCSS',
-			function(e){
-				if(e.element.href.indexOf('opera.css')>-1){
-					e.preventDefault();
-				}
-			}
-		,false);
-		log('PATCH-801, schrack.com: prevent outdated opera-specific stylesheet');
 	} else if(hostname.endsWith('b.mig33.com')){
 		if(location.pathname.indexOf('wap')>-1)
 		{
@@ -438,6 +429,22 @@ function stopKeypressIfDownCancelled(stopKey){
 		}
 		
 		log('PNGLAI-864, overlap issue of migAlerts');
+	} else if(hostname.endsWith('cooliris.com')){
+		document.addEventListener('DOMContentLoaded',
+			function(){
+				var elm = document.querySelector('meta[name="viewport"]');
+				if(elm)elm.content = elm.content.replace(/user-scalable=no/,'user-scalable=yes');
+			}
+		,false);
+		log('PATCH-781, cooliris: user-scalable yes');
+	} else if(hostname.endsWith('m.iboa.pl')){
+		document.addEventListener('DOMContentLoaded',
+			function(){
+				var elm = document.querySelector('meta[name="viewport"]');
+				if(elm)elm.content += ' ,width=device-width';
+			}
+		,false);
+		log('PATCH-779, m.iboa.pl: make it fit device-width');
 	} else if(hostname.endsWith('mail.live.com')){
 		addCssToDocument('.c_is { display: inline-block }');
 	
@@ -455,6 +462,12 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.endsWith('myportfolio.nbcn.ca')){
 		opera.defineMagicFunction('checkBrowserVersion',function(){});
 		log('PATCH-805, nbcn.ca - block browser block');
+	} else if(hostname.endsWith('politics.ie')){
+		document.addEventListener( 'DOMContentLoaded', function(){
+		        var el = document.getElementsByClassName('ui-mobile-rendering')[0];
+			if(el)el.className = el.className.replace(/ui-mobile-rendering/, '');
+		}, false );
+		log('PATCH-820, politics.ie: make mobile version render');
 	} else if(hostname.indexOf( '.56.com' )>-1){
 		addCssToDocument(".so {background-color:transparent !important;} .search .so .so_input .inp_search{ width:232px !important; } ");
 	
@@ -521,6 +534,12 @@ function stopKeypressIfDownCancelled(stopKey){
 			    };
 			    })();
 			log('UMAFINAL-534, Autocomplete makes typing very slow on google.com.tw');
+		}
+		if(location.search.indexOf('imghp')>-1){
+			if(navigator.userAgent.indexOf('Opera Tablet/')>-1){
+			 window.scrollTo=function(){}
+			}
+			log('PATCH-787, Make Google Image Search display on Opera Tablet');
 		}
 		if(pathname.indexOf('/m')==0&&pathname.indexOf('mail')==-1){
 			addCssToDocument('.navbar { height: auto; !important; }');
@@ -721,11 +740,21 @@ function stopKeypressIfDownCancelled(stopKey){
 				}
 			}
 		 }
-		 
 		 document.addEventListener('DOMContentLoaded', setHeaderHeight, false);
 		
-		
 		 opera.addEventListener('BeforeCSS', function(userJSEvent){ userJSEvent.cssText = userJSEvent.cssText .replace(/-(webkit)-(background-size)/g,'$2'); }, false);
+		
+		 opera.addEventListener('AfterScript', function(userJSEvent) {
+		      if (typeof slide != "undefined" && slide.prototype) {
+		        slide.prototype.cssTranslation = function(e, t) {
+		          var n = $("#" + this.swapId);
+		          n.css("left", e.slice(0, -1) * this.slideNum + "%");
+		          n.css("OTransition", "left 0.4s ease-out");
+		          n.css("transition", "left 0.4s ease-out");
+		          n.css("OTransitionDuration", t);
+		          n.css("transitionDuration", t);
+		          n = null;}}});
+		
 		}
 	
 		if(hostname.indexOf('gp.') >-1) {
