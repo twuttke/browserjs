@@ -1,4 +1,4 @@
-// eb4GDuTvDvOQBv5Inz9TIyl/ncZ+0y/dwvuoE5J2aMIhxdPbLK3US0Gy21MamOrSN8afltvf39yeD35Dop5K9x9X0BjqolNnSUtARyPgaYhZZukK1v8Kjsxmezf8ag4fjNjAvKZS7NpvG2GqgWo2azd2ua6/E7G4BO2Ahfq4dJ9YncO5T45kadDpEpcfHsOopK+uHefSRoVmf2MCa1uYtc/cDYxmQ7+ExFMBDpaV5eyll+0Oo/pKOdmBSo6wH1ubjHVa5Hzc+AHSnFTfzwjVtkle2swf+GsydYfQcFB1UVLaP+QrXu6x4nRpomo3QS8yQqmL5HS1crgRu0qCwGNxSw==
+// QtFbxhjT69WQbbCHoRjmWso/CST2McWsTEBu5u4chupiygyhZP080+gmtpsmNCbjDP/VeBQ1G9DsEaQIdL9Y+kZaggt7FWq3dbRlxltMDXt9FB5Vx6DaR6u7Au5/PK74AwCQoelXg7Unr1exOuZ3UKZGCgZioLEqEcUQAmTDhC5wZuDu1ZRR/CD9+r5l4uOcMymWXQloCnYT0WP3TFXUFzADwveuDXVy6+ZuN10TS0BjHRhHb8JTypSVfxz2XLk/tvtWYRx3WXwLWrEu7m3ACqHBa5AOs6wzOt7yKQpVLJJKewyfBj+u6puHlrIc5JeYgzIDlszBNAV+WXJX1JEFvw==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.50 core 2.12.376, August 20, 2012. Active patches: 203 ';
+	var bjsversion=' Opera Desktop 12.50 core 2.12.378, August 27, 2012. Active patches: 202 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -83,10 +83,9 @@
 	};
 	function log(str){
 		opera._bjsStatus.msgs.push(str);
-		window.dispatchEvent.call(opera, new CustomEvent('bjspatchEvent'));
+		if(typeof CustomEvent=='function')window.dispatchEvent.call(opera, new CustomEvent('bjspatchEvent'));
 		if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ('+str+'). See browser.js for details');
 	}
-
 	// Utility functions
 
 	function addCssToDocument(cssText, doc, mediaType){
@@ -304,14 +303,6 @@ function fixOpenCube(name){// IMPORTANT gotcha: the fixOpenCube and fixHVMenu fu
 		defineMagicVariable.call(opera, 'um', function(o){ o.ss=false; o.o7=false; return o; }, null);
     }
 
-function ignoreCancellationOfCertainKeyEvents(type, list){
-	opera.addEventListener( 'BeforeEventListener.'+type, function(e){
-		preventDefault.call=call;
-		if( e.event.keyCode in list ){
-			preventDefault.call(e);
-		}
-	},false );
-}
 function makePropertyCacheable(obj, prop){ 
  (function() { 
 	 var is_cached = false; 
@@ -332,9 +323,12 @@ function prestoVersionBelow(ver){
 	var parts=ver.split(/\./);
 	var current=navigator.userAgent.match(/Presto\/(\d+)\.(\d+)\.(\d+)/);
 	if(!current)return true;
-	if( parts[0] > current[1] )return true;
-	if( parts[0] < current[1] )return false;
-	return parseFloat(parts[1]+'.'+parts[2]) > parseFloat(current[2]+'.'+current[3]);
+	for( var i=1;i<current.length;i++ ){
+		if( parts[i] != current[i] ){
+			return parts[i]<current[i];
+		}
+	}
+	return false; // identical
 }
 function sendOperaEvent(name, target){
 	initEvent.call=createEvent.call=dispatchEvent.call=call;
@@ -497,7 +491,7 @@ function setTinyMCEVersion(e){
 				fixed=true;
 		}else if(indexOf.call(name,'s_code')>-1||indexOf.call(name,'omniture')>-1){ //PATCH-59
 			avoidDocumentWriteAbuse(); // calls log()
-		}else if(indexOf.call(name,'setdomain.js')>-1){
+		}else if(indexOf.call(name,'setdomain.js')>-1 || indexOf.call(name,'browserversion.js')>-1){
 			navRestore.userAgent = navigator.userAgent;
 			navigator.userAgent+=' Gecko';
 			shouldRestore=true;
@@ -663,15 +657,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.contains('sheet.zoho.com')){
 		MouseEvent.prototype.axis=2;
 		log('PATCH-766, Make mouse scrolling work in Zoho spreadsheets');
-	} else if(hostname.endsWith('.schrack.com')){
-		opera.addEventListener('BeforeCSS',
-			function(e){
-				if(e.element.href.indexOf('opera.css')>-1){
-					e.preventDefault();
-				}
-			}
-		,false);
-		log('PATCH-801, schrack.com: prevent outdated opera-specific stylesheet');
 	} else if(hostname.endsWith('aldoshoes.com')){
 		document.__defineSetter__('domain', function(){});
 		log('PATCH-808, aldoshoes.com - fix broken document.domain settings');
@@ -684,6 +669,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('ebayclassifieds.com') && pathname.match(/\/PostAd/)){
 		navigator.userAgent = navigator.userAgent.replace(/Opera/g,'0pera');
 		log('PATCH-784, eBay Classifieds - disable block on image uploader');
+	} else if(hostname.endsWith('github.com')){
+		addCssToDocument('.social-count::before {margin-right:14px;margin-top:0;}.social-count::after {margin-right:13px;margin-top:0;}');
+		log('PATCH-815, github: work around misplaced arrows (Opera bug)');
 	} else if(hostname.endsWith('mail.live.com')){
 		function fixButton(e) {
 			if (e.button == 1) {
@@ -697,11 +685,13 @@ function setTinyMCEVersion(e){
 	
 		addCssToDocument('.c_is { display: inline-block }');
 	
+		HTMLImageElement.prototype.__defineGetter__('complete', function(){ if(this.src.match(/\.js$/))return false; return true; });
+	
 		var styleSetterLookupMethod = document.createElement('span').style.__lookupSetter__;
 		 CSSStyleDeclaration.prototype.__lookupSetter__ = function(prop){
 			return styleSetterLookupMethod.call(document.createElement('span').style, prop);
 		 };
-		log('CORE-17444, Fix drag and drop in Hotmail\nCORE-17447, Mispositioned sprites due to missing CSS\nDSK-235885, Hotmail uses lookupGetter on prototypes, not instances');
+		log('CORE-17444, Fix drag and drop in Hotmail\nCORE-17447, Mispositioned sprites due to missing CSS\nPATCH-823, img.complete must be false while loading a .js file\nDSK-235885, Hotmail uses lookupGetter on prototypes, not instances');
 	} else if(hostname.endsWith('members.webs.com')){
 		opera.addEventListener('BeforeScript', function (e) {
 			if (e.element.src.indexOf('underscore-base.js') > -1) {
@@ -748,26 +738,47 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('pinterest.com')){
 		addCssToDocument('div.NoInput input[data-text-on="On"]{display: inherit !important;visibility: hidden;}');
 		log('PATCH-811, pinterest.com: Opera fails to update status of display:none checkbox');
-	} else if(hostname.endsWith('shaw.ca')){
-		opera.defineMagicFunction('detectBrowserVersion',function(){return true})
-		log('PATCH-788, shaw.ca: work around browser sniff');
-	} else if(hostname.endsWith('staples.com')){
-		(function(){
-			var xhrDocGetter=(new XMLHttpRequest).__lookupGetter__('responseXML');
-			XMLHttpRequest.prototype.__defineGetter__('responseXML', function(){
-				var doc=xhrDocGetter.call(this);
-				if(!doc)return doc;
-				for(var elms=doc.getElementsByTagName('*'),elm,i=0;elm=elms[i];i++){
-					if(elm.hasAttribute('disable-output-escaping'))elm.removeAttribute('disable-output-escaping');
+	} else if(hostname.endsWith('skydrive.live.com')){
+		var getCssText = function() {
+			if (!this.href)	{
+				return this.ownerNode.textContent;
+			} else {
+				try {
+					var xhr = new XMLHttpRequest();
+					xhr.open('GET', this.href, false);
+					xhr.send();
+					return xhr.responseText;
+				} catch(e) {
+					return '';
 				}
-				return doc;
+			}
+		};
+		if (window.__defineGetter__) {
+			CSSStyleSheet.prototype.__defineGetter__('cssText', getCssText);
+			CSSStyleSheet.prototype.__defineSetter__('cssText', function(v) {
+				if (!this.href) {
+					this.ownerNode.innerHTML = '';
+					return this.ownerNode.appendChild(document.createTextNode(v));
+				}
 			});
-		})();
+		} else {
+			window.addEventListener('load', function(){
+				for( var i=0;i<document.styleSheets.length;i++ ){
+					if(document.styleSheets[i])
+						document.styleSheets[i].cssText = { _styleRef: document.styleSheets[i], toString:function(){
+					return this._styleRef.ownerNode.textContent}
+					};
+				}
+			},false);
+		}
 		
-		log('PATCH-769, Opera throws when XSL variable has disable-output-escaping attribute, breaks sorting on staples.com');
+		log('PATCH-810, Emulating IE\'s cssText property on style sheets');
 	} else if(hostname.endsWith('www.auf.org')){
 		opera.defineMagicFunction('OldBrowserDetect',function(){return false})
 		log('PATCH-795, auf.org: work around broken sniffer');
+	} else if(hostname.endsWith('www.shaw.ca')){
+		opera.defineMagicFunction('detectBrowserVersion',function(){return true})
+		log('PATCH-788, shaw.ca: work around browser sniff');
 	} else if(hostname.indexOf("cang.baidu.com") != -1 ){
 		window.opera.defineMagicFunction(
 			"top",
@@ -1537,9 +1548,6 @@ function setTinyMCEVersion(e){
 			false
 		);
 		log('PATCH-176, Allow upload of workspace resources in Salesforce');
-	} else if(hostname.indexOf('santanderbank.de')>-1){
-		ignoreCancellationOfCertainKeyEvents('keypress', {114:'', 116:'', 117:'', 122:''});
-		log('PATCH-84, Santander bank prevents typing certain keys');
 	} else if(hostname.indexOf('sbrf.ru')>-1){
 		addEventListener('DOMContentLoaded', function(){s
 			var nodes=document.evaluate('//*[@onmouseover | @onmouseout]', document.body, null, 4, null), node;
@@ -1552,9 +1560,6 @@ function setTinyMCEVersion(e){
 		}, false);
 		
 		log('PATCH-644, Resolving sbrf.ru\'s menus mouseout confusion by helping them use mouseleave instead');
-	} else if(hostname.indexOf('seb-bank.de')>-1){
-		ignoreCancellationOfCertainKeyEvents('keypress', {114:'', 116:'', 117:'', 122:''});
-		log('PATCH-84, SEB bank prevents typing certain keys');
 	} else if(hostname.indexOf('sharklink.nova.edu')>-1){
 		opera.defineMagicVariable('is_opera',function(){return false},null);
 		opera.defineMagicVariable('is_fox',function(){return true},null);
