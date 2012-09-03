@@ -1,4 +1,4 @@
-// Sqz2seA4rYi4fT3SgXTfjQS8aHVUh3Ufx6KZTCvK3RtjdnJ/O0I88bYDSOeAGzi+YcHXPYHZnyvN8yBCUlWphJ35zbcI+EQMpTXRKuiJrid6Nb86defzC+3EQtHYMUEssjaqfPXwAPxCYpzA4VmMxI8ePEud4K8JnmkhxI5p0zc6huNnSpHzkcGJxo5QpmuMx7uQB9CHDxHSyNnbOhLdZu7f8mSDfKxveKXsLPJtgqh2wOo03rbRz/wvDbchFT/5MYUyMHEz2vFPx6PP7HbS3qLzBNuhRWbC8pJOSPTb2T67JhiPdeg3YZly/gLfzItltb7S734ImjNjKPaOq79BuQ==
+// uJlbr980/QW89YKBM4HdZm+TICXeveM/eRq4j6pA133zDOZ4rXs3C7T13j1d2gx0liX9RX7XU2Yt++diiQtN6V5qjDugtW9Ljjpdm5t9bryiv8RJmhDtGmcqh1BS2kjGfZM6pJeuWxKGWdp5pKarxG8peAa11Fzv+kY9F1niGAxLn0DrmjAlQlQfW64BuqaANeHC3ZrBrrX2DNtVonmUIepgFSWszYL7oqvJOeEbDv8Cpi+qYNOGa8foED2umBWOBbF2+k0b6+fma3R5ErItU2p5bgqJCYPE6Ip31OhJMyNxQmdTStCu41utO8VZJnXSBFV6Z3tIr65qNUrx4dyiow==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, August 27, 2012. Active patches: 234 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, September 3, 2012. Active patches: 234 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -365,6 +365,7 @@ function setTinyMCEVersion(e){
 // PATCH-248, Jive forum software doesn't work in Opera
 // PATCH-503, Working around Transmenu's browser sniffing
 // PATCH-261, Hide broken implementation of showModalDialog to make object detection reliable
+// PATCH-835, Generic fix for the .Net JS library that defines a broken PopOut_Position() function
 // 246299, PDF security patch
 // PATCH-554, Workaround for jquery.jsonp plugin's workaround against missing onerror support
 // PATCH-298, Disable sniffing in old HTMLArea editors
@@ -567,6 +568,14 @@ function setTinyMCEVersion(e){
 
 	delete showModalDialog;
 
+	opera.defineMagicFunction( 'PopOut_Position', function(func, that){
+	    var _opera=window.opera;
+	    if(func.toString().match(/if\s*\(\s*window\.opera\)\s*\{\s*panel\./))delete window.opera;
+	    var value = func.apply( that, [].slice.call(arguments, 2) );
+	    window.opera=_opera;
+	    return value;
+	} );
+
 	opera.addEventListener('BeforeJavaScriptURL', function( e ){
 		unescape.call=toLowerCase.call=indexOf.call=preventDefault.call=call;
 		var hash=unescape.call(self, toLowerCase.call(self.location.hash));
@@ -689,6 +698,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('github.com')){
 		addCssToDocument('.social-count::before {margin-right:14px;margin-top:0;}.social-count::after {margin-right:13px;margin-top:0;}');
 		log('PATCH-815, github: work around misplaced arrows (Opera bug)');
+	} else if(hostname.endsWith('gsmtronix.com')){
+		fixHVMenu('dummy.js');
+		log('PATCH-842, gsmtronix.com: HVmenu');
 	} else if(hostname.endsWith('mail.live.com')){
 		function fixButton(e) {
 			if (e.button == 1) {
@@ -730,6 +742,14 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('myportfolio.nbcn.ca')){
 		opera.defineMagicFunction('checkBrowserVersion',function(){});
 		log('PATCH-805, nbcn.ca - block browser block');
+	} else if(hostname.endsWith('office.microsoft.com')){
+		opera.defineMagicFunction('FIsFirefox',function(){return true});
+		opera.defineMagicFunction('ResizeVideoControl',function(oF,oT){
+			var value=oF.apply(oT, Array.prototype.slice.call(arguments, 2));
+			document.getElementById('objMediaPlayer').outerHTML = document.getElementById('objMediaPlayer').outerHTML;
+			return value;
+		});
+		log('PATCH-513, office.microsoft.com: re-initialize video player after applying page overflow');
 	} else if(hostname.endsWith('pb.com')){
 		navigator.userAgent=navigator.userAgent.replace( /Opera/g, '0pera not Mozilla' );
 	
@@ -762,41 +782,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('pinterest.com')){
 		addCssToDocument('div.NoInput input[data-text-on="On"]{display: inherit !important;visibility: hidden;}');
 		log('PATCH-811, pinterest.com: Opera fails to update status of display:none checkbox');
-	} else if(hostname.endsWith('skydrive.live.com')){
-		var getCssText = function() {
-			if (!this.href)	{
-				return this.ownerNode.textContent;
-			} else {
-				try {
-					var xhr = new XMLHttpRequest();
-					xhr.open('GET', this.href, false);
-					xhr.send();
-					return xhr.responseText;
-				} catch(e) {
-					return '';
-				}
-			}
-		};
-		if (window.__defineGetter__) {
-			CSSStyleSheet.prototype.__defineGetter__('cssText', getCssText);
-			CSSStyleSheet.prototype.__defineSetter__('cssText', function(v) {
-				if (!this.href) {
-					this.ownerNode.innerHTML = '';
-					return this.ownerNode.appendChild(document.createTextNode(v));
-				}
-			});
-		} else {
-			window.addEventListener('load', function(){
-				for( var i=0;i<document.styleSheets.length;i++ ){
-					if(document.styleSheets[i])
-						document.styleSheets[i].cssText = { _styleRef: document.styleSheets[i], toString:function(){
-					return this._styleRef.ownerNode.textContent}
-					};
-				}
-			},false);
-		}
-		
-		log('PATCH-810, Emulating IE\'s cssText property on style sheets');
 	} else if(hostname.endsWith('staples.com')){
 		(function(){
 			var xhrDocGetter=(new XMLHttpRequest).__lookupGetter__('responseXML');
@@ -945,32 +930,6 @@ function setTinyMCEVersion(e){
 		/* Google */
 	
 	
-		// PATCH-480, IME input invisible and does not trigger Google Suggest due to missing events
-	
-		(function(){
-			if(! document instanceof HTMLDocument) return;
-			var lastQValue='', qElm, rxNonAscii=/[^\x00-\x7F]/;
-			document.addEventListener('DOMContentLoaded', function(){
-				if(document.getElementsByName('q').length){
-					qElm=document.getElementsByName('q')[0];
-					opera.addEventListener('BeforeEventListener.input', function(e){
-						if(e.event.target && e.event.target.name=='q')lastQValue=e.event.target.value;
-					}, false);
-					setInterval( function(){
-						if( qElm.value != lastQValue && (rxNonAscii.test(qElm.value) || qElm.value=='' && lastQValue!='') ){
-							var evt=document.createEvent('Event');
-							evt.initEvent('keyup', true, true);
-							evt.keyCode=229;
-							qElm.dispatchEvent(evt);
-							lastQValue=qElm.value;
-						}
-					}, 20);
-				}
-			}, false);
-		})();
-		
-	
-	
 		if(hostname.indexOf('adwords.google.') > -1){
 			window.navigator.product = 'Gecko';
 			log(' PATCH-332, Fix disabled charts on Google AdWords');
@@ -980,9 +939,11 @@ function setTinyMCEVersion(e){
 			log('PATCH-321, Work around pre inheritance into tables on Google Code');
 		}
 		if(hostname.indexOf('docs.google.')>-1){
-			if(pathname.indexOf('spreadsheet')>-1){
-			 addCssToDocument('.row-header-wrapper {display:inline}');
-			}
+			opera.addEventListener('BeforeScript', function (e) {
+			 if (e.element.src.indexOf('trix_waffle') > -1 && e.element.src.indexOf('_core') > -1) {
+			  e.element.text = e.element.text.replace(/indexOf\("Opera"\)/g, 'indexOf("Opra")').replace(/"Gecko"==/g, '"Gecko"!=').replace(/"DOMMouseScroll"/g, '"mousewheel"').replace(/\.charCode\:0\)\:[^\?]+\?/g,'.charCode:0):!0?');
+			 }
+			}, false);
 		
 			addCssToDocument('td.doclist-td-checkbox, td.doclist-td-name, td.doclist-td-star {width:auto !important}');
 		
@@ -1128,12 +1089,6 @@ function setTinyMCEVersion(e){
 		addPreprocessHandler('(C.Opera)?document.body["client"+B]:document.documentElement["client"+B]', '(C.Opera)?document.documentElement["client"+B]:document.documentElement["client"+B]');
 		
 		log('PATCH-742, Work around browser sniffing that breaks traffic.com');
-	} else if(hostname.indexOf('.treasury.gov')>-1){
-		window.__defineGetter__( 'opera', function(){
-			if( arguments.callee.caller && arguments.callee.caller.name==='PopOut_Position' )return undefined;
-			return opera;
-		} );
-		log('PATCH-730, Menu misplaced on treasury.gov due to window.opera sniffing in .NET JS library');
 	} else if(hostname.indexOf('.tv.com')>-1){
 		opera.addEventListener('BeforeCSS', function(e){
 		  e.cssText = e.cssText.replace(/br{content:"&nbsp;";/g,'br{ ');
@@ -1474,9 +1429,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('easycruit.com')>-1){
 		fixIFrameSSIscriptII('resizeIframe');
 		log('PATCH-219, Fujitsu recruitment page on EasyCruit hides content due to browser sniffing');
-	} else if(hostname.indexOf('engfilms.ru')>-1){
-		navigator.product = "Gecko";
-		log('PATCH-699, engfilms.ru: needs navigator.product to work');
 	} else if(hostname.indexOf('enter.nifmail.jp') > -1){
 		opera.defineMagicFunction('checkBrowser',function(){
 			return 1;
@@ -1927,6 +1879,26 @@ function setTinyMCEVersion(e){
 			else{return oReal.apply(oThis, Array.prototype.slice.call(arguments, 2));}
 		});
 	
+		opera.addEventListener("BeforeEvent.click", function(e){
+			/*
+			Opera doesn't send unload events in all cases. Check if
+			a mouse click is about to replace a named frame (target). 
+			If it will, iterate over the subframes and send an unload event.
+			*/
+			if(e.event.target.nodeName=="A" && e.event.target.getAttribute('target')!=null){
+				trgt = e.event.target.getAttribute('target');
+				if(trgt.indexOf('_rightside')){
+					f = parent.frames[trgt];
+					for(i=0;i<f.frames.length;i++){
+						var evt=document.createEvent('Event');
+						evt.initEvent('unload', true, true);
+						f.frames[i].dispatchEvent(evt);
+					}
+				}
+			}
+		}
+		,false);
+	
 		opera.addEventListener("BeforeEvent.unload", function(e){
 				if(!(typeof doSubmitEmptyData==='function'))return;
 				var original_function = doSubmitEmptyData;
@@ -1975,26 +1947,7 @@ function setTinyMCEVersion(e){
 					doSubmitEmptyData = original_function;
 			}
 		},false);
-		opera.addEventListener("BeforeEvent.click", function(e){
-			/*
-			Opera doesn't send unload events in all cases. Check if
-			a mouse click is about to replace a named frame (target). 
-			If it will, iterate over the subframes and send an unload event.
-			*/
-			if(e.event.target.nodeName=="A" && e.event.target.getAttribute('target')!=null){
-				trgt = e.event.target.getAttribute('target');
-				if(trgt.indexOf('_rightside')){
-					f = parent.frames[trgt];
-					for(i=0;i<f.frames.length;i++){
-						var evt=document.createEvent('Event');
-						evt.initEvent('unload', true, true);
-						f.frames[i].dispatchEvent(evt);
-					}
-				}
-			}
-		}
-		,false);
-		log('PATCH-445, Fix Ctrl-G shortcut in Maconomy\nPATCH-6, Fix unload form submit behavior on Maconomy portals');
+		log('PATCH-445, Fix Ctrl-G shortcut in Maconomy\nPATCH-838, Maconomy: nested frameset unload\nPATCH-6, Fix unload form submit behavior on Maconomy portals');
 	} else if(pathname.indexOf('/AnalyticalReporting/')==0){
 		if(pathname.indexOf('AnalyticalReporting/WebiModify.do')>-1 || pathname.indexOf('AnalyticalReporting/WebiCreate.do')>-1){
 		opera.defineMagicVariable('embed_size_attr',
