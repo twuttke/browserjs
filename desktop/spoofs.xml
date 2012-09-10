@@ -300,7 +300,7 @@
 </host>
 <host name="learning.emc.com">
 	<section name="User Agent">
-		<pref name="Spoof UserAgent ID" value="2"/>
+		<pref name="Spoof UserAgent ID" value="1"/>
 	</section>
 </host>
 <host name="viktvaktarna.se">
@@ -766,6 +766,26 @@
 	</section>
 </host>
 <host name="hotlink.com.my">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="help.sap.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="1"/>
+	</section>
+</host>
+<host name="central-tanshifx.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="asianave.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="underthemicroscope.com">
 	<section name="User Agent">
 		<pref name="Spoof UserAgent ID" value="2"/>
 	</section>
