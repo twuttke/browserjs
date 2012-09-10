@@ -1,4 +1,4 @@
-// F2ZHcmOwqKUwZr0SLT4iwYodLTaNy73b5kt9NOq2AKyiK7GQ920xnMufnZAQr4ouuucH8UH9E/zTsHDKlHBVFsVL8f9soz/55ucDCBiq93Cti9RRK1qf77bUrzaMCEYt8XcMfh8+pEyS/9VsrNT4sQcxTfnST+kXNfFchI7D7bGesgF78TvG1dytYEJCKpPBqoNoCdNBrGOiXqOB/HGQQTX0LScxwPUjP3YUJXlm08lv+pNfoWwzh49O2mgnKORnWBlMhwvmxUIKbjsPc39C+lDKzrZmiiaP4X0ese8DQcdc19fdiULX4lbjj1Dq4Sa1c/tjpKNaq8Xb+JG4yPSG1A==
+// H5x4lUB4dPLFgni0lRXxI6desm4I2gbRYzjOzI+yNd4BM88S/jiiBWk4SjsfggV1V2xuWAkgdt+VeImc+d3klQsaaI6SaRqAzOPcZFICiRIZzQECLDgUJ6OC75Gwsj31ByGC/nXk3feFwd0YRE1Cf5yic7SPT21wqt6WXJn+4hy2A4/Fdihfy9VGrBXN0mJUBdsE3Uf/RA45HO3QMxm08mDdFOSiXsNjlmivTSiORD1HZnwmYapuxDbQW1oNVd77fUEvRMFCFrYu18SdVITrBnDPP8YVWFzaqHSwloAtlIRzbv/tmp7dW5MrY/Fk0Gwlr2ZPSPP3PNOe3V9zOEiRnw==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.50 core 2.12.378, September 3, 2012. Active patches: 201 ';
+	var bjsversion=' Opera Desktop 12.50 core 2.12.378, September 10, 2012. Active patches: 209 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -661,12 +661,18 @@ function setTinyMCEVersion(e){
 			},false);
 		}
 		log('PATCH-186, tokyo.jp, lg.jp enable maps');
+	} else if(hostname.contains('curriculum.degois.pt')){
+		addPreprocessHandler(/MouseEvent\._eventHandler = function\(\)\s*\{\s*var e = dynapi\.frame\.event;\s*if\(!e\)\s*return true;/g, 'MouseEvent._eventHandler = function(e) {\nif(!e) return true;');
+		log('PATCH-851, Fix event object detection in old DynAPI code');
 	} else if(hostname.contains('onlinetb.tejaratbank.net')){
 		addPreprocessHandler(/frames\[this\.name\]\.bfo_object = this;/g, 'frames[this.name].bfo_object = this;var T=this;iframe.addEventListener("load", function(){ frames[T.name].bfo_object=T; }, false);');
 		log('PATCH-776, Don\'t set properties on IFRAME window object until content is loaded');
 	} else if(hostname.contains('sheet.zoho.com')){
 		MouseEvent.prototype.axis=2;
 		log('PATCH-766, Make mouse scrolling work in Zoho spreadsheets');
+	} else if(hostname.endsWith('.apple.com')){
+		addPreprocessHandler(/window\.onunload\s*=\s*function\(\)\{\s*location\.reload\(true\);\};/g,'');
+		log('PATCH-846, apple.com: don\'t reload from within unload handler');
 	} else if(hostname.endsWith('aldoshoes.com')){
 		document.__defineSetter__('domain', function(){});
 		log('PATCH-808, aldoshoes.com - fix broken document.domain settings');
@@ -676,6 +682,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('cfe.urssaf.fr')){
 		opera.defineMagicFunction('navigateurAutorise',function(){return true});
 		log('PATCH-807, urssaf.fr: block browser block');
+	} else if(hostname.endsWith('clarkhoward.com')){
+		addCssToDocument('blockquote{content: normal !important;}');
+		log('PATCH-844, clarkhoward.com: abouse of CSS content property');
 	} else if(hostname.endsWith('ebayclassifieds.com') && pathname.match(/\/PostAd/)){
 		navigator.userAgent = navigator.userAgent.replace(/Opera/g,'0pera');
 		log('PATCH-784, eBay Classifieds - disable block on image uploader');
@@ -685,6 +694,25 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('gsmtronix.com')){
 		fixHVMenu('dummy.js');
 		log('PATCH-842, gsmtronix.com: HVmenu');
+	} else if(hostname.endsWith('help.sap.com')){
+		navigator.appName = 'Netscape';
+		navigator.appVersion = '5.0';
+		log('PATCH-833, help.sap.com : fool sniffing to make frameset complete');
+	} else if(hostname.endsWith('ieee.org')){
+		(function(ac){
+			Element.prototype.insertBefore=function(newChild, refChild){
+				if(newChild.src && newChild.src.indexOf('https://securesso.ieee.org/ieeevendorsso/ssocookievalidator')>-1){
+					if( !document.getElementById('ballotlogin') ){
+						var parent=this;
+						setTimeout(function(){ ac.call(parent, newChild, refChild); }, 100);
+						return;
+					}
+				}
+				return ac.call(this,newChild, refChild);
+			}
+		})(Element.prototype.insertBefore);
+		
+		log('PATCH-850, Postphone insertion of JSONP data source until we\'ve parsed the element the data is meant to be inserted into');
 	} else if(hostname.endsWith('mail.live.com')){
 		function fixButton(e) {
 			if (e.button == 1) {
@@ -759,9 +787,18 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('pinterest.com')){
 		addCssToDocument('div.NoInput input[data-text-on="On"]{display: inherit !important;visibility: hidden;}');
 		log('PATCH-811, pinterest.com: Opera fails to update status of display:none checkbox');
+	} else if(hostname.endsWith('sears.com')){
+		addCssToDocument('.scrollWidget .slider { top: 0; } .thumbWidget .slider2 { top: 0; }');
+		log('PATCH-847, sears.com - fix moving product thumbnail images');
+	} else if(hostname.endsWith('shopping.com')){
+		navigator.appName = "Netscape";
+		log('PATCH-836, shopping.com - work around browser sniff');
 	} else if(hostname.endsWith('www.auf.org')){
 		opera.defineMagicFunction('OldBrowserDetect',function(){return false})
 		log('PATCH-795, auf.org: work around broken sniffer');
+	} else if(hostname.endsWith('www.facebook.com')){
+		addCssToDocument('.fbMercuryChatTab .fbChatMessageGroup .metaInfoContainer { float: right; position: inherit !important;} ');
+		log('PATCH-852, facebook: avoid unwanted chat box scroll');
 	} else if(hostname.endsWith('www.shaw.ca')){
 		opera.defineMagicFunction('detectBrowserVersion',function(){return true})
 		log('PATCH-788, shaw.ca: work around browser sniff');
@@ -880,6 +917,16 @@ function setTinyMCEVersion(e){
 		/* Google */
 	
 	
+		if(hostname.contains('docs.google.')){
+			opera.addEventListener('BeforeScript', function (e){
+				if (e.element.src.indexOf('trix_waffle') > -1 && e.element.src.indexOf('_core') > -1){
+					var foo = (/=[a-z]+\?(new [a-z]+)\([a-z]+\([a-z]+\)\):[a-z]+\?new [a-z]+\([a-z]+\([a-z]+\)\):[a-z]+\?(new [a-z]+)\([a-z]+\([a-z]+\)\)/gi).exec(e.element.text);
+					var bar = (/var [a-z]+=[a-z]+\.exec\([a-z]+\(\)\),[a-z]+=[a-z]+\?[a-z]+\[1\]:\"\"/gi).exec(e.element.text);
+					e.element.text = e.element.text.replace(/indexOf\("Opera"\)/g, 'indexOf("Opra")').replace(/indexOf\("WebKit"\)/g, 'indexOf("pera")').replace(new RegExp(foo[1],'g'),foo[2]).replace(/\?-2:0\,/gi,'?-2:-2,').replace(/[a-z]+\&\&[a-z]+\(\)\?0:[a-z]+\?0:1/gi,'0').replace(bar[0],bar[0].replace(/\"\"/g,'"537.1"'));
+					}
+			}, false);
+			log('PATCH-382, Google Spreadsheets cell highligh mismatch and key event');
+		}
 		if(hostname.indexOf('adwords.google.') > -1){
 			window.navigator.product = 'Gecko';
 			log(' PATCH-332, Fix disabled charts on Google AdWords');
@@ -887,14 +934,6 @@ function setTinyMCEVersion(e){
 		if(hostname.indexOf('code.google.')>-1 && (pathname.indexOf('diff')>-1 || pathname.indexOf('detail')>-1 )){
 			addCssToDocument('div.diff>pre>table{white-space: normal;}div.diff>pre>table th, div.diff>pre>table td{white-space: pre-wrap;}');
 			log('PATCH-321, Work around pre inheritance into tables on Google Code');
-		}
-		if(hostname.indexOf('docs.google.')>-1){
-			opera.addEventListener('BeforeScript', function (e) {
-			 if (e.element.src.indexOf('trix_waffle') > -1 && e.element.src.indexOf('_core') > -1) {
-			  e.element.text = e.element.text.replace(/indexOf\("Opera"\)/g, 'indexOf("Opra")').replace(/"Gecko"==/g, '"Gecko"!=').replace(/"DOMMouseScroll"/g, '"mousewheel"').replace(/\.charCode\:0\)\:[^\?]+\?/g,'.charCode:0):!0?');
-			 }
-			}, false);
-			log('PATCH-382, Google Spreadsheets cell size and column label size mismatch');
 		}
 		if(hostname.indexOf('mail.google.')>-1){
 			addCssToDocument('body.editable.LW-avf{font-size: small !important}');
@@ -1494,9 +1533,11 @@ function setTinyMCEVersion(e){
 		opera.addEventListener('BeforeEventListener.load', 
 			function(e){
 				preventDefault.call=call;
-				if(e.event.target.contentDocument && e.event.target.contentDocument.body.innerHTML == ""){
-					preventDefault.call(e);
-				}
+				try{
+					if(e.event.target.contentDocument && e.event.target.contentDocument.body.innerHTML == ""){
+						preventDefault.call(e);
+					}
+				}catch(e){}
 			},
 			false
 		);
