@@ -1,4 +1,4 @@
-// XJyw0L6Bo6NeMd+PAVaLB+Rd4EXSNRClMjBlkiSlLPyI8XMqi8fSiUbJJofWpA8zKahUqG3W02EUPSjgrcyDSbuI4Cc1XxGbXarfC9ZfWOKBhjbbwq+RPsCrIJb5mjeoLRKaGZVQ38k5TTc8Ki5GqNb+aIRdzVauSHnt2DvRAJYL201alf3fY5Ch5vAOcm7XHQLVc24lKcqsqhgKTn7CXKHvki/t2SqJmsytMByS4BNypXYF3ZhQ/ny5naDQj89YzLHPLyi4oPDK/54OmCmBhq+a4YFtNqeplJOBiRWSdHBKWulaiPTxipVB2NsspX4N6LR2TkoS6gfjBIVxStmdSw==
+// pchl1zMp8cO/UnyJhiUmyZALTBDvWSvH3xh/9sqFxhALFGElea/4IRWQt9sQP6TmHMRvKuKnZ69ga2PUNnGPoFS6YnnRURGL7J0LkrQz7GqfPG8yszv/zitJegRx1SBRvURZnPY6+n3GZ1V/aT+GSUZ4ex3dr4YqEoBnMAfzMNzWgbrPviLeymUAMJSXnL7noj0NhjsUrHWrpUz1TBNqujNa4OacXFH245zolGGWTfSofnoMHeSBFgGmuH8MWKuqIL9sM5Sdojl3l9iEAZhLmBt9WkGJ2LZ33GDMtQD9N7Z3mgOsi7BYglFqoSGo4SEFEo32MnZu9WyPR7Pm9rAHfw==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.00 core 2.10.254, August 27, 2012. Active patches: 170 ';
+	var bjsversion=' Opera Mobile 12.00 core 2.10.254, September 19, 2012. Active patches: 174 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -27,7 +27,7 @@
 		toString:function(){return this.value;},
 		valueOf:function(){return this.value;}, 
 		indexOf:function(str){return this.value.indexOf(str);},
-		match: function( rx ){ return this.value.match(rx); },
+		match: function(rx){ return this.value.match(rx); },
 		contains:function(str){ return this.value.indexOf(str)>-1; },
 		endsWith:function(str){ var pos=this.value.indexOf(str);return pos>-1 && this.value.length===pos+str.length; }
 	}
@@ -468,6 +468,9 @@ function stopKeypressIfDownCancelled(stopKey){
 			if(el)el.className = el.className.replace(/ui-mobile-rendering/, '');
 		}, false );
 		log('PATCH-820, politics.ie: make mobile version render');
+	} else if(hostname.endsWith('www.tumblr.com')){
+		addCssToDocument(' .button.green{ background:-o-linear-gradient(#78b662,#679e55); } ');
+		log('PATCH-854, tumblr: using old webkit-gradient without fallback');
 	} else if(hostname.indexOf( '.56.com' )>-1){
 		addCssToDocument(".so {background-color:transparent !important;} .search .so .so_input .inp_search{ width:232px !important; } ");
 	
@@ -818,6 +821,12 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('aeonretail.jp')>-1){
 		addPreprocessHandler(/var el = win \? \$\.browser\.opera \? document\.body : document\.documentElement : elem;/, 'var el = win ? document.documentElement : elem;', true, function(elm){ return elm.src&&elm.src.indexOf('scroll.js')>-1&&elm.text.indexOf('Opera 9.22')>-1; });
 		log('PATCH-88, Make links work on Aeonretail (outdated jQuery plugin detects Opera and scrolls up)');
+	} else if(hostname.indexOf('ameblo.jp')>-1){
+		var cssText = 'div.btnRegist a.sbmt2 {background-color: #FD8B40;}'; 
+		cssText += 'div.btnRegist a.sbmt2 {background: -o-linear-gradient(bottom,#FF6500, #FD8B40 75%, #FD8B40 100%);}'; 
+		cssText += 'div.btnRegist a.sbmt2 {background: linear-gradient(to top,#FF6500, #FD8B40 75%, #FD8B40 100%);}'; 		
+		addCssToDocument(cssText);
+		log('PATCH-839, ameblo.jp - add missing gradients and fallback background color');
 	} else if(hostname.indexOf('athome.co.jp') > -1){
 		opera.defineMagicFunction('checkTargetBrowser',function(){});
 		opera.defineMagicFunction('checkTargetCookie',function(){});
@@ -1389,6 +1398,21 @@ function stopKeypressIfDownCancelled(stopKey){
 		});
 		
 		log('PATCH-360, Enable the password box on smithbarney.com');
+	} else if(hostname.indexOf('sp.mainichi.jp')>-1){
+		var cssText = '';
+		/* Top Menu */
+		cssText += '#m .nav-header ul {background-color: #0098D3;}';
+		cssText += '#m .nav-header ul {background-image: -o-linear-gradient(top, #1ABDEC, #1AB6E6 35%, #00ABE1 36%, #0098D3);}';
+		cssText += '#m .nav-header ul {background-image: linear-gradient(to bottom, #1ABDEC, #1AB6E6 35%, #00ABE1 36%, #0098D3);}';
+		/* Buttons */
+		cssText += 'section.sponichi li:last-child {background-color: #EDEDED;}';
+		cssText += 'section.sponichi li:last-child {background-image: -o-linear-gradient(top, white, #EDEDED 40%, #C9C9C9);}';
+		cssText += 'section.sponichi li:last-child {background-image: linear-gradient(to bottom, white, #EDEDED 40%, #C9C9C9);}';
+		cssText +='.global-footer .btn_back a {background-color: #EDEDED;}';
+		cssText +='.global-footer .btn_back a {background-image: -o-linear-gradient(top, #FCFCFC, #EDEDED 30%, #C9C9C9);}';
+		cssText +='.global-footer .btn_back a {background-image: linear-gradient(to bottom, #FCFCFC, #EDEDED 30%, #C9C9C9);}';
+		addCssToDocument(cssText);
+		log('PATCH-840, sp.mainichi.jp - add missing gradients');
 	} else if(hostname.indexOf('sperrysoftware.com')!=-1){
 		addCssToDocument('td{vertical-align:top}');
 		log('309189, Nested tables with 100% height are not laid out as expected, menu is pushed down');
@@ -1440,6 +1464,19 @@ function stopKeypressIfDownCancelled(stopKey){
 			}
 		}
 		log('NHSP-435, Fix layout messing up issue of m.taobao.com touch screen version\nOMO-267, Fix input box and layout display issue of login.m.taobao.com');
+	} else if(hostname.indexOf('teacup.com')>-1){
+		var cssText = '';
+		/* Gradient support with fallback background-color for mini */
+		cssText += '.create {background-color:#EB3436}'; 
+		cssText += '.create {background-image:-o-linear-gradient(top, #EB3436, #BE0609);}';
+		cssText += '.create {background-image:linear-gradient(to bottom, #EB3436, #BE0609);}';
+		cssText += '.login {background-color:#59A600;}';
+		cssText += '.login {background-image: -o-linear-gradient(top, #59A600, #31A200);}';
+		cssText += '.login {background-image: linear-gradient(to bottom, #59A600, #31A200);}'; 
+		/* Fix for css zoom */
+		cssText += '.special li img {transform:scale(0.62); transform-origin:top center;}';
+		addCssToDocument(cssText);
+		log('PATCH-825, www.teacup.com - add missing gradients and resizing for css zoom');
 	} else if(hostname.indexOf('time.com')>-1){
 		navigator.userAgent=navigator.userAgent.replace( /windows ce/i, '' );
 		log('229826, time.com script causes reload loop if UA contains "Windows CE"');
