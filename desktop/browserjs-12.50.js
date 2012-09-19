@@ -1,4 +1,4 @@
-// H5x4lUB4dPLFgni0lRXxI6desm4I2gbRYzjOzI+yNd4BM88S/jiiBWk4SjsfggV1V2xuWAkgdt+VeImc+d3klQsaaI6SaRqAzOPcZFICiRIZzQECLDgUJ6OC75Gwsj31ByGC/nXk3feFwd0YRE1Cf5yic7SPT21wqt6WXJn+4hy2A4/Fdihfy9VGrBXN0mJUBdsE3Uf/RA45HO3QMxm08mDdFOSiXsNjlmivTSiORD1HZnwmYapuxDbQW1oNVd77fUEvRMFCFrYu18SdVITrBnDPP8YVWFzaqHSwloAtlIRzbv/tmp7dW5MrY/Fk0Gwlr2ZPSPP3PNOe3V9zOEiRnw==
+// TMATqvOM37sQJ66MziSiGoMezKgah8ZIu+VolYTTi1yL9l9/Riq7b0UD/o2l9NH+egXaGefQI3cgaVMmHH7lTVUzIXm0VVIdNl8yb91IEJqNOK8+iLM8YBJ4XV/C4ovK4dvC3eX9gibdTXLc1Pg/K/euH7mdwOAre/jKrxdgVt6dYy05eI2SP6KHZzkMh0+c0+3hv1+EBJuKgoZBXlPaCctVL2nDCHLP4vJo3c+3w7Xnw/EV5btuCwKxEUQRX5waFhZKXJQWSaljfR8NCqmiPeTI+4GukZ8seoMKaWDon7fEwUaPehdoTS1HpJmk/Wny00YwiSJjBjEMGwXwt6WTOQ==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.50 core 2.12.378, September 10, 2012. Active patches: 209 ';
+	var bjsversion=' Opera Desktop 12.50 core 2.12.388, September 19, 2012. Active patches: 213 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -27,7 +27,7 @@
 		toString:function(){return this.value;},
 		valueOf:function(){return this.value;}, 
 		indexOf:function(str){return this.value.indexOf(str);},
-		match: function( rx ){ return this.value.match(rx); },
+		match: function(rx){ return this.value.match(rx); },
 		contains:function(str){ return this.value.indexOf(str)>-1; },
 		endsWith:function(str){ var pos=this.value.indexOf(str);return pos>-1 && this.value.length===pos+str.length; }
 	}
@@ -688,6 +688,27 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('ebayclassifieds.com') && pathname.match(/\/PostAd/)){
 		navigator.userAgent = navigator.userAgent.replace(/Opera/g,'0pera');
 		log('PATCH-784, eBay Classifieds - disable block on image uploader');
+	} else if(hostname.endsWith('garmin.com')){
+		opera.defineMagicFunction('eligible', function() { return true; });
+		opera.defineMagicFunction('detectOSBrowser', function(realFunc, realThis, inOS, inBrowser) {
+			inBrowser = "Firefox";
+			return realFunc(inOS, inBrowser);
+		});
+		opera.addEventListener('AfterScript', function(e){
+			if (e.element.src.indexOf('GarminDeviceControl.js')>-1) {
+				BrowserSupport.isBrowserSupported = function() { return true; }
+			}
+		},false);
+	
+		if (document.location.pathname.indexOf('savePOI.htm')>-1) {
+			document.addEventListener('DOMContentLoaded', function(e){
+				var els = document.querySelectorAll("a[href='javascript:history.back()']");
+				for (var i=0, len=els.length; i<len; i++) {
+					els[i].href = 'javascript:window.history.go(-3)';
+				}
+			},false);
+		}
+		log('PATCH-855, garmin.com - allow Opera to install and use Garmin Communicator Plugin\nPATCH-856, garmin.com - go back multiple pages after saving POI');
 	} else if(hostname.endsWith('github.com')){
 		addCssToDocument('.social-count::before {margin-right:14px;margin-top:0;}.social-count::after {margin-right:13px;margin-top:0;}');
 		log('PATCH-815, github: work around misplaced arrows (Opera bug)');
@@ -698,6 +719,9 @@ function setTinyMCEVersion(e){
 		navigator.appName = 'Netscape';
 		navigator.appVersion = '5.0';
 		log('PATCH-833, help.sap.com : fool sniffing to make frameset complete');
+	} else if(hostname.endsWith('hotels.ctrip.com')){
+		addPreprocessHandler(/win.addEventListener/g,'ifm.addEventListener',true,function(elm){ return elm.src&&elm.src.indexOf('c_result.map.js')>-1});
+		log('PATCH-857, hotels.ctrip.com: word around iframe load event order issue with Opera');
 	} else if(hostname.endsWith('ieee.org')){
 		(function(ac){
 			Element.prototype.insertBefore=function(newChild, refChild){
@@ -796,12 +820,25 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.auf.org')){
 		opera.defineMagicFunction('OldBrowserDetect',function(){return false})
 		log('PATCH-795, auf.org: work around broken sniffer');
-	} else if(hostname.endsWith('www.facebook.com')){
-		addCssToDocument('.fbMercuryChatTab .fbChatMessageGroup .metaInfoContainer { float: right; position: inherit !important;} ');
-		log('PATCH-852, facebook: avoid unwanted chat box scroll');
 	} else if(hostname.endsWith('www.shaw.ca')){
 		opera.defineMagicFunction('detectBrowserVersion',function(){return true})
 		log('PATCH-788, shaw.ca: work around browser sniff');
+	} else if(hostname.endsWith('www.udemy.com')){
+		window.addEventListener('load',
+		function(){
+			document.getElementById('login').style.visibility = 'hidden';
+			document.querySelector('a.goto-login-btn').addEventListener('click',function(){
+				document.getElementById('signup').style.visibility = 'hidden';
+				document.getElementById('login').style.visibility = 'visible';
+			},false);
+			document.querySelector('a.goto-signup-btn').addEventListener('click',function(){
+				document.getElementById('signup').style.visibility = 'visible';
+				document.getElementById('login').style.visibility = 'hidden';
+			},false);
+		}
+		,false);
+		
+		log('PATCH-853, udemy.com: Opera doesn\'t support 3Dtransforms yet');
 	} else if(hostname.indexOf("cang.baidu.com") != -1 ){
 		window.opera.defineMagicFunction(
 			"top",
@@ -1328,6 +1365,11 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('etour.co.jp') > -1){
 		navigator.appName='Netscape';
 		log('PATCH-152, etour.co.jp fix non-disappearing overlapping image');
+	} else if(hostname.indexOf('facebook.com')>-1){
+		if(hostname.endsWith('www.facebook.com')){
+		 addCssToDocument('.fbMercuryChatTab .fbChatMessageGroup .metaInfoContainer { float: right; position: inherit !important;} ');
+		}
+		log('PATCH-852, facebook: avoid unwanted chat box scroll');
 	} else if(hostname.indexOf('fintyre.it')>-1){
 		navigator.appName = "Netscape";
 		log('PATCH-661, fintyre.it: work around sniffing');
