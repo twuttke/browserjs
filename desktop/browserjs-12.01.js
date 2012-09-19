@@ -1,4 +1,4 @@
-// CbZ6W5LGN/hUGKafhZqbUVl9yJsqz/jkVk1JWR664IXUjPTUcDB/Q2veoxE+kHHvW2FcvPau62cc5OkADiEQ1hhWrVFtP27d6RTg1qojf717vBfiITwitqbYvJ/A9TxnMhNvDUhSl2C3VwB21MnFJ6sTGMbmFgAZZOcQNjjZnVavAC8Udm8G8JsygKdsQ4l+5AiLA7ASxE6rZXXQuLELIZkMMbaC8KSdL+ZPDB0mJ5Orjq78ISfcFGhEt2cA8DWIpuBe+0djGR2Y5aAao1QaXrDTyOcVDE8pgvyeTY7GQzBoV05WovbWPjjarQtSiQy+CR9MjDXEwkSx+CTmR4ITjQ==
+// YmsqRkG5/lr9CAzj+F07y85lk40MLeG4icck3sXPGyw8enJ7k/utuRiS4SgJG4J8GNz0rda5KEJ+dt6hyGNKt5FFGlMsImb86iWG1n6+Cs2fiavgtLyquAzmVs9TDWvl7+sd9gbFjl3xtJwekW1arcS5ViMqKNU6NUOjEs+9ga/PFZYdqIwkCrzSv/02Vuo/9mhMxCCsmeqjZefncw5xL5CPO9ZSOek9hiakyOTwwUmj7BWJvhHJSOQ3+bhC4MfxIf8WFxsT0O9kiaLRsO5mEqEGLOiZ3Y37TfUp3B5BmFv0CWiTOdsJUsfKpnmskSWnrnxaM7V35GprGVG/v/c6ag==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, September 10, 2012. Active patches: 241 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, September 19, 2012. Active patches: 245 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -27,7 +27,7 @@
 		toString:function(){return this.value;},
 		valueOf:function(){return this.value;}, 
 		indexOf:function(str){return this.value.indexOf(str);},
-		match: function( rx ){ return this.value.match(rx); },
+		match: function(rx){ return this.value.match(rx); },
 		contains:function(str){ return this.value.indexOf(str)>-1; },
 		endsWith:function(str){ var pos=this.value.indexOf(str);return pos>-1 && this.value.length===pos+str.length; }
 	}
@@ -716,6 +716,27 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('ebayclassifieds.com') && pathname.match(/\/PostAd/)){
 		navigator.userAgent = navigator.userAgent.replace(/Opera/g,'0pera');
 		log('PATCH-784, eBay Classifieds - disable block on image uploader');
+	} else if(hostname.endsWith('garmin.com')){
+		opera.defineMagicFunction('eligible', function() { return true; });
+		opera.defineMagicFunction('detectOSBrowser', function(realFunc, realThis, inOS, inBrowser) {
+			inBrowser = "Firefox";
+			return realFunc(inOS, inBrowser);
+		});
+		opera.addEventListener('AfterScript', function(e){
+			if (e.element.src.indexOf('GarminDeviceControl.js')>-1) {
+				BrowserSupport.isBrowserSupported = function() { return true; }
+			}
+		},false);
+	
+		if (document.location.pathname.indexOf('savePOI.htm')>-1) {
+			document.addEventListener('DOMContentLoaded', function(e){
+				var els = document.querySelectorAll("a[href='javascript:history.back()']");
+				for (var i=0, len=els.length; i<len; i++) {
+					els[i].href = 'javascript:window.history.go(-3)';
+				}
+			},false);
+		}
+		log('PATCH-855, garmin.com - allow Opera to install and use Garmin Communicator Plugin\nPATCH-856, garmin.com - go back multiple pages after saving POI');
 	} else if(hostname.endsWith('github.com')){
 		addCssToDocument('.social-count::before {margin-right:14px;margin-top:0;}.social-count::after {margin-right:13px;margin-top:0;}');
 		log('PATCH-815, github: work around misplaced arrows (Opera bug)');
@@ -726,6 +747,9 @@ function setTinyMCEVersion(e){
 		navigator.appName = 'Netscape';
 		navigator.appVersion = '5.0';
 		log('PATCH-833, help.sap.com : fool sniffing to make frameset complete');
+	} else if(hostname.endsWith('hotels.ctrip.com')){
+		addPreprocessHandler(/win.addEventListener/g,'ifm.addEventListener',true,function(elm){ return elm.src&&elm.src.indexOf('c_result.map.js')>-1});
+		log('PATCH-857, hotels.ctrip.com: word around iframe load event order issue with Opera');
 	} else if(hostname.endsWith('ieee.org')){
 		(function(ac){
 			Element.prototype.insertBefore=function(newChild, refChild){
@@ -845,30 +869,25 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.auf.org')){
 		opera.defineMagicFunction('OldBrowserDetect',function(){return false})
 		log('PATCH-795, auf.org: work around broken sniffer');
-	} else if(hostname.endsWith('www.facebook.com')){
-		addCssToDocument('div.fbNubFlyoutBody.scrollable{position:inherit}');
-	
-		opera.addEventListener('BeforeEventListener.keypress', function(e){
-			if( e.event.ctrlKey && (e.event.keyCode==86 || e.event.keyCode==118 ) ){
-				var trgt=e.event.target;
-				setTimeout(
-					function(){ 
-						var evt=document.createEvent('Event');
-						evt.initEvent('paste', true, true);
-						trgt.dispatchEvent(evt);
-					}, 10
-				);
-			}
-		}, false);
-	
-		opera.addEventListener('BeforeCSS', function(e){
-			e.cssText = e.cssText.replace(/border-(top|bottom)-(right|left)-radius:3px/g, '');
-		}, false);
-		
-		log('PATCH-714, facebook: prevent chat window overflow - Presto bug\nPATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status\nPATCH-573, Facebook\'s border-radius triggers hyperactive reflow bug, performance suffers');
 	} else if(hostname.endsWith('www.shaw.ca')){
 		opera.defineMagicFunction('detectBrowserVersion',function(){return true})
 		log('PATCH-788, shaw.ca: work around browser sniff');
+	} else if(hostname.endsWith('www.udemy.com')){
+		window.addEventListener('load',
+		function(){
+			document.getElementById('login').style.visibility = 'hidden';
+			document.querySelector('a.goto-login-btn').addEventListener('click',function(){
+				document.getElementById('signup').style.visibility = 'hidden';
+				document.getElementById('login').style.visibility = 'visible';
+			},false);
+			document.querySelector('a.goto-signup-btn').addEventListener('click',function(){
+				document.getElementById('signup').style.visibility = 'visible';
+				document.getElementById('login').style.visibility = 'hidden';
+			},false);
+		}
+		,false);
+		
+		log('PATCH-853, udemy.com: Opera doesn\'t support 3Dtransforms yet');
 	} else if(hostname.indexOf("cang.baidu.com") != -1 ){
 		window.opera.defineMagicFunction(
 			"top",
@@ -1494,6 +1513,33 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('etour.co.jp') > -1){
 		navigator.appName='Netscape';
 		log('PATCH-152, etour.co.jp fix non-disappearing overlapping image');
+	} else if(hostname.indexOf('facebook.com')>-1){
+		if(hostname.endsWith('www.facebook.com')){
+		 addCssToDocument('div.fbNubFlyoutBody.scrollable{position:inherit}');
+		}
+	
+		if(hostname.endsWith('www.facebook.com')){
+		opera.addEventListener('BeforeEventListener.keypress', function(e){
+			if( e.event.ctrlKey && (e.event.keyCode==86 || e.event.keyCode==118 ) ){
+				var trgt=e.event.target;
+				setTimeout(
+					function(){ 
+						var evt=document.createEvent('Event');
+						evt.initEvent('paste', true, true);
+						trgt.dispatchEvent(evt);
+					}, 10
+				);
+			}
+		}, false);
+		}
+	
+		if(hostname.endsWith('www.facebook.com')){
+		 opera.addEventListener('BeforeCSS', function(e){
+			e.cssText = e.cssText.replace(/border-(top|bottom)-(right|left)-radius:3px/g, '');
+		 }, false);
+		}
+		
+		log('PATCH-714, facebook: prevent chat window overflow - Presto bug\nPATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status\nPATCH-573, Facebook\'s border-radius triggers hyperactive reflow bug, performance suffers');
 	} else if(hostname.indexOf('fintyre.it')>-1){
 		navigator.appName = "Netscape";
 		log('PATCH-661, fintyre.it: work around sniffing');
