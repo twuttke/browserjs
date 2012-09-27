@@ -1,4 +1,4 @@
-// nZtWOUFs3EsmPgRjgBrBnM7zb8HHtodUAG0fTDsRwJFG4x7tF/XNlgDrKEvzj2Y/IoD/kXtFrC24PFxsyPDASCXlc3Bwxq1wFnPL6mYxfoyfDYmHL9pSbb+3RYe8H6fLiaDU5XO25qliGh9MvKnfBoKnHAutUlMtpcl1Ivaf0YA2i1QfyKhMqCdz4fYBR1d5nFJDlpQ1D3e7ep2mbEfi+ACkQERlv9yIaTnJFsqBxWFID3zv7C6E6BD1RzIJGA6QqK6Sqj7Z5sAEPERnU3TtGxsXfFCFFJJSnVJfTq3SNXnsODqxCQRrgMqZ9FJrpYdf2F8Z8mOeaJJeyRDSrKzLJQ==
+// DBKui9VehArtFtJ/Qro2sRJ8lRqsGSoGfGhSm+Hq1KqJjAKTFMIAmCjGYRju+VnSCYE6aMJVIdjo/JCHba7OJWAF63s8YAlEeHagrxti5YU3XRCnzsdKjMce8LYhtJgcPN+JOCxqAhr4g37sUZ8V5FYZNmWiE17GTb43Q/Xno9re2J3BoA/QCAKyTnCbfq0WX+ZQ0afr4BGxFzsea8LfVoA7fdMD/CvL2b7eLqrSROKIZgayOvQhfIgQShygEBNV3UpNwxZqUN1vqNLrPurDx4KEABvpkhQRrAN8fv55pC9ZZQxFdK9FqRsmugSNX1LaUS7OcB8yQYM9nmFpAlDh+w==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -16,9 +16,9 @@
 **/
 // Generic fixes (mostly)
 (function(opera){
-	if(!opera || (opera&&opera._browserjsran))return;
+	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, September 19, 2012. Active patches: 256 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, September 27, 2012. Active patches: 259 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -195,6 +195,10 @@ function fixIFrameSSIscriptII(funcName, iFrameId){
 		fixIFrameSSIscriptII[funcName]=1;//remember that we fixed this already
 	}
 }
+function fixJQueryAutocomplete(){
+  addPreprocessHandler(/\.opera\s*\?\s*["']keypress["']\s*:\s*["']keydown["']/g, '.opera && !(\'KeyboardEvent\' in window)?"keypress":"keydown"');
+}
+
 function fixLiknoAllWebMenus(ev){
 	indexOf.call=match.call=defineMagicVariable.call=postError.call=removeEventListener.call=appendChild.call=createElement.call=preventDefault.call=replace.call=call;
 	if(fixed)return; fixed=true;
@@ -490,6 +494,8 @@ function setTinyMCEVersion(e){
 				fixed=!0;
 				log('PATCH-768, MS Virtual Earth workaround applied');
 			}
+		}else if(!fixed && (indexOf.call(name, 'jquery.autocomplete')>-1 || indexOf.call(name, 'highslide.js')>-1 )){
+			fixJQueryAutocomplete();
 		}
 		if( typeof window._jive_plain_quote_text!='undefined' ){
 			opera.addEventListener('BeforeScript', function(e){
@@ -822,6 +828,36 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('pinterest.com')){
 		addCssToDocument('div.NoInput input[data-text-on="On"]{display: inherit !important;visibility: hidden;}');
 		log('PATCH-811, pinterest.com: Opera fails to update status of display:none checkbox');
+	} else if(hostname.endsWith('quora.com')){
+		(function(sTo){
+			var lastEvt=new Date();
+			opera.addEventListener('BeforeEventListener.scroll', function(e){ 
+				if( (new Date)-lastEvt < 2000 ){
+					e.preventDefault();
+				}else{
+					lastEvt=new Date();
+				}
+			}, false);
+			window.setTimeout = function(f,t){
+				if(t==50){
+					t=450;
+				}
+				return sTo.call(this, f, t);
+			}
+		})(setTimeout);
+		
+		log('PATCH-863, Throttle scroll events and certain timeouts to improve Quora performance');
+	} else if(hostname.endsWith('reservations.disney.go.com')){
+		opera.defineMagicVariable('Figment', null, function(obj){
+			var str=Element.prototype.__defineSetter__;
+			Element.prototype.__defineSetter__=function(name, func){
+				if( name in document.createElement('div') )return;
+				return str.call(this, name, func);
+			}
+			return obj;
+		});
+		
+		log('PATCH-794, Prevent broken innerHTML setter on Disney booking site');
 	} else if(hostname.endsWith('sears.com')){
 		addCssToDocument('.scrollWidget .slider { top: 0; } .thumbWidget .slider2 { top: 0; }');
 		log('PATCH-847, sears.com - fix moving product thumbnail images');
@@ -1207,6 +1243,16 @@ function setTinyMCEVersion(e){
 		
 	
 	
+		if(hostname.indexOf('.mail.yahoo.')>-1){
+			if(self==top&&location.search.indexOf('reason=ignore')==-1)document.addEventListener('DOMContentLoaded', function(){
+				if( document.evaluate('//a[contains(@href,"/firefox")]', document.body, null, 6, null).snapshotLength && document.evaluate('//a[contains(@href,"/internetexplorer/")]', document.body, null, 6, null).snapshotLength && document.evaluate('//a[contains(@href,"/safari/")]', document.body, null, 6, null).snapshotLength  ){
+						if( document.evaluate('//a[contains(@href,"reason=ignore")]', document.body, null, 6, null).snapshotLength===0)location.search='?reason=ignore'+location.search.replace(/^\?/, '&');
+					
+					}
+			}, false);
+			
+			log('PATCH-325, Y!Mail: work around browser sniffing again and again');
+		}
 		if(hostname.indexOf('.mail.yahoo.')>-1&& ( href.indexOf( '/neo/launch' )>-1 || href.indexOf( '/dc/launch' )>-1 )){
 			opera.addEventListener('BeforeEventListener.mousedown', function(e){
 				if(e.event.target.tagName=='INPUT' && e.event.target.id=='subject-field'){
@@ -1578,8 +1624,11 @@ function setTinyMCEVersion(e){
 			}, false);
 		}
 	
-		addCssToDocument('div.fbNubFlyoutBody.scrollable{position:inherit}');
+		if(hostname.endsWith('www.facebook.com')){
+		 addCssToDocument('div.fbNubFlyoutBody.scrollable{position:inherit}');
+		}
 	
+		if(hostname.endsWith('www.facebook.com')){
 		opera.addEventListener('BeforeEventListener.keypress', function(e){
 			if( e.event.ctrlKey && (e.event.keyCode==86 || e.event.keyCode==118 ) ){
 				var trgt=e.event.target;
@@ -1592,12 +1641,15 @@ function setTinyMCEVersion(e){
 				);
 			}
 		}, false);
+		}
 	
 		addPreprocessHandler(/else CSS\.hide\(this\._gripper\);this\._checkContentBoundaries\(\);return this;\}/,'else CSS.hide(this._gripper);return this;}');
 	
-		opera.addEventListener('BeforeCSS', function(e){
+		if(hostname.endsWith('www.facebook.com')){
+		 opera.addEventListener('BeforeCSS', function(e){
 			e.cssText = e.cssText.replace(/border-(top|bottom)-(right|left)-radius:3px/g, '');
-		}, false);
+		 }, false);
+		}
 		
 		log('PATCH-630, facebook: work around Opera\'s too strict origin checks on https for https -> http(s) other site -> https IFRAME communication\nPATCH-714, facebook: prevent chat window overflow - Presto bug\nPATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status\nPATCH-558, Facebook avoid chat list scroll\nPATCH-573, Facebook\'s border-radius triggers hyperactive reflow bug, performance suffers');
 	} else if(hostname.indexOf('fintyre.it')>-1){
