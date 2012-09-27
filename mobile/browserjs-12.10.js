@@ -1,4 +1,4 @@
-// Y/pt+b/uypssx9I7WKiJYJlZ9hoRNJO+N31j0UFjxol3St7CNXIYiEkbZUwqEQ7LAIEkCqvO1LBYDltiFNIVcdkki/7+YhJPV0hOiECOqm+mhrdd1OWb0WiaXfLtMqbzEoJ67Ewad+zGMR8VnnoaLWRuTWfW4fRsgXwnwt+RfeJM8t7L0zlqE40McXFR3D36x/X3s8dxlHzeS7FxDo4MjDQ0Ub6M811kyxtWi5vC2x/t4KRJTqJQFQS6cvSTKByYqFITOIJ/3OOPIMqiy+cP/CLpn4dWgRQY6ztlPLIc//5d5n8y34+GKDHdgl5zxjlWX0LHh6YR+4NnmxeCUZbcag==
+// Z5LccM4PtCM0s8AsG1nVYp9l6GHAORIFnhVAL6hceid+QBcTuf/j36bslLKLZopla1U9qEk4vL5uLon7PMTnebOA2pLYl5qjWmE+ajgvSbAubXNHgUY7DWgNZrkOFTeXpcRMPDrSft2Sco5LLToFFt0fJd/xEEdgUCx70uBMX9tKcVDFkzF8ZrpUfLFONKvZ9V78D3y0Nbtbst3jaLlZ/P9uMpFl44kqajMr2HkrjtPIGOjHCkLGD8fEDkneaYcWnZeuy1B8p5wWk7MbUee9jBEUH90Bknlu6C9jXVZlHpQWWJPa0zD0AMsbOdSVEFgzfVCF+kzniWD86VdIlN25+w==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -16,9 +16,9 @@
 **/
 // Generic fixes (mostly)
 (function(opera){
-	if(!opera || (opera&&opera._browserjsran))return;
+	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.10 core 2.11.355, September 19, 2012. Active patches: 168 ';
+	var bjsversion=' Opera Mobile 12.10 core 2.11.355, September 27, 2012. Active patches: 173 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -744,6 +744,59 @@ function stopKeypressIfDownCancelled(stopKey){
 		}
 		
 	
+		if(hostname.indexOf('music.')>-1){
+		window.WebKitCSSMatrix = function FakeWebKitCSSMatrix(input) {
+		  var input = input || "translate(0, 0)";
+		  var func = input.split('(')[0].trim();
+		  var middle = input.split('(')[1].split(')')[0].split(',');
+		  if (func == 'translate')
+		    return {e: middle[0].trim(), f: middle[1].trim()};
+		  else if (func == 'matrix')
+		    return {e: middle[4].trim(), f: middle[5].trim()};
+		  else
+		    return {e: '0', f: '0'};
+		};
+		
+		addCssToDocument(// first time page
+		                 ".guide-title { background-size: 282px 31px; }" +
+		                 ".guide-img { background-size: 284px 212px; }" +
+		                 ".guide-download, .guide-skip { background-size: 140px 45px; }" +
+		                 ".guide-word { background-size: cover; }" +
+		                 // main page
+		                 "#logo { background-size: 72px 23px; }" +
+		                 ".h_tabs { white-space: nowrap; }" +
+		                 ".h_tab, .tabTx, .more { display: inline; }" +
+		                 ".arrow { display: inline-block; }" +
+		                 ".tabTx { padding: 4px 5px; }" +
+		                 ".more_links { font-size: 0; white-space: nowrap; }" +
+		                 ".more_links a { display: inline-block; font-size: 16px; }" + 
+		                 "#se_inner { width: auto; }" +
+		                 "#se_bn, #se_bn2 { position: absolute; right: 0; top: 0;" +
+		                 "                  background-image: -o-linear-gradient(to bottom, #F7F7F7, #DFDFDF);" +
+		                 "                  background-image: linear-gradient(to bottom, #F7F7F7, #DFDFDF);" +
+		                 "                  box-shadow: 1px 1px 0 rgba(0, 0, 0, .1),1px 1px 0 white inset; }" +
+		                 ".sub-head.tab { font-size: 0; white-space: nowrap; }" +
+		                 ".sub-head.tab > * { font-size: 18px; }" +
+		                 ".sub-head.tab .tab-new, .sub-head.tab .tab-hot, .sub-head.tab .tab-star" +
+		                 "  { display: inline-block; box-sizing: border-box; }" +
+		                 ".portrait .ad { background-size: cover; }" +
+		                 ".content-new .list-item .item-index," +
+		                 ".content-hot .list-item .item-index," +
+		                 ".list-item .list-cover" +
+		                 "  { float: left; }" +
+		                 ".list-item { position: relative; }" +
+		                 ".list-item .list-songtitle, .list-item .list-albumcover" +
+		                 "  { margin-right: 48px; }" +
+		                 ".list-item .list-albumtitle { margin-right: 30px; }" +
+		                 ".list-item .list-downloadimg, .list-item .list-play" +
+		                 "  { position: absolute; right: 0; top: 0; }");
+		 
+		opera.addEventListener('AfterScript', function(userJSEvent) {
+		  if (pathname == "/" && window.$)
+		    $("#top_sub_head").show();
+		});
+		}
+	
 		if( (hostname.indexOf('m.baidu.com') > -1  && pathname.indexOf('/ssid=') > -1 ) || //news
 		    (hostname.indexOf('m.baidu.com') > -1  && pathname.indexOf('/img') > -1 ) || //image
 		    (hostname.indexOf('m.baidu.com') > -1  && pathname.indexOf('/video') > -1 ) || //image
@@ -814,10 +867,20 @@ function stopKeypressIfDownCancelled(stopKey){
 		
 		    }, false);
 		}
-		log('YUSHAN-3971, Fix search result page display issue of baidu.com\nYUSHAN-2320, Fix links display inside searchbox - image.baidu.com\nNHSP-402, Fix image display issue on baidu news\nYUSHAN-278, Text truncation in blog/forum module - news.baidu.com\nOMO-102, Fix "more" link issue of m.baidu.com');
+		log('YUSHAN-3971, Fix search result page display issue of baidu.com\nYUSHAN-2320, Fix links display inside searchbox - image.baidu.com\nNHSP-402, Fix image display issue on baidu news\nYUSHAN-278, Text truncation in blog/forum module - news.baidu.com\nNHSP-478, Page display issue of music.baidu.com\nOMO-102, Fix "more" link issue of m.baidu.com');
 	} else if(hostname.indexOf('bbc.co.uk')!=-1 && pathname.match( /^\/mobile\// )){
 		forceMobileView();
 		log('TWEETY-118, Mobile BBC should default to mobile view');
+	} else if(hostname.indexOf('bloog.pl')>-1){
+		var cssText = '';
+		cssText += '.cnt {background: -o-linear-gradient(top, #FFF, #E4E4E4)}';
+		cssText += '.cnt {background: linear-gradient(to bottom, #FFF, #E4E4E4)}';
+		cssText += '.right .bar {background: -o-linear-gradient(top, #2BF, #00B);}';
+		cssText += '.right .bar {background: linear-gradient(to bottom, #2BF, #00B);}';
+		cssText += '.buttonBlue {background: -o-linear-gradient(top, #4DF, #09D);}';
+		cssText += '.buttonBlue {background: linear-gradient(to bottom, #4DF, #09D);}';
+		addCssToDocument(cssText);
+		log('PATCH-867, bloog.pl - add missing gradients');
 	} else if(hostname.indexOf('britishairways.')!=-1){
 		opera.defineMagicFunction('CP_getCalendar', function(oReal, oThis){
 		var cal = oReal.apply(oThis, slice.call(arguments, 2));
@@ -943,6 +1006,13 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('gougou.com')>-1){
 		addCssToDocument(".searchform .in_txt { width: 110px !important;} .searchform { width: 225px !important; }");
 		log('YUSHAN-2457, Fixed gougou.com search button display issue');
+	} else if(hostname.indexOf('gry.pl')>-1){
+		var cssText = '';
+		/* Top Menu */
+		cssText += 'header > nav > ul > li a.active {background: -o-linear-gradient(top,#4B9BE9,#0170D7);}';
+		cssText += 'header > nav > ul > li a.active {background: linear-gradient(to bottom, #4B9BE9, #0170D7);}';
+		addCssToDocument(cssText);
+		log('PATCH-866, gry.pl - add missing gradients');
 	} else if(hostname.indexOf('hao123.com')>-1){
 		document.__defineGetter__('GlobalSharedObject', function(){ return document.getElementById('GlobalSharedObject'); });
 		log('DONGDAE-3678, Make sure site accesses correct Flash instance for saved user data');
@@ -986,6 +1056,15 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('m.lifehacker.com')>-1){
 		fixGawkerMobile();
 		log('PATCH-655, Fix Gawker Media mobile site (Lifehacker)');
+	} else if(hostname.indexOf('m.mapbar.com') > -1){
+		window.addEventListener('load',function(){
+		    setTimeout(function(){
+		        if (map.size().width != window.innerWidth){
+		            resizeApp();
+		        }
+		    },100);
+		},false);
+		log('NHSP-471, Full screen launching issue of m.mapbar.com');
 	} else if(hostname.indexOf('m.reference.com')!=-1){
 		forceMobileView();
 		log('TWEETY-107, Mobile reference.com uses generic doctype');
@@ -1415,6 +1494,16 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('westjet.com')>-1 ){
 		opera.defineMagicVariable('browser', function(o){ o.isSupported=true; return o; }, null);
 		log('PATCH-260,  Westjet browser sniffing warns against Opera');
+	} else if(hostname.indexOf('wp.pl')>-1){
+		var cssText = '';
+		/* Page Top */
+		cssText += 'div.topLogo {background: -o-linear-gradient(top, #C6C7C9, #FFF);}';
+		cssText += 'div.topLogo {background: linear-gradient(to bottom, #C6C7C9, #FFF);}';
+		/* Page bottom menu */
+		cssText += '.menu {background: -o-linear-gradient(top, #D6D6D6, #F0F0F0);}';
+		cssText += '.menu {background: linear-gradient(to bottom, #D6D6D6, #F0F0F0);}';
+		addCssToDocument(cssText);
+		log('PATCH-864, wp.pl - add missing gradients');
 	} else if(hostname.indexOf('www.answers.com')>-1){
 		addCssToDocument('body{background-image: -o-linear-gradient(top,rgba(74,114,193,0.98),rgba(31,56,105,0.98)), url(http://en.site2.answcdn.com/templates/images/stripe.png?v=49d225d);}');
 		log('PATCH-719, answers.com: add background gradient');
