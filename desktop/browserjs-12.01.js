@@ -1,4 +1,4 @@
-// YmsqRkG5/lr9CAzj+F07y85lk40MLeG4icck3sXPGyw8enJ7k/utuRiS4SgJG4J8GNz0rda5KEJ+dt6hyGNKt5FFGlMsImb86iWG1n6+Cs2fiavgtLyquAzmVs9TDWvl7+sd9gbFjl3xtJwekW1arcS5ViMqKNU6NUOjEs+9ga/PFZYdqIwkCrzSv/02Vuo/9mhMxCCsmeqjZefncw5xL5CPO9ZSOek9hiakyOTwwUmj7BWJvhHJSOQ3+bhC4MfxIf8WFxsT0O9kiaLRsO5mEqEGLOiZ3Y37TfUp3B5BmFv0CWiTOdsJUsfKpnmskSWnrnxaM7V35GprGVG/v/c6ag==
+// XguPRC1HuuM8VcTUZCcs8yQTaO3C0v06pynFrB0tzv0cNVkDrQHJRgg3BXyYiscJbHpbBeqCUijTIPOsFWghc6Kirq/f6N2YqFlo+6qMV4QNNgqCTQlQcyV6IplCI1y+nywjqUeBgVdN4ZJjWDjQxcUqeIwzuUOQvoDg1MKpG/uLN70DgT66Tkv2lVyeSJSzkch4gIEEyUYK8DfDdkOjnmFYS3nIrM6WeLdtLtcCbdbNjHhU5rqDGT2vB/oKpU90KwQcGrk2Ys0amBUfChfac4CKDDwK68kaEcB58pI1dyO43u8JFwUZ+MvqCZTpY8EHU0oVAgorxJOuz2TlYXEtnw==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -16,9 +16,9 @@
 **/
 // Generic fixes (mostly)
 (function(opera){
-	if(!opera || (opera&&opera._browserjsran))return;
+	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, September 19, 2012. Active patches: 245 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, September 27, 2012. Active patches: 254 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -195,6 +195,10 @@ function fixIFrameSSIscriptII(funcName, iFrameId){
 		fixIFrameSSIscriptII[funcName]=1;//remember that we fixed this already
 	}
 }
+function fixJQueryAutocomplete(){
+  addPreprocessHandler(/\.opera\s*\?\s*["']keypress["']\s*:\s*["']keydown["']/g, '.opera && !(\'KeyboardEvent\' in window)?"keypress":"keydown"');
+}
+
 function fixLiknoAllWebMenus(ev){
 	indexOf.call=match.call=defineMagicVariable.call=postError.call=removeEventListener.call=appendChild.call=createElement.call=preventDefault.call=replace.call=call;
 	if(fixed)return; fixed=true;
@@ -284,6 +288,13 @@ function fixOpenCube(name){// IMPORTANT gotcha: the fixOpenCube and fixHVMenu fu
 	}
 }
 
+function fixTransitionEndCase(){
+	opera.addEventListener('BeforeEventListener.otransitionend', function(e){
+		e.event.__defineGetter__('type', function(){
+			return 'oTransitionEnd';
+		});
+	}, false);
+}
 	function fixUDM(name){
 		if(fixed){return;}fixed=true;
 		defineMagicVariable.call=call;
@@ -506,6 +517,8 @@ function setTinyMCEVersion(e){
 				fixed=!0;
 				log('PATCH-768, MS Virtual Earth workaround applied');
 			}
+		}else if(!fixed && (indexOf.call(name, 'jquery.autocomplete')>-1 || indexOf.call(name, 'highslide.js')>-1 )){
+			fixJQueryAutocomplete();
 		}
 		if( typeof window._jive_plain_quote_text!='undefined' ){
 			opera.addEventListener('BeforeScript', function(e){
@@ -747,6 +760,11 @@ function setTinyMCEVersion(e){
 		navigator.appName = 'Netscape';
 		navigator.appVersion = '5.0';
 		log('PATCH-833, help.sap.com : fool sniffing to make frameset complete');
+	} else if(hostname.endsWith('hipmunk.com')){
+		if(pathname.indexOf('/flights')==0){
+		 addCssToDocument('div#header table td + td{width: 60%;}');
+		}
+		log('PATCH-862, hipmunk.com: avoid header table cell collapse. Core bug.');
 	} else if(hostname.endsWith('hotels.ctrip.com')){
 		addPreprocessHandler(/win.addEventListener/g,'ifm.addEventListener',true,function(elm){ return elm.src&&elm.src.indexOf('c_result.map.js')>-1});
 		log('PATCH-857, hotels.ctrip.com: word around iframe load event order issue with Opera');
@@ -814,6 +832,15 @@ function setTinyMCEVersion(e){
 			return value;
 		});
 		log('PATCH-513, office.microsoft.com: re-initialize video player after applying page overflow');
+	} else if(hostname.endsWith('onlystudy.cn')){
+		document.addEventListener('DOMContentLoaded',function(){
+			var elm = document.getElementById('loginpw');
+			if(elm)elm.setAttribute('onKeyDown',elm.getAttribute('onKeyDown').replace(/KsdOnKeyDown\(\)/,'KsdOnKeyDown(e)'))
+		},false);
+		log('PATCH-873, Make sure an event is passed in to the handler');
+	} else if(hostname.endsWith('openphoto.me')){
+		fixTransitionEndCase();
+		log('PATCH-874, Fix transition event case to un-confuse jQuery');
 	} else if(hostname.endsWith('pb.com')){
 		navigator.userAgent=navigator.userAgent.replace( /Opera/g, '0pera not Mozilla' );
 	
@@ -846,6 +873,39 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('pinterest.com')){
 		addCssToDocument('div.NoInput input[data-text-on="On"]{display: inherit !important;visibility: hidden;}');
 		log('PATCH-811, pinterest.com: Opera fails to update status of display:none checkbox');
+	} else if(hostname.endsWith('quora.com')){
+		(function(sTo){
+			var lastEvt=new Date();
+			opera.addEventListener('BeforeEventListener.scroll', function(e){ 
+				if( (new Date)-lastEvt < 2000 ){
+					e.preventDefault();
+				}else{
+					lastEvt=new Date();
+				}
+			}, false);
+			window.setTimeout = function(f,t){
+				if(t==50){
+					t=450;
+				}
+				return sTo.call(this, f, t);
+			}
+		})(setTimeout);
+		
+		log('PATCH-863, Throttle scroll events and certain timeouts to improve Quora performance');
+	} else if(hostname.endsWith('razr.com')){
+		addPreprocessHandler(/b=b\.substring\(c\+4,b\.length\);c=b\.indexOf\("\)"\);/,'b=b.substring(c+5,b.length);c = b.indexOf(\'")\');', true, function(elm){return elm.src&&elm.src.indexOf('main.js')>-1});
+		log('PATCH-876, razr.com: CSS url() argument takes quotes');
+	} else if(hostname.endsWith('reservations.disney.go.com')){
+		opera.defineMagicVariable('Figment', null, function(obj){
+			var str=Element.prototype.__defineSetter__;
+			Element.prototype.__defineSetter__=function(name, func){
+				if( name in document.createElement('div') )return;
+				return str.call(this, name, func);
+			}
+			return obj;
+		});
+		
+		log('PATCH-794, Prevent broken innerHTML setter on Disney booking site');
 	} else if(hostname.endsWith('sears.com')){
 		addCssToDocument('.scrollWidget .slider { top: 0; } .thumbWidget .slider2 { top: 0; }');
 		log('PATCH-847, sears.com - fix moving product thumbnail images');
@@ -866,6 +926,9 @@ function setTinyMCEVersion(e){
 		})();
 		
 		log('PATCH-769, Opera throws when XSL variable has disable-output-escaping attribute, breaks sorting on staples.com');
+	} else if(hostname.endsWith('tedxboulder.com')){
+		fixTransitionEndCase();
+		log('PATCH-874, Fix transition event case to un-confuse jQuery');
 	} else if(hostname.endsWith('www.auf.org')){
 		opera.defineMagicFunction('OldBrowserDetect',function(){return false})
 		log('PATCH-795, auf.org: work around broken sniffer');
@@ -887,7 +950,13 @@ function setTinyMCEVersion(e){
 		}
 		,false);
 		
-		log('PATCH-853, udemy.com: Opera doesn\'t support 3Dtransforms yet');
+	
+		opera.addEventListener('BeforeEvent.click', function(e) { 
+			if (e.event.target.className == 'placeholder') { 
+				e.event.target.previousSibling.focus();
+			}
+		}, false); 
+		log('PATCH-853, udemy.com: Opera doesn\'t support 3Dtransforms yet\nPATCH-871, udemy.com: work around lack of pointer-events in Opera');
 	} else if(hostname.indexOf("cang.baidu.com") != -1 ){
 		window.opera.defineMagicFunction(
 			"top",
@@ -1203,13 +1272,21 @@ function setTinyMCEVersion(e){
 	
 	
 		if(hostname.indexOf('.mail.yahoo.')>-1){
+			if(self==top&&location.search.indexOf('reason=ignore')==-1)document.addEventListener('DOMContentLoaded', function(){
+				if( document.evaluate('//a[contains(@href,"/firefox")]', document.body, null, 6, null).snapshotLength && document.evaluate('//a[contains(@href,"/internetexplorer/")]', document.body, null, 6, null).snapshotLength && document.evaluate('//a[contains(@href,"/safari/")]', document.body, null, 6, null).snapshotLength  ){
+						if( document.evaluate('//a[contains(@href,"reason=ignore")]', document.body, null, 6, null).snapshotLength===0)location.search='?reason=ignore'+location.search.replace(/^\?/, '&');
+					
+					}
+			}, false);
+			
+		
 			if(self==top&&location.search.indexOf('reason=ignore')==-1){
 				document.addEventListener('DOMContentLoaded',function(){
 					if(el=document.querySelector('a[href*="reason=ignore"]'))
 						el.click();
 				},false);
 			}
-			log('PATCH-325, Y!Mail: click continue link in unsupported browser page');
+			log('PATCH-325, Y!Mail: work around browser sniffing again and again\nPATCH-325, Y!Mail: click continue link in unsupported browser page');
 		}
 		if(hostname.indexOf('.mail.yahoo.')>-1&& ( href.indexOf( '/neo/launch' )>-1 || href.indexOf( '/dc/launch' )>-1 )){
 			opera.addEventListener('BeforeEventListener.mousedown', function(e){
