@@ -1,4 +1,4 @@
-// cDZjFzfGBAnMBEBPwyZ5zsvjECjBNH1LdTywdR5Vr/OMzwuP7nbTjIYh0949hFGnwrpHvg5UywCZgtjQ/BIqFSGUTvh4gNrWJjS8O2NysJY0sZAo0dc2H0iZ8/d45KBKCBlxq2y0uCZnVt1eWZIB4GE3idUbgACBJCgD+Z1n+IMsXMb7Lr6+dTYb5GGPx2YN4N8zuS9UKzcKLXFkD02Pbcp4XjAF9GisDQypIGV9Ud0UiElLvjAqV5keOdXKAriR39bzbELiW0dABoC4K6K9OkSN7UgT/wca5sr2WnG572AMrj8R44C4hzWecnubbwA1+DPQl9D3ggwns6pvrP7NuQ==
+// rjUbhWEzcd4Wi44wUnUGfxonwZ9SsZueX/7IsPIHQVLHkElzOHT1ENhswXo1nRNaK93V8/4lsBZA49PNF2XjyQk25hatzOZl3Geu0cCY8FD+y2vfW/f8+xqeNl89nZRgLVUclsAUBSZmHGRlaZCG/ATp+G5Wi0vrK8TEYlJYTkSGJXnLx7fYyEErPMbn9GCsOrPkw9Ek0aZmulOkkNb4lIIG3E8Uuf4IbXpkTcQuIidXYkVPIni76g/OwHRwYkLD99jZywKCrOv6aEnq1wfuZyD/Xo6bsodCBQTPeP4MzQJ6ITxN/j8VXDzdgfYsLqNO2hUw7j5CCnqAZhsyzl4x9w==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, September 27, 2012. Active patches: 220 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, October 2, 2012. Active patches: 225 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -667,10 +667,40 @@ function setTinyMCEVersion(e){
 		log('PATCH-766, Make mouse scrolling work in Zoho spreadsheets');
 	} else if(hostname.endsWith('.apple.com')){
 		addPreprocessHandler(/window\.onunload\s*=\s*function\(\)\{\s*location\.reload\(true\);\};/g,'');
-		log('PATCH-846, apple.com: don\'t reload from within unload handler');
+	
+		opera.addEventListener('BeforeEvent.animationend',function(e){
+			var evt = document.createEvent("Event");
+			evt.initEvent("OAnimationEnd",true,false);
+			evt.animationName = e.event.animationName;
+			evt.elapsedTime = e.event.elapsedTime;
+			e.event.target.dispatchEvent(evt);
+			}
+		,false);
+		opera.addEventListener('BeforeEvent.animationiteration',function(e){
+			var evt = document.createEvent("Event");
+			evt.initEvent("OAnimationIteration",true,false);
+			evt.animationName = e.event.animationName;
+			evt.elapsedTime = e.event.elapsedTime;
+			e.event.target.dispatchEvent(evt);
+			}
+		,false);
+		opera.addEventListener('BeforeEvent.animationstart',function(e){
+			var evt = document.createEvent("Event");
+			evt.initEvent("OAnimationStart",true,false);
+			evt.animationName = e.event.animationName;
+			e.event.target.dispatchEvent(evt);
+			}
+		,false);
+		log('PATCH-846, apple.com: don\'t reload from within unload handler\nPATCH-888, apple_core: CSS animations are unprefixed from Opera 12.10');
 	} else if(hostname.endsWith('aldoshoes.com')){
 		document.__defineSetter__('domain', function(){});
 		log('PATCH-808, aldoshoes.com - fix broken document.domain settings');
+	} else if(hostname.endsWith('allbankonline.in')){
+		HTMLElement.prototype.onselectstart = true;
+		log('PATCH-889, allbankonline.in: prevent mousedown prevention');
+	} else if(hostname.endsWith('antikvar.hu')){
+		addCssToDocument('#header a{font-size:11px}');
+		log('PATCH-890, antikvar.hu: font fallback breaks layout');
 	} else if(hostname.endsWith('caisse-epargne.fr')){
 		addPreprocessHandler(/this\._changeHandler\);if\s*\(Sys\.Browser\.agent\s==\sSys\.Browser\.Opera\)/g, ' this._changeHandler);if(false)');
 		log('PATCH-798, Avoid browser sniffing that breaks typing');
@@ -737,6 +767,12 @@ function setTinyMCEVersion(e){
 		})(Element.prototype.insertBefore);
 		
 		log('PATCH-850, Postphone insertion of JSONP data source until we\'ve parsed the element the data is meant to be inserted into');
+	} else if(hostname.endsWith('insubuy.com')){
+		HTMLElement.prototype.onselectstart = true;
+		log('PATCH-703, insubuy.com: don\'t prevent mouse click');
+	} else if(hostname.endsWith('loyalbank.com')){
+		HTMLElement.prototype.onselectstart = true;
+		log('PATCH-707, loyalbank.com: prevent mousedown prevention');
 	} else if(hostname.endsWith('mail.live.com')){
 		function fixButton(e) {
 			if (e.button == 1) {
@@ -768,6 +804,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('mycoast.cccd.edu')){
 		opera.defineMagicVariable('is_fox',function(){return true},null);
 		log('PATCH-804, mycoast.cccd.edu: block browser block');
+	} else if(hostname.endsWith('myfreecams.com')){
+		addCssToDocument('div#player_main{width:auto !important;height:auto !important;}div#friends_container{height:auto !important}');
+		log('PATCH-891, myfreecams.com: let height be auto to fill space');
 	} else if(hostname.endsWith('myportfolio.nbcn.ca')){
 		opera.defineMagicFunction('checkBrowserVersion',function(){});
 		log('PATCH-805, nbcn.ca - block browser block');
@@ -862,6 +901,15 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.auf.org')){
 		opera.defineMagicFunction('OldBrowserDetect',function(){return false})
 		log('PATCH-795, auf.org: work around broken sniffer');
+	} else if(hostname.endsWith('www.bankofamerica.com')){
+		if(pathname.indexOf('/activate')==0){
+		opera.addEventListener('BeforeCSS', function(e) {
+			if (e.element.href && e.element.href.indexOf('cardactivation-ie.css')>-1) {
+				e.element.href = e.element.href.replace(/cardactivation-ie.css/, 'cardactivation-moz.css')
+			}
+		}, false);
+		}
+		log('PATCH-875, bankofamerica: don\'t use IE stylesheet');
 	} else if(hostname.endsWith('www.shaw.ca')){
 		opera.defineMagicFunction('detectBrowserVersion',function(){return true})
 		log('PATCH-788, shaw.ca: work around browser sniff');
@@ -1484,9 +1532,6 @@ function setTinyMCEVersion(e){
 			}
 		}, false);
 		log('PATCH-529, Fix SiteCatalyst H.9 code on Nissan/Infiniti USA');
-	} else if(hostname.indexOf('insubuy.com')>-1){
-		HTMLElement.prototype.onselectstart = true;
-		log('PATCH-703, insubuy.com: don\'t prevent mouse click');
 	} else if(hostname.indexOf('investordaily.com.au')>-1){
 		opera.defineMagicFunction('minmax_scan', function(){});
 		log('PATCH-238, Override minmax IE helper script');
@@ -1510,9 +1555,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('lottery.sina.2caipiao.com')>-1){
 		fixIFrameSSIscriptII('dyniframesize');
 		log('PATCH-556, 2caipiao.com: fix iframe resize');
-	} else if(hostname.indexOf('loyalbank.com')>-1){
-		HTMLElement.prototype.onselectstart = true;
-		log('PATCH-707, loyalbank.com: prevent mousedown prevention');
 	} else if(hostname.indexOf('mapion.co.jp')>-1){
 		opera.addEventListener('BeforeScript',function(ev){
 			var name=ev.element.src; 
