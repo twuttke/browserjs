@@ -1,4 +1,4 @@
-// XguPRC1HuuM8VcTUZCcs8yQTaO3C0v06pynFrB0tzv0cNVkDrQHJRgg3BXyYiscJbHpbBeqCUijTIPOsFWghc6Kirq/f6N2YqFlo+6qMV4QNNgqCTQlQcyV6IplCI1y+nywjqUeBgVdN4ZJjWDjQxcUqeIwzuUOQvoDg1MKpG/uLN70DgT66Tkv2lVyeSJSzkch4gIEEyUYK8DfDdkOjnmFYS3nIrM6WeLdtLtcCbdbNjHhU5rqDGT2vB/oKpU90KwQcGrk2Ys0amBUfChfac4CKDDwK68kaEcB58pI1dyO43u8JFwUZ+MvqCZTpY8EHU0oVAgorxJOuz2TlYXEtnw==
+// gUe/YEFqxJyGlIIGxkDBETZzaVyM1otfiDg7hEEfauh/hSm8xc82vRMWpq0vOJlhXaVb6DHCMfYYe5/JTsrQPdjAW1wJvPi6i2cpJ2asJ7ZQL2IMi+uvf0hg/jaij2jSk9us8HGqghY6ad7dqocKqkJXu+Z80ibznGkX0DEOjcVYYQ0hrEB92hiwGCsE5J1O2zMTr+79xmdwq+k//1J/cNkEMrlyHBsrBz5Pa4IEV/LQLkpp02ueUQG+FQdzJm9RHg4jJpyVV/b5u+d7wn4wk4YlG/eAms/2wNacactaHVskJanpjNr559Bd+PMdrzAw0JYEVMM2/rIKPxR+hVyx+A==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, September 27, 2012. Active patches: 254 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, October 2, 2012. Active patches: 259 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -717,6 +717,12 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('aldoshoes.com')){
 		document.__defineSetter__('domain', function(){});
 		log('PATCH-808, aldoshoes.com - fix broken document.domain settings');
+	} else if(hostname.endsWith('allbankonline.in')){
+		HTMLElement.prototype.onselectstart = true;
+		log('PATCH-889, allbankonline.in: prevent mousedown prevention');
+	} else if(hostname.endsWith('antikvar.hu')){
+		addCssToDocument('#header a{font-size:11px}');
+		log('PATCH-890, antikvar.hu: font fallback breaks layout');
 	} else if(hostname.endsWith('caisse-epargne.fr')){
 		addPreprocessHandler(/this\._changeHandler\);if\s*\(Sys\.Browser\.agent\s==\sSys\.Browser\.Opera\)/g, ' this._changeHandler);if(false)');
 		log('PATCH-798, Avoid browser sniffing that breaks typing');
@@ -783,6 +789,15 @@ function setTinyMCEVersion(e){
 		})(Element.prototype.insertBefore);
 		
 		log('PATCH-850, Postphone insertion of JSONP data source until we\'ve parsed the element the data is meant to be inserted into');
+	} else if(hostname.endsWith('insubuy.com')){
+		HTMLElement.prototype.onselectstart = true;
+		log('PATCH-703, insubuy.com: don\'t prevent mouse click');
+	} else if(hostname.endsWith('khanacademy.org')){
+		fixTransitionEndCase();
+		log('PATCH-892, Fix transition event case to un-confuse jQuery');
+	} else if(hostname.endsWith('loyalbank.com')){
+		HTMLElement.prototype.onselectstart = true;
+		log('PATCH-707, loyalbank.com: prevent mousedown prevention');
 	} else if(hostname.endsWith('mail.live.com')){
 		function fixButton(e) {
 			if (e.button == 1) {
@@ -821,6 +836,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('mycoast.cccd.edu')){
 		opera.defineMagicVariable('is_fox',function(){return true},null);
 		log('PATCH-804, mycoast.cccd.edu: block browser block');
+	} else if(hostname.endsWith('myfreecams.com')){
+		addCssToDocument('div#player_main{width:auto !important;height:auto !important;}div#friends_container{height:auto !important}');
+		log('PATCH-891, myfreecams.com: let height be auto to fill space');
 	} else if(hostname.endsWith('myportfolio.nbcn.ca')){
 		opera.defineMagicFunction('checkBrowserVersion',function(){});
 		log('PATCH-805, nbcn.ca - block browser block');
@@ -932,6 +950,15 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.auf.org')){
 		opera.defineMagicFunction('OldBrowserDetect',function(){return false})
 		log('PATCH-795, auf.org: work around broken sniffer');
+	} else if(hostname.endsWith('www.bankofamerica.com')){
+		if(pathname.indexOf('/activate')==0){
+		opera.addEventListener('BeforeCSS', function(e) {
+			if (e.element.href && e.element.href.indexOf('cardactivation-ie.css')>-1) {
+				e.element.href = e.element.href.replace(/cardactivation-ie.css/, 'cardactivation-moz.css')
+			}
+		}, false);
+		}
+		log('PATCH-875, bankofamerica: don\'t use IE stylesheet');
 	} else if(hostname.endsWith('www.shaw.ca')){
 		opera.defineMagicFunction('detectBrowserVersion',function(){return true})
 		log('PATCH-788, shaw.ca: work around browser sniff');
@@ -1675,9 +1702,6 @@ function setTinyMCEVersion(e){
 			}
 		}, false);
 		log('PATCH-529, Fix SiteCatalyst H.9 code on Nissan/Infiniti USA');
-	} else if(hostname.indexOf('insubuy.com')>-1){
-		HTMLElement.prototype.onselectstart = true;
-		log('PATCH-703, insubuy.com: don\'t prevent mouse click');
 	} else if(hostname.indexOf('internetbank.swedbank.se')>-1){
 		Event.prototype.__defineGetter__('charCode', function(){if( this.keyCode>=48 && this.keyCode<=57  )return this.keyCode;});
 		log('PATCH-611, SwedBank: temporary work around for mismatch between window.event support and charcode support');
@@ -1704,9 +1728,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('lottery.sina.2caipiao.com')>-1){
 		fixIFrameSSIscriptII('dyniframesize');
 		log('PATCH-556, 2caipiao.com: fix iframe resize');
-	} else if(hostname.indexOf('loyalbank.com')>-1){
-		HTMLElement.prototype.onselectstart = true;
-		log('PATCH-707, loyalbank.com: prevent mousedown prevention');
 	} else if(hostname.indexOf('mapion.co.jp')>-1){
 		opera.addEventListener('BeforeScript',function(ev){
 			var name=ev.element.src; 
