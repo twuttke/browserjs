@@ -315,12 +315,12 @@
 </host>
 <host name="elanit.ch">
 	<section name="User Agent">
-		<pref name="Spoof UserAgent ID" value="4"/>
+		<pref name="Spoof UserAgent ID" value="1"/>
 	</section>
 </host>
 <host name="elanit.co.uk">
 	<section name="User Agent">
-		<pref name="Spoof UserAgent ID" value="4"/>
+		<pref name="Spoof UserAgent ID" value="1"/>
 	</section>
 </host>
 <host name="directline.com">
@@ -802,7 +802,7 @@
 </host>
 <host name="new.myspace.com">
 	<section name="User Agent">
-		<pref name="Spoof UserAgent ID" value="2"/>
+		<pref name="Spoof UserAgent ID" value="1"/>
 	</section>
 </host>
 <host name="airgreenland.com">
@@ -828,6 +828,41 @@
 <host name="alfa-click.ru">
 	<section name="User Agent">
 		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="ssl.typography.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="5"/>
+	</section>
+</host>
+<host name="cloud.typography.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="5"/>
+	</section>
+</host>
+<host name="www.krys.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="www.l-tunedparts.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="m.foxbusiness.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="elderscrolls.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="bobwards.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
 	</section>
 </host>
 </preferences>
