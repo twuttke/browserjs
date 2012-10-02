@@ -1,4 +1,4 @@
-// DBKui9VehArtFtJ/Qro2sRJ8lRqsGSoGfGhSm+Hq1KqJjAKTFMIAmCjGYRju+VnSCYE6aMJVIdjo/JCHba7OJWAF63s8YAlEeHagrxti5YU3XRCnzsdKjMce8LYhtJgcPN+JOCxqAhr4g37sUZ8V5FYZNmWiE17GTb43Q/Xno9re2J3BoA/QCAKyTnCbfq0WX+ZQ0afr4BGxFzsea8LfVoA7fdMD/CvL2b7eLqrSROKIZgayOvQhfIgQShygEBNV3UpNwxZqUN1vqNLrPurDx4KEABvpkhQRrAN8fv55pC9ZZQxFdK9FqRsmugSNX1LaUS7OcB8yQYM9nmFpAlDh+w==
+// drrQ2oTVWulP+9b0mwlLgIv7ClCz5yNydUldEvTaUMz6eLQsRfbTolLNtDffnr36vhg5FD+B49VanhoYQLI+TQU9bRk3/wibXJU2kb1psgw0bfIGu5THXHabMLkG6C57hSVjSIDR4iRz4+FkMEZJoV+Jq10UwpVKOkIYoHZvTJUw4I+c5h8Eb4GCTR2Wme35om2cVQdldGM6Rf9pqweSK9fvuubw7WWdYEwTp4O8oV6r7mymgTfJO3y7AmsinbrmXHBa5jur6guXgwBnllqnQ+1prtktLMizi6UfJ+S59iNmY55dGTDTPnu8CdBU1DFA4MmGl7Q+KAOupkSJCMh8yA==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, September 27, 2012. Active patches: 259 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, October 2, 2012. Active patches: 262 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -693,6 +693,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('aldoshoes.com')){
 		document.__defineSetter__('domain', function(){});
 		log('PATCH-808, aldoshoes.com - fix broken document.domain settings');
+	} else if(hostname.endsWith('antikvar.hu')){
+		addCssToDocument('#header a{font-size:11px}');
+		log('PATCH-890, antikvar.hu: font fallback breaks layout');
 	} else if(hostname.endsWith('caisse-epargne.fr')){
 		addPreprocessHandler(/this\._changeHandler\);if\s*\(Sys\.Browser\.agent\s==\sSys\.Browser\.Opera\)/g, ' this._changeHandler);if(false)');
 		log('PATCH-798, Avoid browser sniffing that breaks typing');
@@ -747,6 +750,12 @@ function setTinyMCEVersion(e){
 		})(Element.prototype.insertBefore);
 		
 		log('PATCH-850, Postphone insertion of JSONP data source until we\'ve parsed the element the data is meant to be inserted into');
+	} else if(hostname.endsWith('insubuy.com')){
+		HTMLElement.prototype.onselectstart = true;
+		log('PATCH-703, insubuy.com: don\'t prevent mouse click');
+	} else if(hostname.endsWith('loyalbank.com')){
+		HTMLElement.prototype.onselectstart = true;
+		log('PATCH-707, loyalbank.com: prevent mousedown prevention');
 	} else if(hostname.endsWith('mail.live.com')){
 		function fixButton(e) {
 			if (e.button == 1) {
@@ -785,6 +794,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('mycoast.cccd.edu')){
 		opera.defineMagicVariable('is_fox',function(){return true},null);
 		log('PATCH-804, mycoast.cccd.edu: block browser block');
+	} else if(hostname.endsWith('myfreecams.com')){
+		addCssToDocument('div#player_main{width:auto !important;height:auto !important;}div#friends_container{height:auto !important}');
+		log('PATCH-891, myfreecams.com: let height be auto to fill space');
 	} else if(hostname.endsWith('myportfolio.nbcn.ca')){
 		opera.defineMagicFunction('checkBrowserVersion',function(){});
 		log('PATCH-805, nbcn.ca - block browser block');
@@ -881,6 +893,15 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.auf.org')){
 		opera.defineMagicFunction('OldBrowserDetect',function(){return false})
 		log('PATCH-795, auf.org: work around broken sniffer');
+	} else if(hostname.endsWith('www.bankofamerica.com')){
+		if(pathname.indexOf('/activate')==0){
+		opera.addEventListener('BeforeCSS', function(e) {
+			if (e.element.href && e.element.href.indexOf('cardactivation-ie.css')>-1) {
+				e.element.href = e.element.href.replace(/cardactivation-ie.css/, 'cardactivation-moz.css')
+			}
+		}, false);
+		}
+		log('PATCH-875, bankofamerica: don\'t use IE stylesheet');
 	} else if(hostname.endsWith('www.shaw.ca')){
 		opera.defineMagicFunction('detectBrowserVersion',function(){return true})
 		log('PATCH-788, shaw.ca: work around browser sniff');
@@ -1714,9 +1735,6 @@ function setTinyMCEVersion(e){
 			}
 		}, false);
 		log('PATCH-529, Fix SiteCatalyst H.9 code on Nissan/Infiniti USA');
-	} else if(hostname.indexOf('insubuy.com')>-1){
-		HTMLElement.prototype.onselectstart = true;
-		log('PATCH-703, insubuy.com: don\'t prevent mouse click');
 	} else if(hostname.indexOf('internetbank.swedbank.se')>-1){
 		Event.prototype.__defineGetter__('charCode', function(){if( this.keyCode>=48 && this.keyCode<=57  )return this.keyCode;});
 		log('PATCH-611, SwedBank: temporary work around for mismatch between window.event support and charcode support');
@@ -1743,9 +1761,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('lottery.sina.2caipiao.com')>-1){
 		fixIFrameSSIscriptII('dyniframesize');
 		log('PATCH-556, 2caipiao.com: fix iframe resize');
-	} else if(hostname.indexOf('loyalbank.com')>-1){
-		HTMLElement.prototype.onselectstart = true;
-		log('PATCH-707, loyalbank.com: prevent mousedown prevention');
 	} else if(hostname.indexOf('mapion.co.jp')>-1){
 		opera.addEventListener('BeforeScript',function(ev){
 			var name=ev.element.src; 
