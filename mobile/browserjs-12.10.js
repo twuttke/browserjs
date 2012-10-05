@@ -1,4 +1,4 @@
-// EA6rv3yoJcXFNw5jFyPkm1jrgEBDgvmNinvdsTvhNw+Ef3tGroW5bpfjDaOZ/2axwUY9IPg8fFK5VN1qG73imOIIWn5pDlIwWSuNJPEZ5FvP2JT/CxfeS8Ll828MoAOeQ0tUI8YOX7C+U6zLQet2QQK7KOxx7exos6rQWGxUfRSoWMLOKRWT7sDGJWmsEhPTFSGuvo6PJ1AWjTX9AayH+JrUQUj4povAiNHaLtSVuZLIFFBuNlazb5kGdNbZHBFPraF6Rk47cWIlr3TtLkyW2JFk6OHEiW4JZuA33oXSriwIc12g4bWh3q+Td6j+CPyJPEaqh+JROkPnicfCcZORyQ==
+// RlD22540hzuVFqk627m3LJsLOdP+lKBtlMMqx9Q1umzWkRtOKfHEEr7pUdPXyVoqkauCtq4CmDQe8dMpNBwZrdQxkwikkWXMwGD+jKXLSKGCaoijYxvBflLshvLH6LtQrOaYL9WOniRVbNWSzHB/HWJohfA283kveoYsrspxWiSs+AEBCEV7TiCRdQ2V5J5oOENsfaFcrhDtrbOF/7PLH8BDsWeYCL925Sn66BPIAUV8YuvWjOmfstPo8NpnVWQPZ2NLkIYbuy/11AD1AYdR+v95nZLBh17OYpF6/27qTMe/n9z4YKlhaofihFKO3qK6EW1oe4QeDGUQcIudwsleBw==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.10 core 2.11.355, October 4, 2012. Active patches: 179 ';
+	var bjsversion=' Opera Mobile 12.10 core 2.11.355, October 5, 2012. Active patches: 180 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -415,6 +415,18 @@ function stopKeypressIfDownCancelled(stopKey){
 		/* Google */
 	
 	
+		if(hostname.contains('maps.google.')){
+			addCssToDocument('.mini-header-container{background: linear-gradient(to bottom, #d9e2fa 1%,#bccdf9 100%);}');
+			addPreprocessHandler(/-webkit-border-image/g,'-o-border-image');
+			document.addEventListener('DOMContentLoaded',function(){
+				var sl = document.getElementsByTagName('style');
+				for(var i=0;i<sl.length;i++){
+					sl[i].textContent = sl[i].textContent.replace(/-webkit-border-image/g,'-o-border-image');
+				}
+			}
+			,false);
+			log('PATCH-899, maps.google: fix gradient and border-image');
+		}
 		if(hostname.indexOf('mail.google.')>-1){
 			window.opera.version = opera.version = function() { return 0; }
 			log('SOKRI4-171, GMail detects mobile version as desktop version if opera.version() says 9.5');
