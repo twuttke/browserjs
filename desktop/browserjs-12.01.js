@@ -1,4 +1,4 @@
-// gUe/YEFqxJyGlIIGxkDBETZzaVyM1otfiDg7hEEfauh/hSm8xc82vRMWpq0vOJlhXaVb6DHCMfYYe5/JTsrQPdjAW1wJvPi6i2cpJ2asJ7ZQL2IMi+uvf0hg/jaij2jSk9us8HGqghY6ad7dqocKqkJXu+Z80ibznGkX0DEOjcVYYQ0hrEB92hiwGCsE5J1O2zMTr+79xmdwq+k//1J/cNkEMrlyHBsrBz5Pa4IEV/LQLkpp02ueUQG+FQdzJm9RHg4jJpyVV/b5u+d7wn4wk4YlG/eAms/2wNacactaHVskJanpjNr559Bd+PMdrzAw0JYEVMM2/rIKPxR+hVyx+A==
+// IcCA0olNA7fVSF2kyROJChoKqb7fUYqyCt33aXuTingRuuCMz6CEtWVv8u5anfJ6+qEZ4NQRmQcD2Sah4Ve0v2adoOSe4jPNr0tlK39w79ejSQUeeMf7f9zAdr7SNsFVj2/L2CkeZ3Kj3Nr2jHi8YBQ8k7gA+uhhocGDwLnkbLxkLBRmiFDNwBbodadUBuz7T55UNj0DNET3AGXgR50CGUgeI9CGv5qyB1bAUyq3wEgzUMb67dhvEyP0OqBScbwGhngKb8SgBf20pbsY2O3bCgIJNJQe3uPgiQJoR0lYAZucTcztbE1CtawSUKr2lPKvkou5YgMs7/IP0Rat23b91g==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, October 2, 2012. Active patches: 259 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, October 8, 2012. Active patches: 262 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -732,6 +732,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('clarkhoward.com')){
 		addCssToDocument('blockquote{content: normal !important;}');
 		log('PATCH-844, clarkhoward.com: abouse of CSS content property');
+	} else if(hostname.endsWith('directbus.com.mx')){
+		if(pathname=="/")location.href='/home.html';
+		log('PATCH-895, directbus.com.mx: avoid freezing Flash frontpage');
 	} else if(hostname.endsWith('ebayclassifieds.com') && pathname.match(/\/PostAd/)){
 		navigator.userAgent = navigator.userAgent.replace(/Opera/g,'0pera');
 		log('PATCH-784, eBay Classifieds - disable block on image uploader');
@@ -789,6 +792,12 @@ function setTinyMCEVersion(e){
 		})(Element.prototype.insertBefore);
 		
 		log('PATCH-850, Postphone insertion of JSONP data source until we\'ve parsed the element the data is meant to be inserted into');
+	} else if(hostname.endsWith('imf-wb.2012tokyo.mof.go.jp')){
+		addCssToDocument('#TopPage .category-section li{float:left;}#HeaderRight{float:right;}');
+		log('PATCH-910, 2012tokyo: avoid inline-block wrapping');
+	} else if(hostname.endsWith('ingdirect.com')){
+		addCssToDocument('div.alert.caution{display:none}');
+		log('PATCH-902, ingdirect.com: avoid browser blocking');
 	} else if(hostname.endsWith('insubuy.com')){
 		HTMLElement.prototype.onselectstart = true;
 		log('PATCH-703, insubuy.com: don\'t prevent mouse click');
@@ -839,6 +848,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('myfreecams.com')){
 		addCssToDocument('div#player_main{width:auto !important;height:auto !important;}div#friends_container{height:auto !important}');
 		log('PATCH-891, myfreecams.com: let height be auto to fill space');
+	} else if(hostname.endsWith('myharmony.com')){
+		opera.defineMagicFunction('IsSupportedPlatform',function(){return true;});
+		log('PATCH-706, myharmony.com - work around browser blocking');
 	} else if(hostname.endsWith('myportfolio.nbcn.ca')){
 		opera.defineMagicFunction('checkBrowserVersion',function(){});
 		log('PATCH-805, nbcn.ca - block browser block');
@@ -959,6 +971,9 @@ function setTinyMCEVersion(e){
 		}, false);
 		}
 		log('PATCH-875, bankofamerica: don\'t use IE stylesheet');
+	} else if(hostname.endsWith('www.finanzas.com')){
+		addCssToDocument('body{content: normal !important}');
+		log('PATCH-901, finanzas.com: work around generated content abuse');
 	} else if(hostname.endsWith('www.shaw.ca')){
 		opera.defineMagicFunction('detectBrowserVersion',function(){return true})
 		log('PATCH-788, shaw.ca: work around browser sniff');
@@ -1299,21 +1314,16 @@ function setTinyMCEVersion(e){
 	
 	
 		if(hostname.indexOf('.mail.yahoo.')>-1){
-			if(self==top&&location.search.indexOf('reason=ignore')==-1)document.addEventListener('DOMContentLoaded', function(){
-				if( document.evaluate('//a[contains(@href,"/firefox")]', document.body, null, 6, null).snapshotLength && document.evaluate('//a[contains(@href,"/internetexplorer/")]', document.body, null, 6, null).snapshotLength && document.evaluate('//a[contains(@href,"/safari/")]', document.body, null, 6, null).snapshotLength  ){
-						if( document.evaluate('//a[contains(@href,"reason=ignore")]', document.body, null, 6, null).snapshotLength===0)location.search='?reason=ignore'+location.search.replace(/^\?/, '&');
-					
-					}
-			}, false);
-			
-		
 			if(self==top&&location.search.indexOf('reason=ignore')==-1){
 				document.addEventListener('DOMContentLoaded',function(){
-					if(el=document.querySelector('a[href*="reason=ignore"]'))
+					if(el=document.querySelector('a[href*="reason=ignore"]')){
 						el.click();
+					}else if(document.evaluate('//a[contains(@href,"/firefox")]', document.body, null, 6, null).snapshotLength && document.evaluate('//a[contains(@href,"/internetexplorer/")]', document.body, null, 6, null).snapshotLength && document.evaluate('//a[contains(@href,"/safari/")]', document.body, null, 6, null).snapshotLength){
+						location.search='?reason=ignore'+location.search.replace(/^\?/, '&');
+					}
 				},false);
 			}
-			log('PATCH-325, Y!Mail: work around browser sniffing again and again\nPATCH-325, Y!Mail: click continue link in unsupported browser page');
+			log('PATCH-325, Y!Mail: click continue link in unsupported browser page');
 		}
 		if(hostname.indexOf('.mail.yahoo.')>-1&& ( href.indexOf( '/neo/launch' )>-1 || href.indexOf( '/dc/launch' )>-1 )){
 			opera.addEventListener('BeforeEventListener.mousedown', function(e){
@@ -1363,7 +1373,9 @@ function setTinyMCEVersion(e){
 		}
 		if(hostname.indexOf('finance.yahoo.com')>-1){
 			opera.addEventListener('BeforeEventListener.focusout', function(e){e.preventDefault();}, false);
-			log('PATCH-406, Prevent currency menu from closing too fast on Y!Finance');
+		
+			addPreprocessHandler(/Y\.later\(10,\s*this,\s*function\(\)\s*\{\s*Y\.namespace\("Media"\);/,'Y.later(1000, this, function() {Y.namespace("Media");');
+			log('PATCH-406, Prevent currency menu from closing too fast on Y!Finance\nPATCH-911, Y!finance: delay script to load comments');
 		}
 		if(hostname.indexOf('mail.yahoo')>-1){
 			opera.addEventListener('BeforeEvent.keypress', function(e){
@@ -1509,9 +1521,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('boards.4chan.org')>-1){
 		addCssToDocument('td.reply blockquote, td.replyhl blockquote{margin-bottom: 1em}');
 		log('PATCH-585, 4chan: add bottom margin to blockquote for better readability');
-	} else if(hostname.indexOf('bolsamadrid.es')>-1){
-		opera.defineMagicVariable('is', function(obj){obj.ns6=true;return obj}, null);
-		log('PATCH-736, Work around browser sniffing that hides Spain\'s stock exchange\'s menu');
 	} else if(hostname.indexOf('boortz.com')>-1){
 		opera.addEventListener('BeforeCSS', function(e){
 		  e.cssText = e.cssText.replace(/#cmArticleWell q:before,#cmArticleWell blockquote,.cmStaffBioContent q:before,.cmStaffBioContent blockquote{ content:open-quote}/g,'#cmArticleWell q:before,.cmStaffBioContent q:before{content:open-quote}')
@@ -1814,9 +1823,6 @@ function setTinyMCEVersion(e){
 			}
 		})(window.setTimeout);
 		log('CORE-19206, orkut avatar image crop does not happen because of timing issue');
-	} else if(hostname.indexOf('paper.li')>-1){
-		addCssToDocument('.isotope-hidden.isotope-item{visibility:hidden !important}');
-		log('PATCH-514, paper.li: allow clicking headers despite lack of pointer-events');
 	} else if(hostname.indexOf('passport2.hp.com')>-1){
 		navigator.appName='Netscape';
 		log('PATCH-738, Work around sniffing hiding submit buttons on passport2.hp.com');
