@@ -1,4 +1,4 @@
-// GxWQMxYXiMbE0CpMHGzzdYaglEJo6ayeOKUroskjgJVPygq/ZrAcHCtmMyjHmQL3UAfeBz5oZlMeTFnhvcSA5YRU9CBDOwdkeBW2lyxcVUsCJ5p0nKLKvdVZKjqAY5WBB2tGb1WqmahXf/VNqk7tPACwp/meWHHFM+jc5CQdpqVJiuPljgNTsUzVWsefWOnQZiZQCr7fn2LSstCv7/waLt2D3bFh0otIqXXNhgmPo84iKSR9dGTQ1x+Ms36E8y+AJ87ET5bh910YaIsGLyEmhahmJalqSc7AaCuEv/ZptsuA+U4Zo651gJ8SiG6M2r/qks1X1R0tLxhS1jaq8j71xw==
+// sOK+CmBhXpswUCvuWuqV5ZgJYhdu8SnVnT1+VgxWGyEHSLPh1sjbhEBHupK17d2bgsgiOI6N16u6zFDOA5wnla4Ntyug7Gt4XhJbvLO7PaqwbJRTfG1WD0nBvV17WoqD+K5SX/WhB1TWM+lvK9WrFVWpKQaGvUwu+Z6mydywBP28SCGV5MFjjLlUOFKX0LjbWNu05f8ah1xG+p2mEaPhw9XAc9gPYs4YvUUbkYPVzZ2HPOkvsgY7zR744Y9rqhQYqZnKOnF0xiH002SC4TYp3d1a6Ya5mCthylwDM2VqnLI4BZf8tHOsnwo0gC6rBCJIrGqEwDwCW0Ls/5CqHd+aMg==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.00 core 2.10.254, September 27, 2012. Active patches: 179 ';
+	var bjsversion=' Opera Mobile 12.00 core 2.10.254, October 8, 2012. Active patches: 185 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -418,6 +418,9 @@ function stopKeypressIfDownCancelled(stopKey){
 			},false);
 		}
 		log('PATCH-186, tokyo.jp, lg.jp enable maps');
+	} else if(hostname.endsWith('allbankonline.in')){
+		HTMLElement.prototype.onselectstart = true;
+		log('PATCH-889, allbankonline.in: prevent mousedown prevention');
 	} else if(hostname.endsWith('b.mig33.com')){
 		if(location.pathname.indexOf('wap')>-1)
 		{
@@ -437,6 +440,12 @@ function stopKeypressIfDownCancelled(stopKey){
 			}
 		,false);
 		log('PATCH-781, cooliris: user-scalable yes');
+	} else if(hostname.endsWith('insubuy.com')){
+		HTMLElement.prototype.onselectstart = true;
+		log('PATCH-703, insubuy.com: don\'t prevent mouse click');
+	} else if(hostname.endsWith('loyalbank.com')){
+		HTMLElement.prototype.onselectstart = true;
+		log('PATCH-707, loyalbank.com: prevent mousedown prevention');
 	} else if(hostname.endsWith('m.iboa.pl')){
 		document.addEventListener('DOMContentLoaded',
 			function(){
@@ -514,6 +523,18 @@ function stopKeypressIfDownCancelled(stopKey){
 		/* Google */
 	
 	
+		if(hostname.contains('maps.google.')){
+			addCssToDocument('.mini-header-container{background: linear-gradient(to bottom, #d9e2fa 1%,#bccdf9 100%);}');
+			addPreprocessHandler(/-webkit-border-image/g,'-o-border-image');
+			document.addEventListener('DOMContentLoaded',function(){
+				var sl = document.getElementsByTagName('style');
+				for(var i=0;i<sl.length;i++){
+					sl[i].textContent = sl[i].textContent.replace(/-webkit-border-image/g,'-o-border-image');
+				}
+			}
+			,false);
+			log('PATCH-899, maps.google: fix gradient and border-image');
+		}
 		if(hostname.indexOf('mail.google.')>-1){
 			window.opera.version = opera.version = function() { return 0; }
 			log('SOKRI4-171, GMail detects mobile version as desktop version if opera.version() says 9.5');
@@ -1151,6 +1172,21 @@ function stopKeypressIfDownCancelled(stopKey){
 		}
 		
 		log('HMONY-1927, Remove overlapping text on vnet.mobi');
+	} else if(hostname.indexOf('jugem.jp')>-1){
+		var cssText = '';
+		/* page Top icons */
+		cssText += '.jugem_header_right {background: -o-linear-gradient(top, #999, #333);}';
+		cssText += '.jugem_header_right {background: linear-gradient(to bottom, #999, #333);}';
+		cssText += '.jugem_mn_login {background: -o-linear-gradient(top, #FEB235, #ED7902);}';
+		cssText += '.jugem_mn_login {background: linear-gradient(to bottom, #FEB235, #ED7902);}';
+		/* category bars */
+		cssText += '.jugem_btm_all_category {background: -o-linear-gradient(top, #FFFFFF,#D8D8D8);}';
+		cssText += '.jugem_btm_all_category {background: linear-gradient(to bottom, #FFFFFF,#D8D8D8);}';
+		/* button at page bottom */
+		cssText += '.jugem_entry_button, .jugem_entry_button:visited {background: -o-linear-gradient(bottom, #FF18AC, #FF50CC);}';
+		cssText += '.jugem_entry_button, .jugem_entry_button:visited {background: linear-gradient(to top, #FF18AC, #FF50CC);}';
+		addCssToDocument(cssText);
+		log('PATCH-893, jugem.jp - add missing gradients');
 	} else if(hostname.indexOf('m.deadspin.com')>-1){
 		fixGawkerMobile();
 		log('PATCH-655, Fix Gawker Media mobile site (Deadspin)');
@@ -1363,6 +1399,14 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('netpia.linkprice.com')>-1){
 		addEventListener.call(document, 'load', function(){try{clear()}catch(e){}}, false);
 		log('354340, Clears popups that are visible after loading subpages on netpia.linkprice.com');
+	} else if(hostname.indexOf('nocoty.pl')>-1){
+		var cssText = '';
+		cssText += '.bar, .box .bar, .barList, .box .barList {background: -o-linear-gradient(top, #E30A7F, #FAC);}';
+		cssText += '.bar, .box .bar, .barList, .box .barList {background: lindear-gradient(to bottom, #E30A7F, #FAC);}';
+		cssText += '.more, div.lnk, .exch table tr td, .tvNavBar, div.clr {background: -o-linear-gradient(top, #FFF, #C0C0C0);}';
+		cssText += '.more, div.lnk, .exch table tr td, .tvNavBar, div.clr {background: linear-gradient(to bottom, #FFF, #C0C0C0);}';
+		addCssToDocument(cssText);
+		log('PATCH-868, nocoty.pl - add missing gradients');
 	} else if(hostname.indexOf('o2active')!=-1){
 		addCssToDocument('body{width:100%!important; max-width:'+screen.width+'px;}');
 		log('266967, o2active.de, making sure narrow centered column does not appear off-screen');
