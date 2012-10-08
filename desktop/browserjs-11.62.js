@@ -1,4 +1,4 @@
-// drrQ2oTVWulP+9b0mwlLgIv7ClCz5yNydUldEvTaUMz6eLQsRfbTolLNtDffnr36vhg5FD+B49VanhoYQLI+TQU9bRk3/wibXJU2kb1psgw0bfIGu5THXHabMLkG6C57hSVjSIDR4iRz4+FkMEZJoV+Jq10UwpVKOkIYoHZvTJUw4I+c5h8Eb4GCTR2Wme35om2cVQdldGM6Rf9pqweSK9fvuubw7WWdYEwTp4O8oV6r7mymgTfJO3y7AmsinbrmXHBa5jur6guXgwBnllqnQ+1prtktLMizi6UfJ+S59iNmY55dGTDTPnu8CdBU1DFA4MmGl7Q+KAOupkSJCMh8yA==
+// r+5h2mNSiy54w3Q3b7aXPhkTWbiMTqF29xPu5K3zx6WhmYZMpwFSq7sbHi8oR+T1JSK7Nk2TjYPO8URdOwzxcKMhOKOe4VGKJsaXZN7B6NLM8VPjDDM36KWJdOAaND8NVh9hZ3IlE9xHhT7oqh80dppWYlpq7HdhuwXX9fPllTb7hQGYGPFyx8fvz3f4dw1fzxjEyjwYipUzwMcxJYXMiHH6jMoNk680UCxJ7TwO/Z83Nrq7KuhX2CYkfFtaisM7GJABf6IA9ZI4hT3wudeu9V90OzUxoXbZhb4+cWXy+l8lZTOIw6R3USG5/7mUqe79JGXTfs43qchrtjUh+aD18g==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, October 2, 2012. Active patches: 262 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, October 8, 2012. Active patches: 259 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1264,16 +1264,6 @@ function setTinyMCEVersion(e){
 		
 	
 	
-		if(hostname.indexOf('.mail.yahoo.')>-1){
-			if(self==top&&location.search.indexOf('reason=ignore')==-1)document.addEventListener('DOMContentLoaded', function(){
-				if( document.evaluate('//a[contains(@href,"/firefox")]', document.body, null, 6, null).snapshotLength && document.evaluate('//a[contains(@href,"/internetexplorer/")]', document.body, null, 6, null).snapshotLength && document.evaluate('//a[contains(@href,"/safari/")]', document.body, null, 6, null).snapshotLength  ){
-						if( document.evaluate('//a[contains(@href,"reason=ignore")]', document.body, null, 6, null).snapshotLength===0)location.search='?reason=ignore'+location.search.replace(/^\?/, '&');
-					
-					}
-			}, false);
-			
-			log('PATCH-325, Y!Mail: work around browser sniffing again and again');
-		}
 		if(hostname.indexOf('.mail.yahoo.')>-1&& ( href.indexOf( '/neo/launch' )>-1 || href.indexOf( '/dc/launch' )>-1 )){
 			opera.addEventListener('BeforeEventListener.mousedown', function(e){
 				if(e.event.target.tagName=='INPUT' && e.event.target.id=='subject-field'){
@@ -1490,9 +1480,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('boards.4chan.org')>-1){
 		addCssToDocument('td.reply blockquote, td.replyhl blockquote{margin-bottom: 1em}');
 		log('PATCH-585, 4chan: add bottom margin to blockquote for better readability');
-	} else if(hostname.indexOf('bolsamadrid.es')>-1){
-		opera.defineMagicVariable('is', function(obj){obj.ns6=true;return obj}, null);
-		log('PATCH-736, Work around browser sniffing that hides Spain\'s stock exchange\'s menu');
 	} else if(hostname.indexOf('boortz.com')>-1){
 		opera.addEventListener('BeforeCSS', function(e){
 		  e.cssText = e.cssText.replace(/#cmArticleWell q:before,#cmArticleWell blockquote,.cmStaffBioContent q:before,.cmStaffBioContent blockquote{ content:open-quote}/g,'#cmArticleWell q:before,.cmStaffBioContent q:before{content:open-quote}')
@@ -1847,9 +1834,6 @@ function setTinyMCEVersion(e){
 			}
 		})(window.setTimeout);
 		log('CORE-19206, orkut avatar image crop does not happen because of timing issue');
-	} else if(hostname.indexOf('paper.li')>-1){
-		addCssToDocument('.isotope-hidden.isotope-item{visibility:hidden !important}');
-		log('PATCH-514, paper.li: allow clicking headers despite lack of pointer-events');
 	} else if(hostname.indexOf('passport2.hp.com')>-1){
 		navigator.appName='Netscape';
 		log('PATCH-738, Work around sniffing hiding submit buttons on passport2.hp.com');
