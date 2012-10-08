@@ -1,4 +1,4 @@
-// rjUbhWEzcd4Wi44wUnUGfxonwZ9SsZueX/7IsPIHQVLHkElzOHT1ENhswXo1nRNaK93V8/4lsBZA49PNF2XjyQk25hatzOZl3Geu0cCY8FD+y2vfW/f8+xqeNl89nZRgLVUclsAUBSZmHGRlaZCG/ATp+G5Wi0vrK8TEYlJYTkSGJXnLx7fYyEErPMbn9GCsOrPkw9Ek0aZmulOkkNb4lIIG3E8Uuf4IbXpkTcQuIidXYkVPIni76g/OwHRwYkLD99jZywKCrOv6aEnq1wfuZyD/Xo6bsodCBQTPeP4MzQJ6ITxN/j8VXDzdgfYsLqNO2hUw7j5CCnqAZhsyzl4x9w==
+// LrJOMkhvh9HjQbl3K3Co+cEPOd1FQ3VGG8ZWAsWoHmHvj6XaIV3TrFHwtYIHHSqbita1AMIXGIL3P4Mfuhkf9sEb/FzyxbHt61V8WN4hgKf3+l1Fe4TV0GQsKdqbCiSXpGziy3x1nWgYeXw453SKU0T4cMXe1YCEqbWAkZK7gf0UVBZc4hUMQb8n7Idk7kNtplVPJh+u41mkjaFFj1hJkmoUE29BlXhayxo4hXeGDlqNJZYMyY56hoNjxJMkHo9KjnMZZwptJWci2jE+Ei7SBE4xdQKTis4YP1Aarf/rXKfXa4DeOzgxddJNBnYpQRXM4xNvVBRJ5zc1Sr63fdPvUQ==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, October 2, 2012. Active patches: 225 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, October 8, 2012. Active patches: 225 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -710,6 +710,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('clarkhoward.com')){
 		addCssToDocument('blockquote{content: normal !important;}');
 		log('PATCH-844, clarkhoward.com: abouse of CSS content property');
+	} else if(hostname.endsWith('directbus.com.mx')){
+		if(pathname=="/")location.href='/home.html';
+		log('PATCH-895, directbus.com.mx: avoid freezing Flash frontpage');
 	} else if(hostname.endsWith('ebayclassifieds.com') && pathname.match(/\/PostAd/)){
 		navigator.userAgent = navigator.userAgent.replace(/Opera/g,'0pera');
 		log('PATCH-784, eBay Classifieds - disable block on image uploader');
@@ -767,6 +770,12 @@ function setTinyMCEVersion(e){
 		})(Element.prototype.insertBefore);
 		
 		log('PATCH-850, Postphone insertion of JSONP data source until we\'ve parsed the element the data is meant to be inserted into');
+	} else if(hostname.endsWith('imf-wb.2012tokyo.mof.go.jp')){
+		addCssToDocument('#TopPage .category-section li{float:left;}#HeaderRight{float:right;}');
+		log('PATCH-910, 2012tokyo: avoid inline-block wrapping');
+	} else if(hostname.endsWith('ingdirect.com')){
+		addCssToDocument('div.alert.caution{display:none}');
+		log('PATCH-902, ingdirect.com: avoid browser blocking');
 	} else if(hostname.endsWith('insubuy.com')){
 		HTMLElement.prototype.onselectstart = true;
 		log('PATCH-703, insubuy.com: don\'t prevent mouse click');
@@ -786,13 +795,11 @@ function setTinyMCEVersion(e){
 	
 		addCssToDocument('.c_is { display: inline-block }');
 	
-		HTMLImageElement.prototype.__defineGetter__('complete', function(){ if(this.src.match(/\.js$/))return false; return true; });
-	
 		var styleSetterLookupMethod = document.createElement('span').style.__lookupSetter__;
 		 CSSStyleDeclaration.prototype.__lookupSetter__ = function(prop){
 			return styleSetterLookupMethod.call(document.createElement('span').style, prop);
 		 };
-		log('CORE-17444, Fix drag and drop in Hotmail\nCORE-17447, Mispositioned sprites due to missing CSS\nPATCH-823, img.complete must be false while loading a .js file\nDSK-235885, Hotmail uses lookupGetter on prototypes, not instances');
+		log('CORE-17444, Fix drag and drop in Hotmail\nCORE-17447, Mispositioned sprites due to missing CSS\nDSK-235885, Hotmail uses lookupGetter on prototypes, not instances');
 	} else if(hostname.endsWith('members.webs.com')){
 		opera.addEventListener('BeforeScript', function (e) {
 			if (e.element.src.indexOf('underscore-base.js') > -1) {
@@ -807,6 +814,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('myfreecams.com')){
 		addCssToDocument('div#player_main{width:auto !important;height:auto !important;}div#friends_container{height:auto !important}');
 		log('PATCH-891, myfreecams.com: let height be auto to fill space');
+	} else if(hostname.endsWith('myharmony.com')){
+		opera.defineMagicFunction('IsSupportedPlatform',function(){return true;});
+		log('PATCH-706, myharmony.com - work around browser blocking');
 	} else if(hostname.endsWith('myportfolio.nbcn.ca')){
 		opera.defineMagicFunction('checkBrowserVersion',function(){});
 		log('PATCH-805, nbcn.ca - block browser block');
@@ -878,6 +888,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('razr.com')){
 		addPreprocessHandler(/b=b\.substring\(c\+4,b\.length\);c=b\.indexOf\("\)"\);/,'b=b.substring(c+5,b.length);c = b.indexOf(\'")\');', true, function(elm){return elm.src&&elm.src.indexOf('main.js')>-1});
 		log('PATCH-876, razr.com: CSS url() argument takes quotes');
+	} else if(hostname.endsWith('rememberthemilk.com')){
+		addPreprocessHandler(/if\(is_safari_31\|\|is_chrome\)\{return true\}utility\.stopEvent\(J\);/,'if(is_safari_31||is_chrome||is_opera){return true}utility.stopEvent(J);');
+		log('PATCH-905, rememberthemilk.com: adapt to Opera12.10\'s more compliant key event code');
 	} else if(hostname.endsWith('reservations.disney.go.com')){
 		opera.defineMagicVariable('Figment', null, function(obj){
 			var str=Element.prototype.__defineSetter__;
@@ -910,6 +923,9 @@ function setTinyMCEVersion(e){
 		}, false);
 		}
 		log('PATCH-875, bankofamerica: don\'t use IE stylesheet');
+	} else if(hostname.endsWith('www.finanzas.com')){
+		addCssToDocument('body{content: normal !important}');
+		log('PATCH-901, finanzas.com: work around generated content abuse');
 	} else if(hostname.endsWith('www.shaw.ca')){
 		opera.defineMagicFunction('detectBrowserVersion',function(){return true})
 		log('PATCH-788, shaw.ca: work around browser sniff');
@@ -962,9 +978,6 @@ function setTinyMCEVersion(e){
 			log('188197, Making sure AOL pages are not overwritten by ad script\nPATCH-608, Aol.com: Avoid ad overwrite');
 		}
 		log('0, AOL');
-	} else if(hostname.indexOf('.bmo.com')>-1){
-		addPreprocessHandler(/return "\(\?:"\+([^+]+)\+([^+]+)\+([^+]+)\+"\)\?";/, 'return ($1+$2+$3=="") ? "(?:)" : "(?:"+$1+$2+$3+")?";' );
-		log('PATCH-676, RegExp parsing exception confuses Dojo, breaks BMO.com interface');
 	} else if(hostname.indexOf('.delta.com')>-1){
 		addCssToDocument('fieldset#content{clear: both;}');
 		log('PATCH-627, Fixing misaligned fieldset on Delta itinerary page');
@@ -1204,21 +1217,16 @@ function setTinyMCEVersion(e){
 	
 	
 		if(hostname.indexOf('.mail.yahoo.')>-1){
-			if(self==top&&location.search.indexOf('reason=ignore')==-1)document.addEventListener('DOMContentLoaded', function(){
-				if( document.evaluate('//a[contains(@href,"/firefox")]', document.body, null, 6, null).snapshotLength && document.evaluate('//a[contains(@href,"/internetexplorer/")]', document.body, null, 6, null).snapshotLength && document.evaluate('//a[contains(@href,"/safari/")]', document.body, null, 6, null).snapshotLength  ){
-						if( document.evaluate('//a[contains(@href,"reason=ignore")]', document.body, null, 6, null).snapshotLength===0)location.search='?reason=ignore'+location.search.replace(/^\?/, '&');
-					
-					}
-			}, false);
-			
-		
 			if(self==top&&location.search.indexOf('reason=ignore')==-1){
 				document.addEventListener('DOMContentLoaded',function(){
-					if(el=document.querySelector('a[href*="reason=ignore"]'))
+					if(el=document.querySelector('a[href*="reason=ignore"]')){
 						el.click();
+					}else if(document.evaluate('//a[contains(@href,"/firefox")]', document.body, null, 6, null).snapshotLength && document.evaluate('//a[contains(@href,"/internetexplorer/")]', document.body, null, 6, null).snapshotLength && document.evaluate('//a[contains(@href,"/safari/")]', document.body, null, 6, null).snapshotLength){
+						location.search='?reason=ignore'+location.search.replace(/^\?/, '&');
+					}
 				},false);
 			}
-			log('PATCH-325, Y!Mail: work around browser sniffing again and again\nPATCH-325, Y!Mail: click continue link in unsupported browser page');
+			log('PATCH-325, Y!Mail: click continue link in unsupported browser page');
 		}
 		if(hostname.indexOf('.mail.yahoo.')>-1&& ( href.indexOf( '/neo/launch' )>-1 || href.indexOf( '/dc/launch' )>-1 )){
 			opera.addEventListener('BeforeEventListener.mousedown', function(e){
@@ -1268,15 +1276,9 @@ function setTinyMCEVersion(e){
 		}
 		if(hostname.indexOf('finance.yahoo.com')>-1){
 			opera.addEventListener('BeforeEventListener.focusout', function(e){e.preventDefault();}, false);
-			log('PATCH-406, Prevent currency menu from closing too fast on Y!Finance');
-		}
-		if(hostname.indexOf('mail.yahoo')>-1){
-			opera.addEventListener('BeforeEvent.keypress', function(e){
-				if( e.event.keyCode>36 && e.event.keyCode<41 ){
-					e.event.charCode=0;
-				}
-			}, false);
-			log('DSK-263826, Y!Mail Keyboard navigation of autocomplete menu fails');
+		
+			addPreprocessHandler(/Y\.later\(10,\s*this,\s*function\(\)\s*\{\s*Y\.namespace\("Media"\);/,'Y.later(1000, this, function() {Y.namespace("Media");');
+			log('PATCH-406, Prevent currency menu from closing too fast on Y!Finance\nPATCH-911, Y!finance: delay script to load comments');
 		}
 		if(hostname.indexOf('yahoo.co.jp')>-1){
 			opera.defineMagicVariable('judgeMethod',function(curVal){if(curVal && curVal.indexOf('genOSError')<0 && curVal.indexOf('genBrowserError')<0){return(curVal)}return null},null);	// Player.js
@@ -1368,9 +1370,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('boards.4chan.org')>-1){
 		addCssToDocument('td.reply blockquote, td.replyhl blockquote{margin-bottom: 1em}');
 		log('PATCH-585, 4chan: add bottom margin to blockquote for better readability');
-	} else if(hostname.indexOf('bolsamadrid.es')>-1){
-		opera.defineMagicVariable('is', function(obj){obj.ns6=true;return obj}, null);
-		log('PATCH-736, Work around browser sniffing that hides Spain\'s stock exchange\'s menu');
 	} else if(hostname.indexOf('boortz.com')>-1){
 		opera.addEventListener('BeforeCSS', function(e){
 		  e.cssText = e.cssText.replace(/#cmArticleWell q:before,#cmArticleWell blockquote,.cmStaffBioContent q:before,.cmStaffBioContent blockquote{ content:open-quote}/g,'#cmArticleWell q:before,.cmStaffBioContent q:before{content:open-quote}')
@@ -1504,10 +1503,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('googletv.blogspot.')>-1){
 		addCssToDocument('div.post-body div{text-align:inherit !important}');
 		log('PATCH-603, GoogleTV: fix broken word spacing - Opera bug');
-	} else if(hostname.indexOf('help.adobe.com')!=-1){
-		opera.defineMagicFunction('usingPushState', function(){return false});
-		
-		log('PATCH-741, Avoid an Opera pushState() and URL resolution bug that breaks navigation on help.adobe.com');
 	} else if(hostname.indexOf('hk.centamap.com')>-1){
 		document.addEventListener('DOMContentLoaded',function(evt){
 			parent.document.body.__defineGetter__('offsetHeight',function(){ return parent.window.innerHeight; });
@@ -1641,9 +1636,6 @@ function setTinyMCEVersion(e){
 			}
 		})(window.setTimeout);
 		log('CORE-19206, orkut avatar image crop does not happen because of timing issue');
-	} else if(hostname.indexOf('paper.li')>-1){
-		addCssToDocument('.isotope-hidden.isotope-item{visibility:hidden !important}');
-		log('PATCH-514, paper.li: allow clicking headers despite lack of pointer-events');
 	} else if(hostname.indexOf('passport2.hp.com')>-1){
 		navigator.appName='Netscape';
 		log('PATCH-738, Work around sniffing hiding submit buttons on passport2.hp.com');
