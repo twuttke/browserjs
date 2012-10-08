@@ -1,4 +1,4 @@
-// RlD22540hzuVFqk627m3LJsLOdP+lKBtlMMqx9Q1umzWkRtOKfHEEr7pUdPXyVoqkauCtq4CmDQe8dMpNBwZrdQxkwikkWXMwGD+jKXLSKGCaoijYxvBflLshvLH6LtQrOaYL9WOniRVbNWSzHB/HWJohfA283kveoYsrspxWiSs+AEBCEV7TiCRdQ2V5J5oOENsfaFcrhDtrbOF/7PLH8BDsWeYCL925Sn66BPIAUV8YuvWjOmfstPo8NpnVWQPZ2NLkIYbuy/11AD1AYdR+v95nZLBh17OYpF6/27qTMe/n9z4YKlhaofihFKO3qK6EW1oe4QeDGUQcIudwsleBw==
+// B2Xgl4pyfAfmFGbSWvpbQwpr5s23eS6xIR81azoN8wRJjeXoorZbmBzLfC0/A1o9Qq7U29qCeHhnllP9+3xVqqTM97bzp5eWpWtRAg5Lg2F036wGCHB2SLOVJ3spXfeHajG7UFxybsVTDjVRZs+xakBaZ4ccJGfSZtEZ+dhjzUa70TT3XdgtYzMVnhn+TGNJhANyqNYGXnZYwgrj6P2mKa6DQ/u+l44OmmxoJHKPp4mvhy1VSbU8tR8bN5X/p+xkmQfVICpCtNz7oiPiJKPICnid1tuSeEy5WZZpRU+FbyVOesxpsLNb7smyMS8EZVLTjVxjVwzDb8WtrcumW43dEw==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.10 core 2.11.355, October 5, 2012. Active patches: 180 ';
+	var bjsversion=' Opera Mobile 12.10 core 2.11.355, October 8, 2012. Active patches: 181 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -472,6 +472,17 @@ function stopKeypressIfDownCancelled(stopKey){
 		if(hostname.indexOf('finance.yahoo.com')>-1){
 			opera.addEventListener('BeforeEventListener.focusout', function(e){e.preventDefault();}, false);
 			log('PATCH-406, Prevent currency menu from closing too fast on Y!Finance');
+		}
+		if(hostname.indexOf('m.yahoo.com')>-1){
+			addCssToDocument('.oneSearch input[type="search"]{margin-left:50px!important;padding-top:10px!important}'
+					+'.osFilterTrigger{left:0!important}'
+					+'.osSubmit{right:0!important;top:0!important}'
+					+'.tabSection > :first-child,.oneSearch{padding:2px;border-radius:25px;border:2px solid #ccc}'
+					+'.showingCat .catLabel {padding-left:44px!important;}'
+					+'.paginator{margin-top:4px!important;}'
+					+'*{box-sizing:border-box!important}'
+			);
+			log('PATCH-906, m.yahoo.com: adjust styles tailored for mobile webkit.');
 		}
 		if(hostname.indexOf('mail')==-1){
 			opera.addEventListener('AfterEventListener.load',
