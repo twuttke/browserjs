@@ -1,4 +1,4 @@
-// LrJOMkhvh9HjQbl3K3Co+cEPOd1FQ3VGG8ZWAsWoHmHvj6XaIV3TrFHwtYIHHSqbita1AMIXGIL3P4Mfuhkf9sEb/FzyxbHt61V8WN4hgKf3+l1Fe4TV0GQsKdqbCiSXpGziy3x1nWgYeXw453SKU0T4cMXe1YCEqbWAkZK7gf0UVBZc4hUMQb8n7Idk7kNtplVPJh+u41mkjaFFj1hJkmoUE29BlXhayxo4hXeGDlqNJZYMyY56hoNjxJMkHo9KjnMZZwptJWci2jE+Ei7SBE4xdQKTis4YP1Aarf/rXKfXa4DeOzgxddJNBnYpQRXM4xNvVBRJ5zc1Sr63fdPvUQ==
+// CQmD1y5UytdY7zzDsazzrQgHQHfz5gwlv6HsULgfuDQhdH7JBJH1iiL/PqOVL/whUbcgD3oFNWzQ5Nz3ioCYYXo5Jprpw+/QrhYdVHiHdoQ6Ty9eywlYPp+6lkoQxvKKHmNiEBdopiiS396ztf7bpnWeQtstKnxfomU9q11V/Hf2cuq4VXvqDkMt6xBS63EG4sZjBh9iBMIBi+s4npq7nfyL6IJcQhUzaNryhI4TSnisCuSjevR9JS+uY18rndNK2iIXmLkb7DP1k2MrHOGZ0KPjldBXAa1RKpASn83haTH/KuHSkfuO83IlcmpYyuo9TRubEkZf1+CXjM9BS/rigA==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, October 8, 2012. Active patches: 225 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, October 15, 2012. Active patches: 236 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -691,7 +691,11 @@ function setTinyMCEVersion(e){
 			e.event.target.dispatchEvent(evt);
 			}
 		,false);
-		log('PATCH-846, apple.com: don\'t reload from within unload handler\nPATCH-888, apple_core: CSS animations are unprefixed from Opera 12.10');
+	
+		if (hostname.endsWith('itunes.apple.com')) {
+			navigator.userAgent = navigator.userAgent.replace(/OS X (\d+).(\d+).(\d+)+;/,'OS X $1_$2_$3;');
+		}
+		log('PATCH-846, apple.com: don\'t reload from within unload handler\nPATCH-888, apple_core: CSS animations are unprefixed from Opera 12.10\nPATCH-924, apple.com - reformat OS X version string with underscores');
 	} else if(hostname.endsWith('aldoshoes.com')){
 		document.__defineSetter__('domain', function(){});
 		log('PATCH-808, aldoshoes.com - fix broken document.domain settings');
@@ -737,6 +741,9 @@ function setTinyMCEVersion(e){
 			},false);
 		}
 		log('PATCH-855, garmin.com - allow Opera to install and use Garmin Communicator Plugin\nPATCH-856, garmin.com - go back multiple pages after saving POI');
+	} else if(hostname.endsWith('gay.com')){
+		opera.defineMagicFunction('isSupportedBrowser', function() { return true; });
+		log('PATCH-879, gay.com - work around browser blocking');
 	} else if(hostname.endsWith('github.com')){
 		addCssToDocument('.social-count::before {margin-right:14px;margin-top:0;}.social-count::after {margin-right:13px;margin-top:0;}');
 		log('PATCH-815, github: work around misplaced arrows (Opera bug)');
@@ -782,6 +789,11 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('loyalbank.com')){
 		HTMLElement.prototype.onselectstart = true;
 		log('PATCH-707, loyalbank.com: prevent mousedown prevention');
+	} else if(hostname.endsWith('maerskfleet.com')){
+		navigator.userAgent = 'Firefox'+navigator.userAgent;
+		window.opera = null;
+		
+		log('PATCH-733, maerskfleet.com - work around browser sniffing');
 	} else if(hostname.endsWith('mail.live.com')){
 		function fixButton(e) {
 			if (e.button == 1) {
@@ -808,6 +820,18 @@ function setTinyMCEVersion(e){
 		}, false);
 		
 		log('PATCH-743, webs.com - fix reference to stylesheet variable');
+	} else if(hostname.endsWith('mog.com')){
+		opera.addEventListener('BeforeScript',function(ev){
+			var name=ev.element.src; 
+			if(!name){return;}
+			if(name.indexOf('player.min.js')>-1){
+				ev.element.text = ev.element.text.replace(/a.supported_browsers\s*=\s*\[/,'a.supported_browsers=["Opera",');
+			}else if(name.indexOf('global.js')>-1){
+				ev.element.text = ev.element.text.replace(/Mog.supported_browsers\s*=\s*\[/,'Mog.supported_browsers=["Opera",');
+			}
+		},false);
+		
+		log('PATCH-737, mog.com - report Opera as a supported browser');
 	} else if(hostname.endsWith('mycoast.cccd.edu')){
 		opera.defineMagicVariable('is_fox',function(){return true},null);
 		log('PATCH-804, mycoast.cccd.edu: block browser block');
@@ -828,6 +852,9 @@ function setTinyMCEVersion(e){
 			return value;
 		});
 		log('PATCH-513, office.microsoft.com: re-initialize video player after applying page overflow');
+	} else if(hostname.endsWith('oly-forum.com')){
+		addCssToDocument('#navigation ul#menu li { margin-left: 0; }');
+		log('PATCH-922, oly-forum.com: better placement of menu dropdown');
 	} else if(hostname.endsWith('onlystudy.cn')){
 		document.addEventListener('DOMContentLoaded',function(){
 			var elm = document.getElementById('loginpw');
@@ -911,6 +938,28 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('skype.com')){
 		fixJQueryAutocomplete();
 		log('PATCH-613, Work around sniffing in old jQuery autocomplete plugin');
+	} else if(hostname.endsWith('washingtonpost.com')){
+		addPreprocessHandler(  /if\(\(b\.webkit\|\|b\.gecko\)&&y\.type==="css"\)/  ,'if((b.webkit||b.gecko||b.opera)&&y.type==="css")' , true, function(el){return el.src.indexOf('yui/yui-min.js')>-1;} );
+	
+		avoidDocumentWriteAbuse(/<div id="trc_related_container".*/);
+		
+	
+		opera.defineMagicVariable('goodBrowser',function(){return true},null);
+		
+		log('PATCH-633, No load fires for LINK element if href returns an empty file with text/javascript type - breaks Washingtonpost.com slideshows\nPATCH-494, Washingtonpost: avoid articles being overwritten in race condition\nPATCH-832, Report that Opera is a good browser on The Washington Post');
+	} else if(hostname.endsWith('westelm.com')){
+		opera.addEventListener('BeforeExternalScript',function(ev){
+			var name=ev.element.src; 
+			if(!name){return;}
+			if(name.indexOf('mqResultsControllerMini.js')>-1){
+				window.navigator.appName = "Netscape";
+				opera.defineMagicFunction('mqXmlToStr', function(oRealFunc, oThis, xmlDoc) {
+					var serializer = new window.XMLSerializer();
+					return serializer.serializeToString(xmlDoc).replace('<?xml version="1.0"?>','');;
+				});
+			}
+		},false);
+		log('PATCH-750, westelm.com - Fix compatibility with old version of MapQuest API');
 	} else if(hostname.endsWith('www.auf.org')){
 		opera.defineMagicFunction('OldBrowserDetect',function(){return false})
 		log('PATCH-795, auf.org: work around broken sniffer');
@@ -926,6 +975,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.finanzas.com')){
 		addCssToDocument('body{content: normal !important}');
 		log('PATCH-901, finanzas.com: work around generated content abuse');
+	} else if(hostname.endsWith('www.lingvo.ru')){
+		addPreprocessHandler(/a\.unselectable="on";if\(window\.opera\)\{a\.onmousedown=function\(\)\{return\s*false\}\}/,'a.unselectable="on";if(!window.opera){a.onmousedown=function(){return false}}');
+		log('PATCH-925, lingvo.ru: prevent mousedown prevention');
 	} else if(hostname.endsWith('www.shaw.ca')){
 		opera.defineMagicFunction('detectBrowserVersion',function(){return true})
 		log('PATCH-788, shaw.ca: work around browser sniff');
@@ -1066,10 +1118,9 @@ function setTinyMCEVersion(e){
 		if(hostname.contains('docs.google.')){
 			opera.addEventListener('BeforeScript', function (e){
 				if (e.element.src.indexOf('trix_waffle') > -1 && e.element.src.indexOf('_core') > -1){
-					var foo = (/=[a-z]+\?(new [a-z]+)\([a-z]+\([a-z]+\)\):[a-z]+\?new [a-z]+\([a-z]+\([a-z]+\)\):[a-z]+\?(new [a-z]+)\([a-z]+\([a-z]+\)\)/gi).exec(e.element.text);
-					var bar = (/var [a-z]+=[a-z]+\.exec\([a-z]+\(\)\),[a-z]+=[a-z]+\?[a-z]+\[1\]:\"\"/gi).exec(e.element.text);
-					e.element.text = e.element.text.replace(/indexOf\("Opera"\)/g, 'indexOf("Opra")').replace(/indexOf\("WebKit"\)/g, 'indexOf("pera")').replace(new RegExp(foo[1],'g'),foo[2]).replace(/\?-2:0\,/gi,'?-2:-2,').replace(/[a-z]+\&\&[a-z]+\(\)\?0:[a-z]+\?0:1/gi,'0').replace(bar[0],bar[0].replace(/\"\"/g,'"537.1"'));
-					}
+					var foo = (/(\]\);)([a-z]+)=([a-z]+)==this\.[a-z]+;/gi).exec(e.element.text);
+					e.element.text = e.element.text.replace(/[a-z]+&&![a-z]+\([a-z]+\.keyCode\,this\.[a-z]+\,[a-z]+\.shiftKey\,[a-z]+\.ctrlKey\,[a-z]+\.altKey\)/gi,'!0').replace(foo[0],foo[0].replace(foo[1],foo[1]+'if('+foo[2]+'.type=="keydown")'+foo[3]+'='+foo[2]+'.keyCode;'));
+				}
 			}, false);
 			log('PATCH-382, Google Spreadsheets cell highligh mismatch and key event');
 		}
@@ -1472,7 +1523,11 @@ function setTinyMCEVersion(e){
 		if(hostname.endsWith('www.facebook.com')){
 		 addCssToDocument('.fbMercuryChatTab .fbChatMessageGroup .metaInfoContainer { float: right; position: inherit !important;} ');
 		}
-		log('PATCH-852, facebook: avoid unwanted chat box scroll');
+	
+		if(hostname.endsWith('www.facebook.com')){
+		 addCssToDocument('div.videoStage + div + div#fbPhotoPageTagBoxes{visibility:hidden;}');
+		}
+		log('PATCH-852, facebook: avoid unwanted chat box scroll\nPATCH-923, facebook: work around lack of pointer-events blocking video playback');
 	} else if(hostname.indexOf('fintyre.it')>-1){
 		navigator.appName = "Netscape";
 		log('PATCH-661, fintyre.it: work around sniffing');
@@ -1503,6 +1558,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('googletv.blogspot.')>-1){
 		addCssToDocument('div.post-body div{text-align:inherit !important}');
 		log('PATCH-603, GoogleTV: fix broken word spacing - Opera bug');
+	} else if(hostname.indexOf('groups.live.com')>-1){
+		addCssToDocument('span.et_main{padding-left:0 !important}');
+		log('PATCH-571, live.com: make file names visible');
 	} else if(hostname.indexOf('hk.centamap.com')>-1){
 		document.addEventListener('DOMContentLoaded',function(evt){
 			parent.document.body.__defineGetter__('offsetHeight',function(){ return parent.window.innerHeight; });
@@ -1700,7 +1758,9 @@ function setTinyMCEVersion(e){
 		log('SEOUL-609, ActiveX installation page redirect on siren24.com due to sniffing limitation on redirect script');
 	} else if(hostname.indexOf('skydrive.live.com')>-1){
 		MouseEvent.prototype.__defineGetter__('button',function(){return this.which == 2 ? 1 : this.which == 3 ? 2 : 0;;})
-		log('PATCH-679, skydrive: correct MouseEvent which');
+	
+		addCssToDocument('span.et_main{padding-left:0 !important}');
+		log('PATCH-679, skydrive: correct MouseEvent which\nPATCH-571, live.com: make file names visible');
 	} else if(hostname.indexOf('smithbarney.com')>-1){
 		HTMLInputElement.prototype.__defineSetter__('type',function(){
 			if (this.getAttribute('type')!=arguments[0]) {
@@ -1777,12 +1837,6 @@ function setTinyMCEVersion(e){
 		navigator.appName='Netscape';
 		opera.defineMagicVariable('browserType',function(){return 'gecko'},null);
 		log('PATCH-492, virginamerica.com - Fix browser sniffing');
-	} else if(hostname.indexOf('washingtonpost.com')>-1){
-		addPreprocessHandler(  /if\(\(b\.webkit\|\|b\.gecko\)&&y\.type==="css"\)/  ,'if((b.webkit||b.gecko||b.opera)&&y.type==="css")' , true, function(el){return el.src.indexOf('yui/yui-min.js')>-1;} );
-	
-		avoidDocumentWriteAbuse(/<div id="trc_related_container".*/);
-		
-		log('PATCH-633, No load fires for LINK element if href returns an empty file with text/javascript type - breaks Washingtonpost.com slideshows\nPATCH-494, Washingtonpost: avoid articles being overwritten in race condition');
 	} else if(hostname.indexOf('webprint.post.japanpost.jp')>-1){
 		opera.defineMagicFunction('_supportsDOM',function (oReal,oThis) { return true; });
 		log('PATCH-449, japanpost.jp: Fix broken _supportsDOM function');
