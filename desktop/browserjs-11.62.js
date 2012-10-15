@@ -1,4 +1,4 @@
-// r+5h2mNSiy54w3Q3b7aXPhkTWbiMTqF29xPu5K3zx6WhmYZMpwFSq7sbHi8oR+T1JSK7Nk2TjYPO8URdOwzxcKMhOKOe4VGKJsaXZN7B6NLM8VPjDDM36KWJdOAaND8NVh9hZ3IlE9xHhT7oqh80dppWYlpq7HdhuwXX9fPllTb7hQGYGPFyx8fvz3f4dw1fzxjEyjwYipUzwMcxJYXMiHH6jMoNk680UCxJ7TwO/Z83Nrq7KuhX2CYkfFtaisM7GJABf6IA9ZI4hT3wudeu9V90OzUxoXbZhb4+cWXy+l8lZTOIw6R3USG5/7mUqe79JGXTfs43qchrtjUh+aD18g==
+// m908An0EvKQ7CVd6PWNUQhDui/KBMq87x74lF4p5dqEle7jIh9BmwV1jtKt2qLoQRiYkzKfSLp0/x0Eq/ON0+f853xjoJWgdOQFxY0M2vjuoUt7izCjZcqZ6D/ZmDggLOBhZqoNDyymNXhcxkum8C3SKb71NLNQHJ95SxgoajGGP397xNjD2xoiUSAfLwPcgTMK6sj5XLeMlgsSLywSg0+j+Jqv62fLRx522c9ysuKKL332lLKZzdeMQgCW4B2brPnWnHn2fhVRrA+5zU3ivhQXXqTy+RZVKhpvtZ24gr1MoL02aj+wIZODeceaAPInBbKa1AgHMwmGlpT7GSHaeFA==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, October 8, 2012. Active patches: 259 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, October 15, 2012. Active patches: 266 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -689,7 +689,11 @@ function setTinyMCEVersion(e){
 		if(hostname.indexOf('daw.')>-1){
 		 addCssToDocument('#globalheader #globalnav li{width: auto !important}');
 		}
-		log('PATCH-387, Make Apple Store menu visible\nPATCH-387, Enable menu on Apple support pages\nPATCH-387, Enable menu on Apple community pages');
+	
+		if (hostname.endsWith('itunes.apple.com')) {
+			navigator.userAgent = navigator.userAgent.replace(/OS X (\d+).(\d+).(\d+)+;/,'OS X $1_$2_$3;');
+		}
+		log('PATCH-387, Make Apple Store menu visible\nPATCH-387, Enable menu on Apple support pages\nPATCH-387, Enable menu on Apple community pages\nPATCH-924, apple.com - reformat OS X version string with underscores');
 	} else if(hostname.endsWith('aldoshoes.com')){
 		document.__defineSetter__('domain', function(){});
 		log('PATCH-808, aldoshoes.com - fix broken document.domain settings');
@@ -729,6 +733,9 @@ function setTinyMCEVersion(e){
 			},false);
 		}
 		log('PATCH-855, garmin.com - allow Opera to install and use Garmin Communicator Plugin\nPATCH-856, garmin.com - go back multiple pages after saving POI');
+	} else if(hostname.endsWith('gay.com')){
+		opera.defineMagicFunction('isSupportedBrowser', function() { return true; });
+		log('PATCH-879, gay.com - work around browser blocking');
 	} else if(hostname.endsWith('github.com')){
 		addCssToDocument('.social-count::before {margin-right:14px;margin-top:0;}.social-count::after {margin-right:13px;margin-top:0;}');
 		log('PATCH-815, github: work around misplaced arrows (Opera bug)');
@@ -756,6 +763,11 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('loyalbank.com')){
 		HTMLElement.prototype.onselectstart = true;
 		log('PATCH-707, loyalbank.com: prevent mousedown prevention');
+	} else if(hostname.endsWith('maerskfleet.com')){
+		navigator.userAgent = 'Firefox'+navigator.userAgent;
+		window.opera = null;
+		
+		log('PATCH-733, maerskfleet.com - work around browser sniffing');
 	} else if(hostname.endsWith('mail.live.com')){
 		function fixButton(e) {
 			if (e.button == 1) {
@@ -791,6 +803,18 @@ function setTinyMCEVersion(e){
 		}, false);
 		
 		log('PATCH-743, webs.com - fix reference to stylesheet variable');
+	} else if(hostname.endsWith('mog.com')){
+		opera.addEventListener('BeforeScript',function(ev){
+			var name=ev.element.src; 
+			if(!name){return;}
+			if(name.indexOf('player.min.js')>-1){
+				ev.element.text = ev.element.text.replace(/a.supported_browsers\s*=\s*\[/,'a.supported_browsers=["Opera",');
+			}else if(name.indexOf('global.js')>-1){
+				ev.element.text = ev.element.text.replace(/Mog.supported_browsers\s*=\s*\[/,'Mog.supported_browsers=["Opera",');
+			}
+		},false);
+		
+		log('PATCH-737, mog.com - report Opera as a supported browser');
 	} else if(hostname.endsWith('mycoast.cccd.edu')){
 		opera.defineMagicVariable('is_fox',function(){return true},null);
 		log('PATCH-804, mycoast.cccd.edu: block browser block');
@@ -890,6 +914,28 @@ function setTinyMCEVersion(e){
 		})();
 		
 		log('PATCH-769, Opera throws when XSL variable has disable-output-escaping attribute, breaks sorting on staples.com');
+	} else if(hostname.endsWith('washingtonpost.com')){
+		addPreprocessHandler(  /if\(\(b\.webkit\|\|b\.gecko\)&&y\.type==="css"\)/  ,'if((b.webkit||b.gecko||b.opera)&&y.type==="css")' , true, function(el){return el.src.indexOf('yui/yui-min.js')>-1;} );
+	
+		avoidDocumentWriteAbuse(/<div id="trc_related_container".*/);
+		
+	
+		opera.defineMagicVariable('goodBrowser',function(){return true},null);
+		
+		log('PATCH-633, No load fires for LINK element if href returns an empty file with text/javascript type - breaks Washingtonpost.com slideshows\nPATCH-494, Washingtonpost: avoid articles being overwritten in race condition\nPATCH-832, Report that Opera is a good browser on The Washington Post');
+	} else if(hostname.endsWith('westelm.com')){
+		opera.addEventListener('BeforeExternalScript',function(ev){
+			var name=ev.element.src; 
+			if(!name){return;}
+			if(name.indexOf('mqResultsControllerMini.js')>-1){
+				window.navigator.appName = "Netscape";
+				opera.defineMagicFunction('mqXmlToStr', function(oRealFunc, oThis, xmlDoc) {
+					var serializer = new window.XMLSerializer();
+					return serializer.serializeToString(xmlDoc).replace('<?xml version="1.0"?>','');;
+				});
+			}
+		},false);
+		log('PATCH-750, westelm.com - Fix compatibility with old version of MapQuest API');
 	} else if(hostname.endsWith('www.auf.org')){
 		opera.defineMagicFunction('OldBrowserDetect',function(){return false})
 		log('PATCH-795, auf.org: work around broken sniffer');
@@ -1659,7 +1705,11 @@ function setTinyMCEVersion(e){
 		 }, false);
 		}
 		
-		log('PATCH-630, facebook: work around Opera\'s too strict origin checks on https for https -> http(s) other site -> https IFRAME communication\nPATCH-714, facebook: prevent chat window overflow - Presto bug\nPATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status\nPATCH-558, Facebook avoid chat list scroll\nPATCH-573, Facebook\'s border-radius triggers hyperactive reflow bug, performance suffers');
+	
+		if(hostname.endsWith('www.facebook.com')){
+		 addCssToDocument('div.videoStage + div + div#fbPhotoPageTagBoxes{visibility:hidden;}');
+		}
+		log('PATCH-630, facebook: work around Opera\'s too strict origin checks on https for https -> http(s) other site -> https IFRAME communication\nPATCH-714, facebook: prevent chat window overflow - Presto bug\nPATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status\nPATCH-558, Facebook avoid chat list scroll\nPATCH-573, Facebook\'s border-radius triggers hyperactive reflow bug, performance suffers\nPATCH-923, facebook: work around lack of pointer-events blocking video playback');
 	} else if(hostname.indexOf('fintyre.it')>-1){
 		navigator.appName = "Netscape";
 		log('PATCH-661, fintyre.it: work around sniffing');
@@ -2044,12 +2094,6 @@ function setTinyMCEVersion(e){
 		window.constructor={};
 		window.constructor.prototype={};
 		log('PATCH-522, wangpiao.com: allow seat selection');
-	} else if(hostname.indexOf('washingtonpost.com')>-1){
-		addPreprocessHandler(  /if\(\(b\.webkit\|\|b\.gecko\)&&y\.type==="css"\)/  ,'if((b.webkit||b.gecko||b.opera)&&y.type==="css")' , true, function(el){return el.src.indexOf('yui/yui-min.js')>-1;} );
-	
-		avoidDocumentWriteAbuse(/<div id="trc_related_container".*/);
-		
-		log('PATCH-633, No load fires for LINK element if href returns an empty file with text/javascript type - breaks Washingtonpost.com slideshows\nPATCH-494, Washingtonpost: avoid articles being overwritten in race condition');
 	} else if(hostname.indexOf('webprint.post.japanpost.jp')>-1){
 		opera.defineMagicFunction('_supportsDOM',function (oReal,oThis) { return true; });
 		log('PATCH-449, japanpost.jp: Fix broken _supportsDOM function');
