@@ -1,4 +1,4 @@
-// CQmD1y5UytdY7zzDsazzrQgHQHfz5gwlv6HsULgfuDQhdH7JBJH1iiL/PqOVL/whUbcgD3oFNWzQ5Nz3ioCYYXo5Jprpw+/QrhYdVHiHdoQ6Ty9eywlYPp+6lkoQxvKKHmNiEBdopiiS396ztf7bpnWeQtstKnxfomU9q11V/Hf2cuq4VXvqDkMt6xBS63EG4sZjBh9iBMIBi+s4npq7nfyL6IJcQhUzaNryhI4TSnisCuSjevR9JS+uY18rndNK2iIXmLkb7DP1k2MrHOGZ0KPjldBXAa1RKpASn83haTH/KuHSkfuO83IlcmpYyuo9TRubEkZf1+CXjM9BS/rigA==
+// CjxGQ6fFp1uWrrN5ikkJTwiE1hb0HLnRR/rRFFe4vyg3jbzb2T7mR+E2CoRGpedP7YHFwCqTukXi86Kc2zQBPMK3aSWzhhQ1DfsFuxTuD0hTqAW/x/vD+7plqPou+tO6NwjZvaj3wBuqPvAoc6jzr4NpmvW2lu+4clLkAiOZXjhoNDPSaegdShZjE6LHv5aQ5RAO+/CJArCHEPYyjLOBXtRnB4QByjP4ojQ449VoXpfKxE3g6TxY9zsXN2Tzq/eewmlhDVFeG3ldtoZF0yHFix9Ac2aggLGfgUR/Pyqy0S5UrV/7dgto4BXHaQ4VjHJ2qmGZ0aHxN+RThU+csTqUqw==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, October 15, 2012. Active patches: 236 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, October 19, 2012. Active patches: 248 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -288,6 +288,13 @@ function fixOpenCube(name){// IMPORTANT gotcha: the fixOpenCube and fixHVMenu fu
 	}
 }
 
+function fixTransitionEndCase(){
+	opera.addEventListener('BeforeEventListener.otransitionend', function(e){
+		e.event.__defineGetter__('type', function(){
+			return 'oTransitionEnd';
+		});
+	}, false);
+}
 	function fixUDM(name){
 		if(fixed){return;}fixed=true;
 		defineMagicVariable.call=call;
@@ -665,6 +672,23 @@ function setTinyMCEVersion(e){
 	} else if(hostname.contains('sheet.zoho.com')){
 		MouseEvent.prototype.axis=2;
 		log('PATCH-766, Make mouse scrolling work in Zoho spreadsheets');
+	} else if(hostname.endsWith("ikea.com")){
+		opera.addEventListener('AfterScript', 
+			function(e) {
+				if (e.element.src.indexOf('prodInfo.js') > -1) {
+					var f = localPricePip.bindMouseDownOnLocalPrice;
+					var called = false;
+					localPricePip.bindMouseDownOnLocalPrice = function() {
+						if (called) {
+							return;
+						}
+						called = true;
+						return f.apply(this, arguments);
+					};
+				}
+			},
+		false); 
+		log('PATCH-940, Prevent double registering of click handler');
 	} else if(hostname.endsWith('.apple.com')){
 		addPreprocessHandler(/window\.onunload\s*=\s*function\(\)\{\s*location\.reload\(true\);\};/g,'');
 	
@@ -786,6 +810,12 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('insubuy.com')){
 		HTMLElement.prototype.onselectstart = true;
 		log('PATCH-703, insubuy.com: don\'t prevent mouse click');
+	} else if(hostname.endsWith('khanacademy.org')){
+		fixTransitionEndCase();
+		log('PATCH-892, Fix transition event case to un-confuse jQuery');
+	} else if(hostname.endsWith('kmart.com')){
+		addCssToDocument('.scrollWidget .slider { top: 0; } .thumbWidget .slider2 { top: 0; }');
+		log('PATCH-847, kmart.com - fix moving product thumbnail images');
 	} else if(hostname.endsWith('loyalbank.com')){
 		HTMLElement.prototype.onselectstart = true;
 		log('PATCH-707, loyalbank.com: prevent mousedown prevention');
@@ -844,6 +874,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('myportfolio.nbcn.ca')){
 		opera.defineMagicFunction('checkBrowserVersion',function(){});
 		log('PATCH-805, nbcn.ca - block browser block');
+	} else if(hostname.endsWith('netflix.com')){
+		addCssToDocument('#SLPlayerWrapper { display: none; }');
+		log('PATCH-946, netflix: avoid player init issues');
 	} else if(hostname.endsWith('office.microsoft.com')){
 		opera.defineMagicFunction('FIsFirefox',function(){return true});
 		opera.defineMagicFunction('ResizeVideoControl',function(oF,oT){
@@ -861,6 +894,9 @@ function setTinyMCEVersion(e){
 			if(elm)elm.setAttribute('onKeyDown',elm.getAttribute('onKeyDown').replace(/KsdOnKeyDown\(\)/,'KsdOnKeyDown(e)'))
 		},false);
 		log('PATCH-873, Make sure an event is passed in to the handler');
+	} else if(hostname.endsWith('openphoto.me')){
+		fixTransitionEndCase();
+		log('PATCH-874, Fix transition event case to un-confuse jQuery');
 	} else if(hostname.endsWith('pb.com')){
 		navigator.userAgent=navigator.userAgent.replace( /Opera/g, '0pera not Mozilla' );
 	
@@ -929,6 +965,9 @@ function setTinyMCEVersion(e){
 		});
 		
 		log('PATCH-794, Prevent broken innerHTML setter on Disney booking site');
+	} else if(hostname.endsWith('ruter.no')){
+		fixJQueryAutocomplete();
+		log('PATCH-934, ruter.no: jQuery autocompleter');
 	} else if(hostname.endsWith('sears.com')){
 		addCssToDocument('.scrollWidget .slider { top: 0; } .thumbWidget .slider2 { top: 0; }');
 		log('PATCH-847, sears.com - fix moving product thumbnail images');
@@ -938,6 +977,12 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('skype.com')){
 		fixJQueryAutocomplete();
 		log('PATCH-613, Work around sniffing in old jQuery autocomplete plugin');
+	} else if(hostname.endsWith('thaiair.co.jp')){
+		navigator.appName = 'M'+navigator.appName;
+		log('PATCH-943, thaiair.co.jp - fix drop-down menu positioning');
+	} else if(hostname.endsWith('viaplay.no')){
+		addCssToDocument('div.overlay.disabled,div.dim{display:none !important}');
+		log('PATCH-931, viaplay.no: dismiss browser warning');
 	} else if(hostname.endsWith('washingtonpost.com')){
 		addPreprocessHandler(  /if\(\(b\.webkit\|\|b\.gecko\)&&y\.type==="css"\)/  ,'if((b.webkit||b.gecko||b.opera)&&y.type==="css")' , true, function(el){return el.src.indexOf('yui/yui-min.js')>-1;} );
 	
@@ -972,12 +1017,21 @@ function setTinyMCEVersion(e){
 		}, false);
 		}
 		log('PATCH-875, bankofamerica: don\'t use IE stylesheet');
+	} else if(hostname.endsWith('www.dickmorris.com')){
+		addCssToDocument('*{content:normal !important}')
+		log('PATCH-929, dickmorris.com - avoid empty lightbox');
 	} else if(hostname.endsWith('www.finanzas.com')){
 		addCssToDocument('body{content: normal !important}');
 		log('PATCH-901, finanzas.com: work around generated content abuse');
 	} else if(hostname.endsWith('www.lingvo.ru')){
 		addPreprocessHandler(/a\.unselectable="on";if\(window\.opera\)\{a\.onmousedown=function\(\)\{return\s*false\}\}/,'a.unselectable="on";if(!window.opera){a.onmousedown=function(){return false}}');
 		log('PATCH-925, lingvo.ru: prevent mousedown prevention');
+	} else if(hostname.endsWith('www.nfl.com')){
+		addPreprocessHandler( /if\(y&&y\["display"\]==="none"\)\{w=true;\}/ , '' , true , function(el){return ( el.src.indexOf('&g=nflbase')>-1 && el.src.indexOf('yui/min2/index.php')>-1 );} );
+		log('PATCH-936, nfl.com: avoid hundreds of reflows');
+	} else if(hostname.endsWith('www.omv.cz')){
+		fixIFrameSSIscriptII('resizeIframeToFitContent');
+		log('PATCH-937, omv.cz: old iframe resize script');
 	} else if(hostname.endsWith('www.shaw.ca')){
 		opera.defineMagicFunction('detectBrowserVersion',function(){return true})
 		log('PATCH-788, shaw.ca: work around browser sniff');
@@ -1328,7 +1382,7 @@ function setTinyMCEVersion(e){
 		if(hostname.indexOf('finance.yahoo.com')>-1){
 			opera.addEventListener('BeforeEventListener.focusout', function(e){e.preventDefault();}, false);
 		
-			addPreprocessHandler(/Y\.later\(10,\s*this,\s*function\(\)\s*\{\s*Y\.namespace\("Media"\);/,'Y.later(1000, this, function() {Y.namespace("Media");');
+			addPreprocessHandler(/Y\.later\(10,\s*this,\s*function\(\)\s*\{\s*\/\*\s*if/,'Y.later(10, this, function() {/*if');
 			log('PATCH-406, Prevent currency menu from closing too fast on Y!Finance\nPATCH-911, Y!finance: delay script to load comments');
 		}
 		if(hostname.indexOf('yahoo.co.jp')>-1){
@@ -1776,6 +1830,20 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('smn.gov.ar')>-1){
 		addCssToDocument('input#busqueda{max-width:108px}');
 		log('PATCH-572, smn.gov.ar: reduce search input width to avoid wrapping');
+	} else if(hostname.indexOf('social.')>-1&&hostname.indexOf('.microsoft.')>-1){
+		opera.defineMagicFunction('Editor_onLoad', function(oFunc, oThis){ 
+			try{
+				var editor = $(oThis).data('tEditor');
+				var range=editor.document.createRange();
+				range.setStart(editor.body, 0);
+				range.setEnd(editor.body, 0);
+				editor.document.defaultView.getSelection().removeAllRanges();
+				editor.document.defaultView.getSelection().addRange(range);
+			}catch(e){opera.postError(e);}
+			return oFunc.apply(oThis, [].slice.call(arguments,2));
+		});
+		
+		log('PATCH-932, Work around race condition bug where script calls selection.collapseToEnd() before there is a selection, makes it possible to reply on MS forum');
 	} else if(hostname.indexOf('sslsecure.maybank.com')>-1){
 		opera.defineMagicFunction('MM_checkBrowser', function(){});
 		log('PATCH-415, Browser sniffing causes 404 page on login to Maybank');
