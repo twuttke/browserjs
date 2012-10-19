@@ -1,4 +1,4 @@
-// cQ/Hm+Y38Wa5mXl/L8s09QSnO4V6LUnBqHbe+3iMcphzogbZIcuuriYuuLUqk7hIQGZqtBuXVFLOBGO2aNn0BiUf/Hs2BJhZWQndHpW/qrr3inMUrusbJQrk8HFjqweOz8wfe1862dmFxRuxJ2Vb5yzmh6UqkNlJj3V3ZHXHW6y/Q+K1ICTzVFhnq1qX4+Dm9hM9+Hq9c8Fns2Hgfr5fJO5oo4xcHYh3K8PmLMwr1yuYkgIJUO/qwNVvVF9mPcPTxIm1zECdeQcIGsEhNH8QdLhnLDS1TBw+vjGzXE9XDJnpGC7O6Dnq77NBixJrIQh9jhr8bq4y65mgQ18Zy6woSA==
+// hqJqF/NQkaSUF9jxcHFHGOiU6j/oPWcrtYH/EL1dj76Yd1DJpPhDgXcsy2FnphFl/g6O624IBg1Z9fIG01KzBUP3Rudy4Ld38MNpEvRqZ1GuWZ6CRsnOvfQsDQRv5Xxdt91nc4ocAKXKkCGIu6DEAM3eJ0JVRKpzkBm5kvlD0BL/HPnfa7iHxQFPpl22j3iJJ5BVsmPYC/8uNltLQQ32ivyb6cvV7lW4Zni6EIRwpyloxBreRrwODdKJF3GX1Z19ojDO4ZPFTLEwxKfOg/qjbHqc4ARF9wea9XYMHNCAK78kOWhmaYrCdVmX85/EvsuoE9//z6xr5f182+Q/3/7tNg==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, October 15, 2012. Active patches: 273 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, October 19, 2012. Active patches: 282 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -699,6 +699,23 @@ function setTinyMCEVersion(e){
 	} else if(hostname.contains('sheet.zoho.com')){
 		MouseEvent.prototype.axis=2;
 		log('PATCH-766, Make mouse scrolling work in Zoho spreadsheets');
+	} else if(hostname.endsWith("ikea.com")){
+		opera.addEventListener('AfterScript', 
+			function(e) {
+				if (e.element.src.indexOf('prodInfo.js') > -1) {
+					var f = localPricePip.bindMouseDownOnLocalPrice;
+					var called = false;
+					localPricePip.bindMouseDownOnLocalPrice = function() {
+						if (called) {
+							return;
+						}
+						called = true;
+						return f.apply(this, arguments);
+					};
+				}
+			},
+		false); 
+		log('PATCH-940, Prevent double registering of click handler');
 	} else if(hostname.endsWith('.apple.com')){
 		if(hostname.indexOf('store.')>-1){
 		 addCssToDocument('#apple-header.enhanced .links li{width: auto !important}');
@@ -718,6 +735,9 @@ function setTinyMCEVersion(e){
 			navigator.userAgent = navigator.userAgent.replace(/OS X (\d+).(\d+).(\d+)+;/,'OS X $1_$2_$3;');
 		}
 		log('PATCH-387, Make Apple Store menu visible\nPATCH-387, Enable menu on Apple support pages\nPATCH-387, Enable menu on Apple community pages\nPATCH-846, apple.com: don\'t reload from within unload handler\nPATCH-924, apple.com - reformat OS X version string with underscores');
+	} else if(hostname.endsWith('airbnb.com')){
+		fixTransitionEndCase();
+		log('PATCH-935, Fix case for transitionend event on airbnb.com.');
 	} else if(hostname.endsWith('aldoshoes.com')){
 		document.__defineSetter__('domain', function(){});
 		log('PATCH-808, aldoshoes.com - fix broken document.domain settings');
@@ -811,6 +831,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('khanacademy.org')){
 		fixTransitionEndCase();
 		log('PATCH-892, Fix transition event case to un-confuse jQuery');
+	} else if(hostname.endsWith('kmart.com')){
+		addCssToDocument('.scrollWidget .slider { top: 0; } .thumbWidget .slider2 { top: 0; }');
+		log('PATCH-847, kmart.com - fix moving product thumbnail images');
 	} else if(hostname.endsWith('loyalbank.com')){
 		HTMLElement.prototype.onselectstart = true;
 		log('PATCH-707, loyalbank.com: prevent mousedown prevention');
@@ -878,6 +901,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('myportfolio.nbcn.ca')){
 		opera.defineMagicFunction('checkBrowserVersion',function(){});
 		log('PATCH-805, nbcn.ca - block browser block');
+	} else if(hostname.endsWith('netflix.com')){
+		addCssToDocument('#SLPlayerWrapper { display: none; }');
+		log('PATCH-946, netflix: avoid player init issues');
 	} else if(hostname.endsWith('office.microsoft.com')){
 		opera.defineMagicFunction('FIsFirefox',function(){return true});
 		opera.defineMagicFunction('ResizeVideoControl',function(oF,oT){
@@ -888,7 +914,7 @@ function setTinyMCEVersion(e){
 		log('PATCH-513, office.microsoft.com: re-initialize video player after applying page overflow');
 	} else if(hostname.endsWith('oly-forum.com')){
 		addCssToDocument('#navigation ul#menu li { margin-left: 0; }');
-		log('PATCH-922, oly-forum.com: better placemnet of menu dropdown');
+		log('PATCH-922, oly-forum.com: better placement of menu dropdown');
 	} else if(hostname.endsWith('onlystudy.cn')){
 		document.addEventListener('DOMContentLoaded',function(){
 			var elm = document.getElementById('loginpw');
@@ -986,6 +1012,12 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('tedxboulder.com')){
 		fixTransitionEndCase();
 		log('PATCH-874, Fix transition event case to un-confuse jQuery');
+	} else if(hostname.endsWith('thaiair.co.jp')){
+		navigator.appName = 'M'+navigator.appName;
+		log('PATCH-943, thaiair.co.jp - fix drop-down menu positioning');
+	} else if(hostname.endsWith('viaplay.no')){
+		addCssToDocument('div.overlay.disabled,div.dim{display:none !important}');
+		log('PATCH-931, viaplay.no: dismiss browser warning');
 	} else if(hostname.endsWith('washingtonpost.com')){
 		addPreprocessHandler(  /if\(\(b\.webkit\|\|b\.gecko\)&&y\.type==="css"\)/  ,'if((b.webkit||b.gecko||b.opera)&&y.type==="css")' , true, function(el){return el.src.indexOf('yui/yui-min.js')>-1;} );
 	
@@ -1020,12 +1052,21 @@ function setTinyMCEVersion(e){
 		}, false);
 		}
 		log('PATCH-875, bankofamerica: don\'t use IE stylesheet');
+	} else if(hostname.endsWith('www.dickmorris.com')){
+		addCssToDocument('*{content:normal !important}')
+		log('PATCH-929, dickmorris.com - avoid empty lightbox');
 	} else if(hostname.endsWith('www.finanzas.com')){
 		addCssToDocument('body{content: normal !important}');
 		log('PATCH-901, finanzas.com: work around generated content abuse');
 	} else if(hostname.endsWith('www.lingvo.ru')){
 		addPreprocessHandler(/a\.unselectable="on";if\(window\.opera\)\{a\.onmousedown=function\(\)\{return\s*false\}\}/,'a.unselectable="on";if(!window.opera){a.onmousedown=function(){return false}}');
 		log('PATCH-925, lingvo.ru: prevent mousedown prevention');
+	} else if(hostname.endsWith('www.nfl.com')){
+		addPreprocessHandler( /if\(y&&y\["display"\]==="none"\)\{w=true;\}/ , '' , true , function(el){return ( el.src.indexOf('&g=nflbase')>-1 && el.src.indexOf('yui/min2/index.php')>-1 );} );
+		log('PATCH-936, nfl.com: avoid hundreds of reflows');
+	} else if(hostname.endsWith('www.omv.cz')){
+		fixIFrameSSIscriptII('resizeIframeToFitContent');
+		log('PATCH-937, omv.cz: old iframe resize script');
 	} else if(hostname.endsWith('www.shaw.ca')){
 		opera.defineMagicFunction('detectBrowserVersion',function(){return true})
 		log('PATCH-788, shaw.ca: work around browser sniff');
@@ -1426,7 +1467,7 @@ function setTinyMCEVersion(e){
 		if(hostname.indexOf('finance.yahoo.com')>-1){
 			opera.addEventListener('BeforeEventListener.focusout', function(e){e.preventDefault();}, false);
 		
-			addPreprocessHandler(/Y\.later\(10,\s*this,\s*function\(\)\s*\{\s*Y\.namespace\("Media"\);/,'Y.later(1000, this, function() {Y.namespace("Media");');
+			addPreprocessHandler(/Y\.later\(10,\s*this,\s*function\(\)\s*\{\s*\/\*\s*if/,'Y.later(10, this, function() {/*if');
 			log('PATCH-406, Prevent currency menu from closing too fast on Y!Finance\nPATCH-911, Y!finance: delay script to load comments');
 		}
 		if(hostname.indexOf('mail.yahoo')>-1){
