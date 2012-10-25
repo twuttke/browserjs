@@ -1,4 +1,4 @@
-// vdKJzuJU3e+85QuUybilHXxL+SvydIHnclEouDguz/BZO9F0dMquwLcjkCN+sT7ancrc/rrcOcf+y8vLLY2kwZxE9TUQ+QtWAAcfTJL1r7rRoeQjRLCXNBFoii0s5/DuO1COocCg7Qgi51E5IkCeD984l9GDZ4n26r+CT18+jAGTGSKNgjx5qbduvq0VOlSznf0qDG56kRSZDcROjw4678JNzbfWAgX6SfRK3+usT1SVij2ud+o761xGPmwhFNyVeURv1NfknXTfNMHS4g/TbCPQuQzwgxFwqlSAjfZZVS8Q9sl8tVrFDwz37/ZK1QjFbVkEOUcab3SWcpSU2W1pTQ==
+// u+21jE/JnSX2Y0daNSc6iQTZr42RNab7ckpt8rSIGWcTANdCAWSF3h5n9BYUDvnR9UEuquHSPN72nVKPJCU6227ppoJisgWNsHGP4u+X1L4v6T6/dV7LQHFA71uiZ42DYxguTDm72YFkMp7URyrhx2h3oj9+ot3L4XUFgdKt5EM4J2aEOlFPptBEja0DOym2EPYgnF/uFOWgM8X7B4YYfzFjR4OjyawqyHTMFYsxTBCrSy4rGj9qlQMEpWorJCh/bmsjjil5V0mPxzzaGjrYfIsHn3yFD6H+uvhE9W9Q8R2IPXxYfq537izVHGnpERKkOflIPVaHZMZoJR6wgySh7A==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.10 core 2.11.355, October 23, 2012. Active patches: 190 ';
+	var bjsversion=' Opera Mobile 12.10 core 2.11.355, October 25, 2012. Active patches: 192 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -755,6 +755,13 @@ function stopKeypressIfDownCancelled(stopKey){
 		cssText += 'div.btnRegist a.sbmt2 {background: linear-gradient(to top,#FF6500, #FD8B40 75%, #FD8B40 100%);}'; 		
 		addCssToDocument(cssText);
 		log('PATCH-839, ameblo.jp - add missing gradients and fallback background color');
+	} else if(hostname.indexOf('ana.co.jp')>-1){
+		var cssText = '';
+		cssText += 'img:not([width]) {transform: scale(0.5); transform-origin:top;}';
+		cssText += '#config-btn-next a {background-image: -o-linear-gradient(top, #FC3, #F82);}';
+		cssText += 'p.txtBnr {background:-o-linear-gradient(top, #1F559A, #0A3A73);}';
+		addCssToDocument(cssText);
+		log('PATCH-953, ana.co.jp - add missing gradient and fix for css zoom');
 	} else if(hostname.indexOf('athome.co.jp') > -1){
 		opera.defineMagicFunction('checkTargetBrowser',function(){});
 		opera.defineMagicFunction('checkTargetCookie',function(){});
@@ -979,7 +986,7 @@ function stopKeypressIfDownCancelled(stopKey){
 	
 		// Top Bar
 		var cssText = '.chromeBar.acb { background-image: -o-linear-gradient(top, #738ABA, #2C4987); }';
-		cssText += '.touch .btnC, .touch .btnI.bgb { background: -o-linear-gradient(top, #647AAB, #2C467E); }';
+		cssText += '.touch .btnC, .touch .btnI.bgb { background: -o-linear-gradient(top, #647AAB, #2C467E) !important; }';
 		cssText += '.touch .btnD, .touch .btnI{ background: -o-linear-gradient(top, #FDFEFE, #F0F1F2) !important; }';
 		// Profile Buttons
 		cssText += '.touch .btnD.bglb, .touch .btnI.bglb { background: -o-linear-gradient(top, #FAFBFE, #E0E3EA); }';
@@ -1052,14 +1059,6 @@ function stopKeypressIfDownCancelled(stopKey){
 			addCssToDocument(cssText);
 		}
 		log('PATCH-848, goo-net.com - add missing gradients and fallback bg color for mini');
-	} else if(hostname.indexOf('goo.ne.jp')>-1){
-		HTMLElement.prototype.__defineGetter__('currentStyle', function(){})
-		document.addEventListener('DOMContentLoaded',function(e){
-			if (gooSuggest && typeof sgtObj == "undefined") {
-				createSuggest();
-			}
-		},false);
-		log('PATCH-650, Fix search suggestions on Goo search engine');
 	} else if(hostname.indexOf('gougou.com')>-1){
 		addCssToDocument(".searchform .in_txt { width: 110px !important;} .searchform { width: 225px !important; }");
 		log('YUSHAN-2457, Fixed gougou.com search button display issue');
@@ -1070,6 +1069,19 @@ function stopKeypressIfDownCancelled(stopKey){
 		cssText += 'header > nav > ul > li a.active {background: linear-gradient(to bottom, #4B9BE9, #0170D7);}';
 		addCssToDocument(cssText);
 		log('PATCH-866, gry.pl - add missing gradients');
+	} else if(hostname.indexOf('hangame.co.jp')>-1){
+		var cssText = '';
+		/* top page */
+		cssText += '.m-rttnIcnAreaT00P00 {background: -o-linear-gradient(top, #FFF 40%, #EAEAEA 41%, #F7F7F7);}';		
+		cssText += '.p-tabT00P02 .tab, .p-tabT00P01 .tab {box-sizing: border-box; background:-o-linear-gradient(top, #FBFBFB, #F0F0F0);}';
+		/* game page */
+		cssText += '.p-btnT00P01 .u-w {background: -o-linear-gradient(top, #F66625, #CC1E03);}';
+		/* login page */
+		cssText += '.p-inpt .inpt input, .p-btn {box-sizing: border-box;}';
+		cssText += '.p-btnT01P01 .u-w {background: -o-linear-gradient(top, #FFF 20%, #E5E5E5 80%);}';
+		cssText += '.p-btn .u-w {box-sizing: border-box;}';
+		addCssToDocument(cssText);
+		log('PATCH-868, hangame.co.jp - layout fix and add missing gradient');
 	} else if(hostname.indexOf('hao123.com')>-1){
 		document.__defineGetter__('GlobalSharedObject', function(){ return document.getElementById('GlobalSharedObject'); });
 		log('DONGDAE-3678, Make sure site accesses correct Flash instance for saved user data');
@@ -1430,6 +1442,17 @@ function stopKeypressIfDownCancelled(stopKey){
 		 addCssToDocument('@-o-viewport {width:device-width; zoom:1; min-zoom:1; max-zoom:2; user-zoom:zoom;} @viewport {width:device-width; zoom:1; min-zoom:1; max-zoom:2; user-zoom:zoom;}');
 		}
 		log('NHSP-477, App ads position issue of qiushibaike.com');
+	} else if(hostname.indexOf('rikunabi.com')>-1){
+		var cssText = '';
+		/* top page */
+		cssText += '#main h2.title_blue {background: -o-linear-gradient(top , #417EC5 25%, #0B51A2);}';
+		cssText += '#main h2.title_red  {background: -o-linear-gradient(top , #F04848 25%, #FF0101);}';
+		cssText += '#main h2.title_orange {background: -o-linear-gradient(top , #FF9935 25%, #FF5A01);}';
+		cssText += '#main h2.title_gray {background: -o-linear-gradient(top , #999 25%, #333);}';
+		/* second pages */
+		cssText += '#mainContents h2, h2.h2Link, input[class="tdaction"], #smp_loginArea .smp_btn_login {background-image: -o-linear-gradient(top, #A2C6F3, #448CE6);}';
+		addCssToDocument(cssText);
+		log('PATCH-956, rikunabi.com - add missing gradient');
 	} else if(hostname.indexOf('rr.com') != -1 || hostname.indexOf('roadrunner.com') != -1){
 		addCssToDocument("a.btnXLRed span, .header .content .menu li a{text-shadow:none !important;}");
 		log('PIONER-353, Text-shadow not properly specified on rr.com');
