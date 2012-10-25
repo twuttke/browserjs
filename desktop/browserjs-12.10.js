@@ -1,4 +1,4 @@
-// CjxGQ6fFp1uWrrN5ikkJTwiE1hb0HLnRR/rRFFe4vyg3jbzb2T7mR+E2CoRGpedP7YHFwCqTukXi86Kc2zQBPMK3aSWzhhQ1DfsFuxTuD0hTqAW/x/vD+7plqPou+tO6NwjZvaj3wBuqPvAoc6jzr4NpmvW2lu+4clLkAiOZXjhoNDPSaegdShZjE6LHv5aQ5RAO+/CJArCHEPYyjLOBXtRnB4QByjP4ojQ449VoXpfKxE3g6TxY9zsXN2Tzq/eewmlhDVFeG3ldtoZF0yHFix9Ac2aggLGfgUR/Pyqy0S5UrV/7dgto4BXHaQ4VjHJ2qmGZ0aHxN+RThU+csTqUqw==
+// jH0OZ3LzRxCdJMsez6soRRrhqBe3gztALjegtCPGClwnPXwxS3tdh8xV+Z8iRGVr+KpvxY5/NTRhrfebcDmwfdF/mAsGFq6ESAKTlPGzAIhMQiB0tS/8mOtOP1a0I7mOT6AmHBEsgEv0w6QRzWv2PPCbUtfABLqlBUTm68JDX3k4k2vFWChQ/S1pNJruD2sMRj1aIItgJf2cAvj50y7atTX9cvIUyNQjFfS3cWCJg7i1GNa9Zt2fKpkFFDeTTRET+cavZ7b/2QgnTH+36Pp5fsDZDfU6Z5AThvwP2Q5HmlYjwX3cUcIKN74FI3LJ0JpQqK0FusBsJKQzMG5oY91aXA==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, October 19, 2012. Active patches: 248 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, October 25, 2012. Active patches: 251 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -720,6 +720,9 @@ function setTinyMCEVersion(e){
 			navigator.userAgent = navigator.userAgent.replace(/OS X (\d+).(\d+).(\d+)+;/,'OS X $1_$2_$3;');
 		}
 		log('PATCH-846, apple.com: don\'t reload from within unload handler\nPATCH-888, apple_core: CSS animations are unprefixed from Opera 12.10\nPATCH-924, apple.com - reformat OS X version string with underscores');
+	} else if(hostname.endsWith('aio.meb.gov.tr')){
+		navigator.appName='Netscape';
+		log('PATCH-959, Fix sniffing in old menu');
 	} else if(hostname.endsWith('aldoshoes.com')){
 		document.__defineSetter__('domain', function(){});
 		log('PATCH-808, aldoshoes.com - fix broken document.domain settings');
@@ -735,6 +738,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('cfe.urssaf.fr')){
 		opera.defineMagicFunction('navigateurAutorise',function(){return true});
 		log('PATCH-807, urssaf.fr: block browser block');
+	} else if(hostname.endsWith('checkvist.com')){
+		addPreprocessHandler(/e=Prototype\.Browser\.Opera,f=navigator\.userAgent\.indexOf\("Firefox"\)>-1\|\|e,/,'e=Prototype.Browser.Opera,f=navigator.userAgent.indexOf("Firefox")>-1,');
+		log('PATCH-960, checkvist.com: adapt to new keyboard handling');
 	} else if(hostname.endsWith('clarkhoward.com')){
 		addCssToDocument('blockquote{content: normal !important;}');
 		log('PATCH-844, clarkhoward.com: abouse of CSS content property');
@@ -968,6 +974,16 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('ruter.no')){
 		fixJQueryAutocomplete();
 		log('PATCH-934, ruter.no: jQuery autocompleter');
+	} else if(hostname.endsWith('search.nta.co.jp')){
+		opera.addEventListener('BeforeScript',function(ev){
+			var name=ev.element.src; 
+			if(!name){return;}
+			if(name.indexOf('nta_yado/index.js')>-1){
+				ev.element.text = ev.element.text.replace(/([\w]+)\.innerHTML\s*=\s*([\w]+)\.innerHTML\.replace/g,"var myimg=$1.getElementsByTagName('img')[0];myimg.src=myimg.src.replace");
+			}
+		},false);
+		
+		log('PATCH-949, search.nta.co.jp - fix mouseover/mouseout state change with innerHTML');
 	} else if(hostname.endsWith('sears.com')){
 		addCssToDocument('.scrollWidget .slider { top: 0; } .thumbWidget .slider2 { top: 0; }');
 		log('PATCH-847, sears.com - fix moving product thumbnail images');
@@ -1020,6 +1036,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.dickmorris.com')){
 		addCssToDocument('*{content:normal !important}')
 		log('PATCH-929, dickmorris.com - avoid empty lightbox');
+	} else if(hostname.endsWith('www.expostas.com')){
+		addCssToDocument('a[target="_blank"]::after{content: "\u200B"}');
+		log('PATCH-928, expostas.com - add word break opportunity');
 	} else if(hostname.endsWith('www.finanzas.com')){
 		addCssToDocument('body{content: normal !important}');
 		log('PATCH-901, finanzas.com: work around generated content abuse');
@@ -1032,9 +1051,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.omv.cz')){
 		fixIFrameSSIscriptII('resizeIframeToFitContent');
 		log('PATCH-937, omv.cz: old iframe resize script');
-	} else if(hostname.endsWith('www.shaw.ca')){
-		opera.defineMagicFunction('detectBrowserVersion',function(){return true})
-		log('PATCH-788, shaw.ca: work around browser sniff');
 	} else if(hostname.endsWith('www.udemy.com')){
 		window.addEventListener('load',
 		function(){
@@ -1233,6 +1249,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('.sina.com.cn')>-1){
 		navigator.userAgent += ' not Gecko';
 		log('PATCH-614, sina.com: video doesn\'t play due to missing script readystate support');
+	} else if(hostname.indexOf('.sytadin.')!=-1){
+		fixIFrameSSIscriptII('resizeIframeOnContent');
+		log('OTW-5415, Sytadin.fr IFRAME resize script detects Opera');
 	} else if(hostname.indexOf('.t-online.de')>-1){
 		if(hostname.indexOf('unterhaltung')>-1){
 					//Fix browser detection
@@ -1433,9 +1452,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('archives.aisne.fr')>-1){
 		defineMagicVariable.call(opera, 'isNS', function(){ return true }, null);
 		log('PATCH-682, Fix document viewer on Archives départementales de l\'Aisne');
-	} else if(hostname.indexOf('argos.co.uk')>-1){
-		if(HTMLBodyElement.prototype.__defineGetter__)HTMLBodyElement.prototype.__defineGetter__('clientHeight', function(){return this.ownerDocument.documentElement.clientHeight;});
-		log('PATCH-583, argos.co.uk: work around old jQuery/Opera clientHeight issue');
 	} else if(hostname.indexOf('athome.co.jp') > -1){
 		opera.defineMagicFunction('checkTargetBrowser',function(){});
 		opera.defineMagicFunction('checkTargetCookie',function(){});
@@ -1581,7 +1597,11 @@ function setTinyMCEVersion(e){
 		if(hostname.endsWith('www.facebook.com')){
 		 addCssToDocument('div.videoStage + div + div#fbPhotoPageTagBoxes{visibility:hidden;}');
 		}
-		log('PATCH-852, facebook: avoid unwanted chat box scroll\nPATCH-923, facebook: work around lack of pointer-events blocking video playback');
+	
+		if(hostname.endsWith('www.facebook.com')){
+		 addCssToDocument('div#fbProfileCover + div.groupsJumpCoverBorder{visibility:hidden;}');
+		}
+		log('PATCH-852, facebook: avoid unwanted chat box scroll\nPATCH-923, facebook: work around lack of pointer-events blocking video playback\nPATCH-954, facebook: work around lack of pointer-events breaking group page photos');
 	} else if(hostname.indexOf('fintyre.it')>-1){
 		navigator.appName = "Netscape";
 		log('PATCH-661, fintyre.it: work around sniffing');
@@ -1853,9 +1873,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('suzuki.co.jp')>-1){
 		opera.defineMagicFunction('browserCheck',function(){return true});
 		log('PATCH-716, Suzuki Japan - fix 3D car browser functionality');
-	} else if(hostname.indexOf('sytadin.fr')!=-1){
-		fixIFrameSSIscriptII('resizeIframeOnContent');
-		log('OTW-5415, Sytadin.fr IFRAME resize script detects Opera');
 	} else if(hostname.indexOf('t.qq.com')>-1){
 		opera.addEventListener('BeforeScript', function(e){
 			if(e.element.src && e.element.src.indexOf('mi.Tmpl')>-1 && typeof _ === 'function'){
