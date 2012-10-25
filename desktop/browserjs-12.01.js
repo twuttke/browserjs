@@ -1,4 +1,4 @@
-// hqJqF/NQkaSUF9jxcHFHGOiU6j/oPWcrtYH/EL1dj76Yd1DJpPhDgXcsy2FnphFl/g6O624IBg1Z9fIG01KzBUP3Rudy4Ld38MNpEvRqZ1GuWZ6CRsnOvfQsDQRv5Xxdt91nc4ocAKXKkCGIu6DEAM3eJ0JVRKpzkBm5kvlD0BL/HPnfa7iHxQFPpl22j3iJJ5BVsmPYC/8uNltLQQ32ivyb6cvV7lW4Zni6EIRwpyloxBreRrwODdKJF3GX1Z19ojDO4ZPFTLEwxKfOg/qjbHqc4ARF9wea9XYMHNCAK78kOWhmaYrCdVmX85/EvsuoE9//z6xr5f182+Q/3/7tNg==
+// aiqY+gqE11par4GhY4fTshC1R7StLLolrz3pA52xdiL/GdEhbqfw2idfJEXSc/9WjGE5g8dna5TATbWeCodRyndzJhTQN5ZiKHNM8L0ilSgASTi+/QbZtHrcjv9gktvMb2p8U7EYf8VByJ29FpsM/0YR2eiWoDWqpB66nLUzTND/8C3TJuDQHyn9adiHOZyhYQWn52Iql9DYzRvNQXEtR3aSaeYTIQN2tSGAoZRHcFE0tJrGcxexL3Be+F9h9//50vM3MxtQDUZZdNWeTlEuRlZCWR3tanaysnd8YWcldZiZC5YuAU7MFluK+oFsxrtUfeWVpCB/eV0LxMfcQWKHjw==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, October 19, 2012. Active patches: 282 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, October 25, 2012. Active patches: 284 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -735,6 +735,9 @@ function setTinyMCEVersion(e){
 			navigator.userAgent = navigator.userAgent.replace(/OS X (\d+).(\d+).(\d+)+;/,'OS X $1_$2_$3;');
 		}
 		log('PATCH-387, Make Apple Store menu visible\nPATCH-387, Enable menu on Apple support pages\nPATCH-387, Enable menu on Apple community pages\nPATCH-846, apple.com: don\'t reload from within unload handler\nPATCH-924, apple.com - reformat OS X version string with underscores');
+	} else if(hostname.endsWith('aio.meb.gov.tr')){
+		navigator.appName='Netscape';
+		log('PATCH-959, Fix sniffing in old menu');
 	} else if(hostname.endsWith('airbnb.com')){
 		fixTransitionEndCase();
 		log('PATCH-935, Fix case for transitionend event on airbnb.com.');
@@ -989,6 +992,16 @@ function setTinyMCEVersion(e){
 		});
 		
 		log('PATCH-794, Prevent broken innerHTML setter on Disney booking site');
+	} else if(hostname.endsWith('search.nta.co.jp')){
+		opera.addEventListener('BeforeScript',function(ev){
+			var name=ev.element.src; 
+			if(!name){return;}
+			if(name.indexOf('nta_yado/index.js')>-1){
+				ev.element.text = ev.element.text.replace(/([\w]+)\.innerHTML\s*=\s*([\w]+)\.innerHTML\.replace/g,"var myimg=$1.getElementsByTagName('img')[0];myimg.src=myimg.src.replace");
+			}
+		},false);
+		
+		log('PATCH-949, search.nta.co.jp - fix mouseover/mouseout state change with innerHTML');
 	} else if(hostname.endsWith('sears.com')){
 		addCssToDocument('.scrollWidget .slider { top: 0; } .thumbWidget .slider2 { top: 0; }');
 		log('PATCH-847, sears.com - fix moving product thumbnail images');
@@ -1055,6 +1068,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.dickmorris.com')){
 		addCssToDocument('*{content:normal !important}')
 		log('PATCH-929, dickmorris.com - avoid empty lightbox');
+	} else if(hostname.endsWith('www.expostas.com')){
+		addCssToDocument('a[target="_blank"]::after{content: "\u200B"}');
+		log('PATCH-928, expostas.com - add word break opportunity');
 	} else if(hostname.endsWith('www.finanzas.com')){
 		addCssToDocument('body{content: normal !important}');
 		log('PATCH-901, finanzas.com: work around generated content abuse');
@@ -1067,9 +1083,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.omv.cz')){
 		fixIFrameSSIscriptII('resizeIframeToFitContent');
 		log('PATCH-937, omv.cz: old iframe resize script');
-	} else if(hostname.endsWith('www.shaw.ca')){
-		opera.defineMagicFunction('detectBrowserVersion',function(){return true})
-		log('PATCH-788, shaw.ca: work around browser sniff');
 	} else if(hostname.endsWith('www.udemy.com')){
 		window.addEventListener('load',
 		function(){
@@ -1302,6 +1315,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('.sina.com.cn')>-1){
 		navigator.userAgent += ' not Gecko';
 		log('PATCH-614, sina.com: video doesn\'t play due to missing script readystate support');
+	} else if(hostname.indexOf('.sytadin.')!=-1){
+		fixIFrameSSIscriptII('resizeIframeOnContent');
+		log('OTW-5415, Sytadin.fr IFRAME resize script detects Opera');
 	} else if(hostname.indexOf('.t-online.de')>-1){
 		if(hostname.indexOf('unterhaltung')>-1){
 					//Fix browser detection
@@ -1558,9 +1574,6 @@ function setTinyMCEVersion(e){
 		window.constructor={};
 		window.constructor.prototype={};
 		log('PATCH-695, area-11.com: prevent high CPU usage');
-	} else if(hostname.indexOf('argos.co.uk')>-1){
-		if(HTMLBodyElement.prototype.__defineGetter__)HTMLBodyElement.prototype.__defineGetter__('clientHeight', function(){return this.ownerDocument.documentElement.clientHeight;});
-		log('PATCH-583, argos.co.uk: work around old jQuery/Opera clientHeight issue');
 	} else if(hostname.indexOf('athome.co.jp') > -1){
 		opera.defineMagicFunction('checkTargetBrowser',function(){});
 		opera.defineMagicFunction('checkTargetCookie',function(){});
@@ -1749,7 +1762,11 @@ function setTinyMCEVersion(e){
 		if(hostname.endsWith('www.facebook.com')){
 		 addCssToDocument('div.videoStage + div + div#fbPhotoPageTagBoxes{visibility:hidden;}');
 		}
-		log('PATCH-714, facebook: prevent chat window overflow - Presto bug\nPATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status\nPATCH-573, Facebook\'s border-radius triggers hyperactive reflow bug, performance suffers\nPATCH-923, facebook: work around lack of pointer-events blocking video playback');
+	
+		if(hostname.endsWith('www.facebook.com')){
+		 addCssToDocument('div#fbProfileCover + div.groupsJumpCoverBorder{visibility:hidden;}');
+		}
+		log('PATCH-714, facebook: prevent chat window overflow - Presto bug\nPATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status\nPATCH-573, Facebook\'s border-radius triggers hyperactive reflow bug, performance suffers\nPATCH-923, facebook: work around lack of pointer-events blocking video playback\nPATCH-954, facebook: work around lack of pointer-events breaking group page photos');
 	} else if(hostname.indexOf('fintyre.it')>-1){
 		navigator.appName = "Netscape";
 		log('PATCH-661, fintyre.it: work around sniffing');
@@ -2031,9 +2048,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('suzuki.co.jp')>-1){
 		opera.defineMagicFunction('browserCheck',function(){return true});
 		log('PATCH-716, Suzuki Japan - fix 3D car browser functionality');
-	} else if(hostname.indexOf('sytadin.fr')!=-1){
-		fixIFrameSSIscriptII('resizeIframeOnContent');
-		log('OTW-5415, Sytadin.fr IFRAME resize script detects Opera');
 	} else if(hostname.indexOf('t.qq.com')>-1){
 		opera.addEventListener('BeforeScript', function(e){
 			if(e.element.src && e.element.src.indexOf('mi.Tmpl')>-1 && typeof _ === 'function'){
