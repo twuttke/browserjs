@@ -1,4 +1,4 @@
-// Vdo5Se+74BLcoDypjH8kGPzcmFvLPla8E+OSZzW+wEg2ISxrbW6KUv4pAbOEEGSO6fw+5ylLUwuszCcydyxAUCV19LYMNkSWYZhTtRfwv5OC501fbBBVWeMmq2NTWAVwXdbFgXDPJXF0FvRKrFQ0EcB8P8w55nlHevTAnz/+0tm9naMuMc8b2ox9yihY/jHj1ar8xCNQ6+im5EhDfM8tCL3LPoezXR8OPOrWm/TEihNomXVv16MVQ6Cj8ZNB1p8wnUJZ1WE1T57s3uhPzeFIEAXqouQlJjUxk8NUD1+WxXgvLPhrSa3MpQRCW7QQiKY6ZVBef6+qIA5XPDp7NwUMMQ==
+// cBh6IJ0SU777KGjcIRPVQbtzjU4vPAK7HosYEFnESz947jmW2fAmZnVrQ0oeseVGmPtUYB5vAQnxGfEAzF98KvMLfWc/3i5UyNYXa5LF1Y7FBPDIP0pXLG/BxHuQDKa5CW5iExZjc59mj7NolCOtapEtGTSayf1wKBHJrC4yPugx22drUWT9h4oIUcucQzS1ZNTOmjA91gyBfjZOV143RfY+TH/ri5wsIHETw/ZHaqiYKgWtDMzwaZQEbfStR0ohiLLh6QE52a3XVIhE96uWPhXu/Nx+G6EPYnMoN84OqwdeuyplAr0PVZx1g4s/1m2Av78pDk1qJ/7+Ai/VbCdNIA==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, October 25, 2012. Active patches: 269 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, October 31, 2012. Active patches: 270 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -715,6 +715,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('ebayclassifieds.com') && pathname.match(/\/PostAd/)){
 		navigator.userAgent = navigator.userAgent.replace(/Opera/g,'0pera');
 		log('PATCH-784, eBay Classifieds - disable block on image uploader');
+	} else if(hostname.endsWith('espn.go.com')){
+		navigator.appName="netscape";
+		log('PATCH-375, Make sure the ESPN polls work');
 	} else if(hostname.endsWith('garmin.com')){
 		opera.defineMagicFunction('eligible', function() { return true; });
 		opera.defineMagicFunction('detectOSBrowser', function(realFunc, realThis, inOS, inBrowser) {
@@ -841,6 +844,9 @@ function setTinyMCEVersion(e){
 			return value;
 		});
 		log('PATCH-513, office.microsoft.com: re-initialize video player after applying page overflow');
+	} else if(hostname.endsWith('oldspice.com')){
+		addPreprocessHandler(/has_postMessage\s*=\s*window\[postMessage\]\s*&&\s*!\$\.browser\.opera;/, 'has_postMessage = true;')
+		log('PATCH-961, Remove sniff in jQuery postMessage plugin (incorrectly assumes lack of postMessage).');
 	} else if(hostname.endsWith('pb.com')){
 		navigator.userAgent=navigator.userAgent.replace( /Opera/g, '0pera not Mozilla' );
 	
@@ -1141,9 +1147,9 @@ function setTinyMCEVersion(e){
 			log('PATCH-382, Google Spreadsheets cell size and column label size mismatch\nPATCH-482, Delay mousedown event on Flash file upload to make sure Flash sees it\nPATCH-517, docs.google: make document names visible\nPATCH-278, We should not send keypress events for navigation- and function keys');
 		}
 		if(hostname.indexOf('mail.google.')>-1){
-			addCssToDocument('div.wl{overflow:inherit}body.aam{position:inherit}');
+			addCssToDocument('div.wl{overflow:inherit}body{position:static !important}');
 		
-			addCssToDocument('body.editable.LW-avf{font-size: small !important}');
+			addCssToDocument('.editable.LW-avf{font-size: small !important}');
 			log('PATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
 		}
 		if(hostname.indexOf('maps.google.')>-1 || hostname.indexOf('mapy.google.')>-1){
@@ -1644,9 +1650,6 @@ function setTinyMCEVersion(e){
 			return 1;
 		},false);
 		log('OTW-4878, Nifmail web mail bypass browser blocking');
-	} else if(hostname.indexOf('espn.go.com')>-1){
-		navigator.appName="netscape";
-		log('PATCH-375, Make sure the ESPN polls work');
 	} else if(hostname.indexOf('etour.co.jp') > -1){
 		navigator.appName='Netscape';
 		log('PATCH-152, etour.co.jp fix non-disappearing overlapping image');
@@ -2005,7 +2008,7 @@ function setTinyMCEVersion(e){
 		FileList = undefined;
 		File = undefined;
 	
-		MouseEvent.prototype.__defineGetter__('button',function(){return this.which == 2 ? 1 : this.which == 3 ? 2 : 0;;})
+		MouseEvent.prototype.__defineGetter__('button',function(){return this.which == 2 ? 1 : this.which == 3 ? 2 : 0;})
 	
 		opera.addEventListener('BeforeEventListener.load', 
 			function(e){
@@ -2016,7 +2019,7 @@ function setTinyMCEVersion(e){
 			},
 			false
 		);
-		log('PATCH-657, skydrive: disable new upload code due to various Opera bugs\nPATCH-679, skydrive: correct MouseEvent which\nPATCH-782, skydrive.live.com - Allow upload of files');
+		log('PATCH-657, skydrive: disable new upload code due to various Opera bugs\nPATCH-679, skydrive: correct MouseEvent button\nPATCH-782, skydrive.live.com - Allow upload of files');
 	} else if(hostname.indexOf('smithbarney.com')>-1){
 		HTMLInputElement.prototype.__defineSetter__('type',function(){
 			if (this.getAttribute('type')!=arguments[0]) {
