@@ -988,4 +988,32 @@
 		<pref name="Spoof UserAgent ID" value="4"/>
 	</section>
 </host>
+<host name="career.hugoboss.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="3"/>
+	</section>
+</host>
+<host name="bloggar.aftonbladet.se">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="guardianretirement.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="mobile.free.fr">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="0"/>
+	</section>
+	<section name="Performance">
+		<pref name="Enable Pipelining" value="0"/>
+	</section>
+</host>
+<host name="airset.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
 </preferences>
