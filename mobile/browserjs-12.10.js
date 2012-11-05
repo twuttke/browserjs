@@ -1,4 +1,4 @@
-// u+21jE/JnSX2Y0daNSc6iQTZr42RNab7ckpt8rSIGWcTANdCAWSF3h5n9BYUDvnR9UEuquHSPN72nVKPJCU6227ppoJisgWNsHGP4u+X1L4v6T6/dV7LQHFA71uiZ42DYxguTDm72YFkMp7URyrhx2h3oj9+ot3L4XUFgdKt5EM4J2aEOlFPptBEja0DOym2EPYgnF/uFOWgM8X7B4YYfzFjR4OjyawqyHTMFYsxTBCrSy4rGj9qlQMEpWorJCh/bmsjjil5V0mPxzzaGjrYfIsHn3yFD6H+uvhE9W9Q8R2IPXxYfq537izVHGnpERKkOflIPVaHZMZoJR6wgySh7A==
+// m2xqX7rmogUt8epelgsA8AspdD0IJ8Oq5GIxv56uphoCoNomEleNlGgujRLAU8foIea7tlrJEBAj/gbm60xX782SPbVRVfRwJR9A+v5o5ShknicNyR8SD/mcyRYp0GpGQMykHCmcf4t5wh3hV39JmXVxazcymhc+IziUJvrxmhBTDKrE5gN0CL5pBtrZGuyHhvvh0wMgclRC4BK1Md3jaIflUZrfbUO5mo/WN1aR/5aj38AEVUsAh77o/cNUEtJnXdMV1EgsRynmEnTmlJ6kaVgeAtYjSk2yhIVY+r8lqElxI0VHFdDgZ4tg9bBAPgOQClcthgdyRj1I5yO3+t2X8w==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.10 core 2.11.355, October 25, 2012. Active patches: 192 ';
+	var bjsversion=' Opera Mobile 12.10 core 2.11.355, November 5, 2012. Active patches: 207 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -187,6 +187,7 @@ function stopKeypressIfDownCancelled(stopKey){
 
 
 
+
 	// 272007, Prototype requires function.toString to return a unique string per function
 // PATCH-621, Work around browser sniffing in old Macromedia menu script
 // ANDMO-1210, Replace Youtube embeds with image and link on Android devices with no plugins.
@@ -259,6 +260,14 @@ function stopKeypressIfDownCancelled(stopKey){
 		}else if(name.indexOf('_zap/')!=-1 && name.indexOf('source/js/script.js')!=-1){ 
 			log('PATCH-471, ZAPPALLAS Fortune _zap fix applied');
 			opera.defineMagicFunction('checkNavigator',function(){return true;}); 
+		}else if(name.indexOf('shop/js/futureshop2.js')!=-1){
+			log('PATCH-994, add future-shop CMS gradients');
+			var cssText = '.FS2_InCartButton_D,.FS2_Search_btn_D,.FS2_SystemNav_btnPC,.FS2_sort_menu_title' + 
+			'{background:-o-linear-gradient(top,#555,#000);}' + 
+			'.FS2_Sort_btn {background:-o-linear-gradient(top,#FFF,#AAA);}' +
+			'.FS2_Button_P {background:-o-linear-gradient(top,#444,#000);}' +
+			'.FS2_Button_N {background:-o-linear-gradient(top,#EEE,#BBB);}'
+			addCssToDocument(cssText);
 		}
 	},false);
 
@@ -332,6 +341,53 @@ function stopKeypressIfDownCancelled(stopKey){
 			}
 		,false);
 		log('PATCH-781, cooliris: user-scalable yes');
+	} else if(hostname.endsWith('goo.ne.jp')){
+		/* goo.ne.jp */
+	
+	
+		if(hostname.indexOf('.goo.')>-1){
+			var cssText ='input[type="text"] {box-sizing:border-box;}';
+			cssText +='a.brc {background-image:-o-linear-gradient(top,#9FF,#09F);}';
+			addCssToDocument(cssText);
+			log('PATCH-987, goo.ne.jp - generic patch');
+		}
+		if(hostname.indexOf('dictionary.goo.')>-1){
+			var cssText = '.dicResultTitle {background:-o-linear-gradient(top,#61A6F1,#3D74B5);}';
+			cssText +='.dicResultList li {background: url(/img/smp/arrow.png) right center no-repeat, -o-linear-gradient(top, #C5E2F7,#F0F8FE);}';
+			cssText +='#header {width:98%;}';
+			cssText +='#header img, #header input, #footer img, #footer input {vertical-align:bottom;}';
+			addCssToDocument(cssText);
+			log('PATCH-983, dictionary.goo.ne.jp - add missing gradients and layout fix');
+		}
+		if(hostname.indexOf('oshiete.goo.')>-1){
+			var cssText ='ul.tab {background:-o-linear-gradient(top,#FFF,#EEF);}';
+			cssText +='ul.tab li.ui-tabs-selected {background:-o-linear-gradient(top,#FEB,#FFF);}';
+			cssText +='#search,.search,.title,.cb_list_wrap,.benri_paging ul li.on,.sub_title,.e_confirm_btn p a {background:-o-linear-gradient(top,#AAA,#CCC);}';
+			cssText +='.navi_menu3 ul li,.oshiete_menu a {background:url(http://cdn.oshiete.goo.ne.jp/images/sp/oshiete_menu.png) scroll 10px no-repeat,-o-linear-gradient(top,#FFF,#EEE);}';
+			cssText +='.qa_navi {background:-o-linear-gradient(top,#AEF,#6BF);}';
+			cssText +='.main_c_menu ul li,.navi_menu3 ul li a,.benri_paging ul li {box-sizing:border-box;}';
+			addCssToDocument(cssText);
+			log('PATCH-986, oshiete.goo.ne.jp - add missing gradients and layout fix');
+		}
+		if(hostname.indexOf('ranking.goo.')>-1){
+			var cssText = '#main-contents .main_area .nav ul li {background-color:#EEE;}';
+			cssText += 'h1.bk_or, .bk_or a {background:-o-linear-gradient(top,#FA2,#F80);}';
+			cssText +='h1.bk_ye, .bk_ye a {background:-o-linear-gradient(top,#FC4,#FB1);}';
+			cssText +='h1.bk_gn, .bk_gn a {background:-o-linear-gradient(top,#8D3,#6B2);}';
+			cssText +='h1.bk_bu {background:-o-linear-gradient(top,#3BF,#2AD);}';
+			cssText +='.genre ul > li a {background:-o-linear-gradient(top,#FFF,#EEE);}';
+			cssText +='.main_area .btnarea .nextbtn {background:-o-linear-gradient(top,#FC4,#FB1);}';
+			addCssToDocument(cssText);
+			log('PATCH-984, ranking.goo.ne.jp - add missing gradients');
+		}
+		if(hostname.indexOf('www.goo.')>-1){
+			var cssText = '#searchtop {background: -o-linear-gradient(top,#CAEDFA,#A0DFF9 60%,#5EC7F4);}';
+			cssText +='#news ul.newstab li span a {background: -o-linear-gradient(top,#56BDEC,#3A9CD2);}';
+			cssText +='h2 {background: -o-linear-gradient(top, #7EBAD7,#52A0CC 50%, #89C2DD);}';
+			addCssToDocument(cssText);
+			log('PATCH-981, www.goo.ne.jp - add missing gradient and layout fix');
+		}
+		log('0, goo.ne.jp');
 	} else if(hostname.endsWith('insubuy.com')){
 		HTMLElement.prototype.onselectstart = true;
 		log('PATCH-703, insubuy.com: don\'t prevent mouse click');
@@ -369,6 +425,9 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.endsWith('myportfolio.nbcn.ca')){
 		opera.defineMagicFunction('checkBrowserVersion',function(){});
 		log('PATCH-805, nbcn.ca - block browser block');
+	} else if(hostname.endsWith('oldspice.com')){
+		addPreprocessHandler(/has_postMessage\s*=\s*window\[postMessage\]\s*&&\s*!\$\.browser\.opera;/, 'has_postMessage = true;')
+		log('PATCH-961, Remove sniff in jQuery postMessage plugin (incorrectly assumes lack of postMessage).');
 	} else if(hostname.endsWith('politics.ie')){
 		document.addEventListener( 'DOMContentLoaded', function(){
 		        var el = document.getElementsByClassName('ui-mobile-rendering')[0];
@@ -481,6 +540,52 @@ function stopKeypressIfDownCancelled(stopKey){
 		/* Yahoo! */
 	
 	
+		if((hostname.indexOf('auctions.yahoo.co.jp')>-1)||(hostname.indexOf('auctions.search.yahoo.co.jp')>-1)){
+			var cssText = '#Sa {background-image: -o-linear-gradient(top, #FDDD7B,#FBB123 50%,#FDC958)}';
+			cssText += '.searchHeader .submit {background: -o-linear-gradient(top,#B4B4B4,#6E6E6E 52%,#636363);}';
+			cssText += '#SbWrap, #SyWrap {background-color: #FFF;}';
+			cssText += '#ASg {background: -o-linear-gradient(top,#7D7D7D, #000);}';
+			cssText += '#ASi header {background: -o-linear-gradient(top,#FEEAAB,#FBB226 50%,#FED457);}';
+			cssText += '#ASi li.current {background: -o-linear-gradient(top,#FDF3A1,#FDF9E1);}';
+			cssText += '#ASw li.cur .inner {background: -o-linear-gradient(top,#FEC620,#FEE18F);}';
+			cssText += '#ASk {background: -o-linear-gradient(top,#FEE18A,#FFFBEF);}';
+			cssText += '.Sk {background-image: -o-linear-gradient(top,#959595,silver);}';
+			addCssToDocument(cssText);
+			log('PATCH-969, auctions.yahoo.co.jp - add missing gradients');
+		}
+		if((hostname.indexOf('chiebukuro.yahoo.co.jp')>-1)||(hostname.indexOf('chiebukuro.search.yahoo.co.jp')>-1)){
+			var cssText = '.headerDefault #logo {background: -o-linear-gradient(top,#D2B9EB,#AD7EDA 50%,#B990DF);}';
+			cssText += '.searchBox input.ygbt {background: -o-linear-gradient(top,#FFF8DB,#FFCC02);}';
+			cssText += '.searchBox input#yschsp2, .searchBox input#yschsp2Ft {background-color: #FFF;}';
+			cssText += '#KSf {background: -o-linear-gradient(top,#D6BAEF,#FFF);}';
+			cssText += '#KSf li a[href], #note #KSf li a[href] {background: -o-linear-gradient(top,#FDFCFB,#DCDAD5);}';
+			cssText += '.Sx .pageList li.current {background-image: -o-linear-gradient(top,#C1B6E8,#F0EDF9);}';
+			cssText += '#SbWrap, #SyWrap {background-color: #FFF;}';
+			addCssToDocument(cssText);
+			log('PATCH-970, chiebukuro.yahoo.co.jp - add missing gradients');
+		}
+		if((hostname.indexOf('loco.yahoo.co.jp')>-1)||(hostname.indexOf('loco.search.yahoo.co.jp')>-1)){
+			var cssText = '#SbWrap, #SyWrap {background-color: #FFF;}';
+			cssText += '.headerDefault_v2 #logo {background: -o-linear-gradient(top,#EDEBCA,#DAD791);}';
+			cssText += '.LScd .plcimg  {background: -o-linear-gradient(top,#6E799D,#93A3D5 5%,#5A77AF 48%,#3A57A0 52%,#1E3A95);}';
+			cssText += '#LSe .inner {background: -o-linear-gradient(top,#E9E8D3,#FAF8E0);}';
+			addCssToDocument(cssText);
+			log('PATCH-973, loco.yahoo.co.jp - add missing gradients');
+		}
+		if((hostname.indexOf('market.yahoo.co.jp')>-1)||(hostname.indexOf('app.search.yahoo.co.jp')>-1)){
+			var cssText = '#SbWrap, #SyWrap {background-color: #FFF;}';
+			cssText += '#cmnHeaderDefault .hd #logo {background: -o-linear-gradient(top,#6CC0F4,#2478AC 50%,#3A8EC2);}';
+			cssText += '#contentsNav ul li  {background: url(http://i.yimg.jp/images/market/m/main/spContentsNav-2.0.0.png) no-repeat, -o-linear-gradient(top,#FFF,#EAEAEB);}';
+			cssText += '.cmnSearchDefault2 .sdWrap, .cmnSearchDefault .sdWrap {background: -o-linear-gradient(top,#666,#333);}';
+			cssText += '.cmnBlueLabel2 {background: -o-linear-gradient(top,#22A5FE,#1582CE);}';
+			cssText += '.cmnBlueLabelLarge_rcmd .ll div {background: -o-linear-gradient(top,#22A5FE,#1582CE);}';
+			cssText += '.cmnBlueLabelLarge .ll div, #cmnBlueLabelLarge .ll div{background: -o-linear-gradient(top,#FFF,#EFEFEE);}';
+			cssText += 'a.android {background: url(http://i.yimg.jp/images/market/m/main/spExpand-2.0.0.png) no-repeat 12px -193px, -o-linear-gradient(top, #F2FFFF 50%, #C1D3E5);}';
+			cssText += '.MKSa li a {background-image: -o-linear-gradient(bottom,#EEE,#DDD);}';
+			cssText += '#searchOption, #searchOption2 {width:95%;}';
+			addCssToDocument(cssText);
+			log('PATCH-975, market.yahoo.co.jp - add missing gradients and width fix');
+		}
 		if(hostname.indexOf('finance.yahoo.com')>-1){
 			opera.addEventListener('BeforeEventListener.focusout', function(e){e.preventDefault();}, false);
 			log('PATCH-406, Prevent currency menu from closing too fast on Y!Finance');
@@ -500,6 +605,12 @@ function stopKeypressIfDownCancelled(stopKey){
 			opera.addEventListener('AfterEventListener.load',
 			function(){ try{ document.sf1.p.focus=function(){}; }catch(e){}},false);
 			log('252519, Prevent page from focusing search field because it causes unexpected scrolling');
+		}
+		if(hostname.indexOf('mail.yahoo.co.jp')>-1){
+			var cssText = '.subjectList {left:60px;}';
+			cssText += '.folders .separator h3 a.openFolderBtn.open span {transform: rotate(0deg);}';
+			addCssToDocument(cssText);
+			log('PATCH-972, mail.yahoo.co.jp - layout fix');
 		}
 		if(hostname=='new.m.yahoo.com'){
 			scaleImagesToScreenWidth(); 
@@ -968,6 +1079,23 @@ function stopKeypressIfDownCancelled(stopKey){
 		    
 		log('PENGU-745, Can not login to digg.com');
 	} else if(hostname.indexOf('facebook.com')>-1){
+		var isTouchMoving;
+		document.addEventListener('touchstart',function(){isTouchMoving=true;},false);
+		document.addEventListener('touchend',function(){isTouchMoving=false;},false);
+		document.addEventListener('touchcancel',function(){isTouchMoving=false;},false);
+		(function(tmp){
+				var origSetter = tmp.style.__lookupSetter__('transform');
+				CSSStyleDeclaration.prototype.__defineSetter__('transform',
+					function(e){
+						if(e.indexOf('translate3d')>-1 && isTouchMoving){
+							e=e.replace(/3d/,'').replace(/,0\)/,')');
+						}
+						return origSetter.call(this,e);
+					}
+				);
+			}
+		)(document.createElement('span'));
+	
 		var cssText = '.jewel .flyout:after { content: none !important; border: 0 !important; }';
 		addCssToDocument(cssText);
 	
@@ -1014,7 +1142,7 @@ function stopKeypressIfDownCancelled(stopKey){
 		cssText += '.touch .egoAttachment > .right{display:flex;align-items:center}';
 		addCssToDocument(cssText);
 		
-		log('PATCH-618, touch.facebook.com - Fix unclickable dropdowns\nPATCH-618, touch.facebook.com - Add missing background images\nPATCH-618, touch.facebook.com - Missing opera prefixes/syntax');
+		log('PATCH-997, touch.facebook.com - make translate3d sliders work\nPATCH-618, touch.facebook.com - Fix unclickable dropdowns\nPATCH-618, touch.facebook.com - Add missing background images\nPATCH-618, touch.facebook.com - Missing opera prefixes/syntax');
 	} else if(hostname.indexOf('forever21.co.jp') > -1){
 		if (pathname.indexOf('QuickView.aspx')>-1) {
 			addCssToDocument('html{background:#fff}');
@@ -1381,6 +1509,11 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('netpia.linkprice.com')>-1){
 		addEventListener.call(document, 'load', function(){try{clear()}catch(e){}}, false);
 		log('354340, Clears popups that are visible after loading subpages on netpia.linkprice.com');
+	} else if(hostname.indexOf('news.cn')>-1){
+		if(hostname.indexOf('3g.') > -1 || hostname.indexOf('m.') > -1){
+		  addCssToDocument('.button, .button1{background:-o-linear-gradient(to bottom, #A9CA39, #689D00);} .categories ul li.blnone{clear:left;}');
+		}
+		log('NHSP-564, Button display issue of news.cn');
 	} else if(hostname.indexOf('nocoty.pl')>-1){
 		var cssText = '';
 		cssText += '.bar, .box .bar, .barList, .box .barList {background: linear-gradient(to bottom, #E30A7F, #FAC);}';
@@ -1623,6 +1756,11 @@ function stopKeypressIfDownCancelled(stopKey){
 		cssText +='#related .relMenu li {transform: scale(0.8); transform-origin:top center; background: -o-linear-gradient(left, #F3F8E7, #E3EFC5 4%, #CDE298 50%, #C2DC81 95%, #8EA856);}';
 		addCssToDocument(cssText);
 		log('PATCH-952, u-can.co.jp - add missing gradient and fix for css zoom');
+	} else if(hostname.indexOf('veoh.com')>-1){
+		var cssText = '.iBClassic {background-image: -o-linear-gradient(top,#666,#000);}';
+		cssText += '.iBClassic_select {background-image: -o-linear-gradient(#111,#111);}';
+		addCssToDocument(cssText);
+		log('PATCH-979, veoh.com - replace border image by gradients');
 	} else if(hostname.indexOf('viacom.com')!=-1){
 		opera.defineMagicVariable('plugin', function(curVal) { return true; }, null);
 		log('SEOUL-616, Tweaked SWFObject on viacom.com creates constant document reflows');
