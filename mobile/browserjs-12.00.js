@@ -1,4 +1,4 @@
-// PbeS0AklKXFX3uZbiC49TFGwVSD/ZpNe4CmUXUdf1TwYKVOyAURZ+Dny8KBlKGXMC2qFTWkSy4Py0Dz1WGidabbQHrlbF/S3CnyKCWQLxgXm54OJ9iwyhRYjq0MAQySVuvWhKpPwWmBBXzJPjujbg9j4tmid/IW8mTx/aVP8Fn5VvqNh/tV9+rPQ2cHOmSUUVuWJ+EBj/vuovYtUWyWp9y8TKpgEPyTUfkpiLwWr+m9SmdtuUEjIltH5AKoPpCJ+gY2NEcuFzMKVEmAU/5GS45RSNLzq/hU4k9fK54RCCkR1mfDEjzwFRUrEaSxxfph8Y/KeN9Gx/45M0vDUS4Vvww==
+// ec1KJ4+3MYLA4urbMz1ig/Qxlf87G3lH8oFqjBkN5YXEWOJDGrN6Kwt/iN+XYPG+a3r7OvbmD+IISM7uBC0Sd9RXYl1pxRyzXVLQ1VaoFJlgipS+xFHuxJdzjL7/tugf296xBRZzaoJl33zOcdndUGtAAz5QPFoHtOGWUXBTrrJsGkfxEygDVzfTBbRsyBWt93DTp6xQ0CHgBM0l14moXsjOZePS4b9k2R+bsm3bAaNzuQR8xLoVnRnBQXxW3gTYGZv3A3p1PcSDLfA8MmHYWNa0g3RofmVHGiQVZGNcSD4lucQ2/xCAGIYgb5ANVxy6qz0ZjfRlAF/W1i0AEB/e8w==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.00 core 2.10.254, October 25, 2012. Active patches: 194 ';
+	var bjsversion=' Opera Mobile 12.00 core 2.10.254, November 5, 2012. Active patches: 201 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -232,6 +232,7 @@ function stopKeypressIfDownCancelled(stopKey){
 
 
 
+
 	// 272007, Prototype requires function.toString to return a unique string per function
 // PATCH-621, Work around browser sniffing in old Macromedia menu script
 // ANDMO-1210, Replace Youtube embeds with image and link on Android devices with no plugins.
@@ -326,6 +327,13 @@ function stopKeypressIfDownCancelled(stopKey){
 		}else if(name.indexOf('_zap/')!=-1 && name.indexOf('source/js/script.js')!=-1){ 
 			log('PATCH-471, ZAPPALLAS Fortune _zap fix applied');
 			opera.defineMagicFunction('checkNavigator',function(){return true;}); 
+		}else if(name.indexOf('shop/js/futureshop2.js')!=-1){
+			var cssText = '.FS2_InCartButton_D,.FS2_Search_btn_D,.FS2_SystemNav_btnPC,.FS2_sort_menu_title' + 
+			'{background:-o-linear-gradient(top,#555,#000);}' + 
+			'.FS2_Sort_btn {background:-o-linear-gradient(top,#FFF,#AAA);}' +
+			'.FS2_Button_P {background:-o-linear-gradient(top,#444,#000);}' +
+			'.FS2_Button_N {background:-o-linear-gradient(top,#EEE,#BBB);}'
+			addCssToDocument(cssText);
 		}
 	},false);
 
@@ -440,6 +448,36 @@ function stopKeypressIfDownCancelled(stopKey){
 			}
 		,false);
 		log('PATCH-781, cooliris: user-scalable yes');
+	} else if(hostname.endsWith('goo.ne.jp')){
+		/* goo.ne.jp */
+	
+	
+		if(hostname.indexOf('.goo.')>-1){
+			var cssText ='input[type="text"] {box-sizing:border-box;}';
+			cssText +='a.brc {background-image:-o-linear-gradient(top,#9FF,#09F);}';
+			addCssToDocument(cssText);
+			log('PATCH-987, goo.ne.jp - generic patch');
+		}
+		if(hostname.indexOf('dictionary.goo.')>-1){
+			var cssText = '.dicResultTitle {background:-o-linear-gradient(top,#61A6F1,#3D74B5);}';
+			cssText +='.dicResultList li {background: url(/img/smp/arrow.png) right center no-repeat, -o-linear-gradient(top, #C5E2F7,#F0F8FE);}';
+			cssText +='#header {width:98%;}';
+			cssText +='#header img, #header input, #footer img, #footer input {vertical-align:bottom;}';
+			addCssToDocument(cssText);
+			log('PATCH-983, dictionary.goo.ne.jp - add missing gradients and layout fix');
+		}
+		if(hostname.indexOf('ranking.goo.')>-1){
+			var cssText = '#main-contents .main_area .nav ul li {background-color:#EEE;}';
+			cssText += 'h1.bk_or, .bk_or a {background:-o-linear-gradient(top,#FA2,#F80);}';
+			cssText +='h1.bk_ye, .bk_ye a {background:-o-linear-gradient(top,#FC4,#FB1);}';
+			cssText +='h1.bk_gn, .bk_gn a {background:-o-linear-gradient(top,#8D3,#6B2);}';
+			cssText +='h1.bk_bu {background:-o-linear-gradient(top,#3BF,#2AD);}';
+			cssText +='.genre ul > li a {background:-o-linear-gradient(top,#FFF,#EEE);}';
+			cssText +='.main_area .btnarea .nextbtn {background:-o-linear-gradient(top,#FC4,#FB1);}';
+			addCssToDocument(cssText);
+			log('PATCH-984, ranking.goo.ne.jp - add missing gradients');
+		}
+		log('0, goo.ne.jp');
 	} else if(hostname.endsWith('insubuy.com')){
 		HTMLElement.prototype.onselectstart = true;
 		log('PATCH-703, insubuy.com: don\'t prevent mouse click');
@@ -474,6 +512,9 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.endsWith('myportfolio.nbcn.ca')){
 		opera.defineMagicFunction('checkBrowserVersion',function(){});
 		log('PATCH-805, nbcn.ca - block browser block');
+	} else if(hostname.endsWith('oldspice.com')){
+		addPreprocessHandler(/has_postMessage\s*=\s*window\[postMessage\]\s*&&\s*!\$\.browser\.opera;/, 'has_postMessage = true;')
+		log('PATCH-961, Remove sniff in jQuery postMessage plugin (incorrectly assumes lack of postMessage).');
 	} else if(hostname.endsWith('politics.ie')){
 		document.addEventListener( 'DOMContentLoaded', function(){
 		        var el = document.getElementsByClassName('ui-mobile-rendering')[0];
@@ -1483,6 +1524,11 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('netpia.linkprice.com')>-1){
 		addEventListener.call(document, 'load', function(){try{clear()}catch(e){}}, false);
 		log('354340, Clears popups that are visible after loading subpages on netpia.linkprice.com');
+	} else if(hostname.indexOf('news.cn')>-1){
+		if(hostname.indexOf('3g.') > -1 || hostname.indexOf('m.') > -1){
+		  addCssToDocument('.button, .button1{background:-o-linear-gradient(to bottom, #A9CA39, #689D00);} .categories ul li.blnone{clear:left;}');
+		}
+		log('NHSP-564, Button display issue of news.cn');
 	} else if(hostname.indexOf('nocoty.pl')>-1){
 		var cssText = '';
 		cssText += '.bar, .box .bar, .barList, .box .barList {background: -o-linear-gradient(top, #E30A7F, #FAC);}';
@@ -1724,6 +1770,11 @@ function stopKeypressIfDownCancelled(stopKey){
 		cssText +='#related .relMenu li {transform: scale(0.8); transform-origin:top center; background: -o-linear-gradient(left, #F3F8E7, #E3EFC5 4%, #CDE298 50%, #C2DC81 95%, #8EA856);}';
 		addCssToDocument(cssText);
 		log('PATCH-952, u-can.co.jp - add missing gradient and fix for css zoom');
+	} else if(hostname.indexOf('veoh.com')>-1){
+		var cssText = '.iBClassic {background-image: -o-linear-gradient(top,#666,#000);}';
+		cssText += '.iBClassic_select {background-image: -o-linear-gradient(#111,#111);}';
+		addCssToDocument(cssText);
+		log('PATCH-979, veoh.com - replace border image by gradients');
 	} else if(hostname.indexOf('viacom.com')!=-1){
 		opera.defineMagicVariable('plugin', function(curVal) { return true; }, null);
 		log('SEOUL-616, Tweaked SWFObject on viacom.com creates constant document reflows');
