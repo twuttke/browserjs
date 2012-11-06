@@ -1,4 +1,4 @@
-// MR/fgFEtdDZUuNSi6GYQYmLtG5qBRXJZJeF0Yx3ilfETFnM6IXBX3zsayWpjtX/HtK+2iLCzX3b4K0y56eo/28n61yVYTqF4zSWsxxOO++N+nDrtRjDyUXph8Ud4Ueq382eX+r93nRWE3+zJP6XqnDPl2SYr3OQzXbJUbGx/ZQWu60nr3ZCaOHZ5cl8OnxyCGZVNQye5xFigHSHYadVVpPaq2uCE7mNb9kKU+WYSnB1n+2+afq+nc6zPWuDsy8rj7lTsl123PKvOSCTf9P2sNUwsV/FH7Kuxi43LlCSJ1dtO9F/izHHCUtjjNSBjCnd/bbtu3Dwuzq0o4fkyvW5vZg==
+// mbOTyHHgztN6kYzsxsl/tJc9VTt5/fgo7s1cGvzq6XpI0qHUmgAadFhjwScLIYVplx7d05j4dG5CPSKnR2PkT7c6XlteZOKMPzrllDdSHMe1ep2/GM+A0Irw7c8ylatquCNdNAUXyjwO4nY2CFNGaMCYUwTHaR2wcApEgJW9sxLpG48JulMmGPGy+7fuIdWKOA8e0wP2TEJuWWyrZO2TDgohSCiE1tpcJI2z+LmViOafaWan6w3SBn7r/SMdkE1Ysr0Rsl7AYy6AT84TqutF7J+96ecKbfF+Ymup0dEMR7sJBC0lkdkuU5TfA+dUbNwqx3m3N+uwW1oWxUBuvN3Hzg==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, November 6, 2012. Active patches: 296 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, November 6, 2012. Active patches: 298 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1108,6 +1108,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.dickmorris.com')){
 		addCssToDocument('*{content:normal !important}')
 		log('PATCH-929, dickmorris.com - avoid empty lightbox');
+	} else if(hostname.endsWith('www.downg.com')){
+		addCssToDocument('.softwaretable .inner{font-size:10px}');
+		log('PATCH-1007, downg.com: decrease font-size to avoid wrapping');
 	} else if(hostname.endsWith('www.dr.dk')){
 		addPreprocessHandler(/if\s*\(Browser\.ie\s*&&\s*isNaN\(parseFloat\(result\)\)\)\{/,'if (Browser.opera && isNaN(parseFloat(result))){',true,function(elm){ return elm.src&&elm.src.indexOf('base.js')>-1});
 		log('PATCH-962, dr.dk: fix misnested browser sniff');
@@ -1296,10 +1299,18 @@ function setTinyMCEVersion(e){
 			log('PATCH-382, Google Spreadsheets cell size and column label size mismatch\nPATCH-517, docs.google: make document names visible\nPATCH-278, We should not send keypress events for navigation- and function keys');
 		}
 		if(hostname.indexOf('mail.google.')>-1){
+			window.addEventListener('load', function(){
+			  for(var elms=document.getElementsByTagName('style'),el, i=0; el=elms[i]; i++){
+			    if(el.textContent.indexOf('::selection')>-1){
+			      el.textContent=el.textContent.replace( /:focus\[tabindex\]::selection,?/g, '' );
+			    }
+			  }
+			}, false);
+		
 			addCssToDocument('div.wl{overflow:inherit}body{position:static !important}');
 		
 			addCssToDocument('.editable.LW-avf{font-size: small !important}');
-			log('PATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
+			log('PATCH-992, Remove CSS that sets transparent background colour for selections\nPATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
 		}
 		if(hostname.indexOf('maps.google.')>-1 || hostname.indexOf('mapy.google.')>-1){
 			opera.addEventListener('BeforeEventListener.mousedown', function(e){if(e.event.target.tagName=='OPTION')e.preventDefault()}, false);
