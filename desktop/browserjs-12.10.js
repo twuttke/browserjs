@@ -1,4 +1,4 @@
-// aFMELiM3deNsYf0Fkviq0fHG7DwVe7Y3pu3BzWdPQPqYgpVMB3d4tactqo1a3w6/2x1OVFwFHrTr4CPCT/S8VQ7KihynGqk1yaBWWFON0HLzomlhrUNeIUjbZ/l/4sUx/gSHy+pgmcisyE+pVu1J5d1YtvmJlQzMTcdpERxA1qjrrjcCU+KZYtXzdPUL+3XsIRVLivzxcyb801l3S3aqwvr9BRqXKh8uw8JK5hqEx4epLm1/QsfRX7cFRiuw/yHOIzhHGCNE52doh696aneNH4aQf8VbS/Cw0RIgeuiBMFXdOb2ryZEv/eeJebPwnFI4YDyY8BeF9u/eOH49VD9RXA==
+// EOsi5ZWn7aXThQdvLG9nuUzgmXDrmurtd1cxGR81RgUAE60fpa64By/HDEsf7zcjWqjbOCQzcZPGxbPXrCdt41m1rffpxvTY+l/QYGcbRl/49stNWvqP3ImNawlFmjG1p59JRljQVM3z+xS7xWo6kDTDMgkel2q5VCBPgTpbswkPf0cc6Z6AKcBNgSoI4p52T//Y4mTIZdloCKcGgZaDAReQ87bgHJgcHkCxNBBO5+Rt34sUiMlDA9CzpfvSzr6JpqeXm73dO8A0D/xtOskEeL6Jh9aC41ARhnQx3IZBGIBRWw8sWfsCOZkp1QnY2YttK+Syf/e4ZOG+0NPhc6AY7A==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, November 6, 2012. Active patches: 265 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, November 6, 2012. Active patches: 268 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1076,6 +1076,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.dickmorris.com')){
 		addCssToDocument('*{content:normal !important}')
 		log('PATCH-929, dickmorris.com - avoid empty lightbox');
+	} else if(hostname.endsWith('www.downg.com')){
+		addCssToDocument('.softwaretable .inner{font-size:10px}');
+		log('PATCH-1007, downg.com: decrease font-size to avoid wrapping');
 	} else if(hostname.endsWith('www.dr.dk')){
 		addPreprocessHandler(/if\s*\(Browser\.ie\s*&&\s*isNaN\(parseFloat\(result\)\)\)\{/,'if (Browser.opera && isNaN(parseFloat(result))){',true,function(elm){ return elm.src&&elm.src.indexOf('base.js')>-1});
 		log('PATCH-962, dr.dk: fix misnested browser sniff');
@@ -1256,10 +1259,25 @@ function setTinyMCEVersion(e){
 			log('PATCH-321, Work around pre inheritance into tables on Google Code');
 		}
 		if(hostname.indexOf('mail.google.')>-1){
+			window.addEventListener('load', function(){
+			  for(var elms=document.getElementsByTagName('style'),el, i=0; el=elms[i]; i++){
+			    if(el.textContent.indexOf('::selection')>-1){
+			      el.textContent=el.textContent.replace( /:focus\[tabindex\]::selection,?/g, '' );
+			    }
+			  }
+			}, false);
+		
+			if(pathname.indexOf('/mail-static/_/js/main/')>-1){
+				opera.addEventListener('BeforeScript', function (e){
+					var foo = (/(\]\);)([a-z]+)=([a-z]+)==this\.[a-z]+;/gi).exec(e.element.text);
+					e.element.text = e.element.text.replace(/[a-z]+&&![a-z]+\([a-z]+\.keyCode\,this\.[a-z]+\,[a-z]+\.shiftKey\,[a-z]+\.ctrlKey\,[a-z]+\.altKey\)/gi,'!0').replace(foo[0],foo[0].replace(foo[1],foo[1]+'if('+foo[2]+'.type=="keydown")'+foo[3]+'='+foo[2]+'.keyCode;'));
+				}, false);
+			}
+		
 			addCssToDocument('div.wl{overflow:inherit}body{position:static !important}');
 		
 			addCssToDocument('.editable.LW-avf{font-size: small !important}');
-			log('PATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
+			log('PATCH-992, Remove CSS that sets transparent background colour for selections\nPATCH-1008, GMail: new composer recipient autocomplete arrow navigation\nPATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
 		}
 		log('0, Google');
 	} else if(hostname.indexOf('.hbo.com')>-1){
