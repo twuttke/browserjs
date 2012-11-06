@@ -1,4 +1,4 @@
-// A68/B3z9cpc29T4Utv8MmE8kMCNZZ0RW96h8NVLEtJYEQO/cv829puHKXiocFlCWGqfMGJ8wwSHiwcR/7j8zkTDKm6C4dJ4MlwhEXbKm9QEXo4Ky6gg7iRNrzdlY5eysaPHgNh5ztOGzJa7yrmSsc59mptG9b9ldK1NK9qWjpYW9HjNbsNRCntouT7kV9Rd+oAlKj3Yp4h2wl7qiTAUdzKt2zbPMZisRQPVSVAcocGWhH20r1am/pmZ1n6/XNdp9jEJ9EVwYeNvgXHrrxDpMTQ+bvOSnAyesavMYKrlMaKATiq/8yHLHK4Sj8FBXykW6UsP0kHf4vn7hx/lXnhJsXA==
+// MR/fgFEtdDZUuNSi6GYQYmLtG5qBRXJZJeF0Yx3ilfETFnM6IXBX3zsayWpjtX/HtK+2iLCzX3b4K0y56eo/28n61yVYTqF4zSWsxxOO++N+nDrtRjDyUXph8Ud4Ueq382eX+r93nRWE3+zJP6XqnDPl2SYr3OQzXbJUbGx/ZQWu60nr3ZCaOHZ5cl8OnxyCGZVNQye5xFigHSHYadVVpPaq2uCE7mNb9kKU+WYSnB1n+2+afq+nc6zPWuDsy8rj7lTsl123PKvOSCTf9P2sNUwsV/FH7Kuxi43LlCSJ1dtO9F/izHHCUtjjNSBjCnd/bbtu3Dwuzq0o4fkyvW5vZg==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, October 31, 2012. Active patches: 292 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, November 6, 2012. Active patches: 296 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -641,6 +641,14 @@ function setTinyMCEVersion(e){
 		}else if(name.indexOf('_zap/')!=-1 && name.indexOf('source/js/script.js')!=-1){ 
 			log('PATCH-471, ZAPPALLAS Fortune _zap fix applied');
 			opera.defineMagicFunction('checkNavigator',function(){return true;}); 
+		}else if(name.indexOf('shop/js/futureshop2.js')!=-1){
+			log('PATCH-994, add future-shop CMS gradients');
+			var cssText = '.FS2_InCartButton_D,.FS2_Search_btn_D,.FS2_SystemNav_btnPC,.FS2_sort_menu_title' + 
+			'{background:-o-linear-gradient(top,#555,#000);}' + 
+			'.FS2_Sort_btn {background:-o-linear-gradient(top,#FFF,#AAA);}' +
+			'.FS2_Button_P {background:-o-linear-gradient(top,#444,#000);}' +
+			'.FS2_Button_N {background:-o-linear-gradient(top,#EEE,#BBB);}'
+			addCssToDocument(cssText);
 		}
 	},false);
 
@@ -950,6 +958,12 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('openphoto.me')){
 		fixTransitionEndCase();
 		log('PATCH-874, Fix transition event case to un-confuse jQuery');
+	} else if(hostname.endsWith('ozakiverse.com')){
+		opera.addEventListener('BeforeEvent.mousewheel', function(e) {
+			var d = e.event.wheelDelta * -1;
+			e.event.__defineGetter__('wheelDelta', function() { return d });
+		}, false);
+		log('PATCH-1000, ozakiverse.com - inverse wheelDelta');
 	} else if(hostname.endsWith('pb.com')){
 		navigator.userAgent=navigator.userAgent.replace( /Opera/g, '0pera not Mozilla' );
 	
@@ -1051,6 +1065,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('thaiair.co.jp')){
 		navigator.appName = 'M'+navigator.appName;
 		log('PATCH-943, thaiair.co.jp - fix drop-down menu positioning');
+	} else if(hostname.endsWith('uye.memurlar.net')){
+		addCssToDocument('table{table-layout:auto;}');
+		log('PATCH-988, uye.memurlar.net: fix table layout');
 	} else if(hostname.endsWith('viaplay.no')){
 		addCssToDocument('div.overlay.disabled,div.dim{display:none !important}');
 		log('PATCH-931, viaplay.no: dismiss browser warning');
@@ -1100,6 +1117,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.finanzas.com')){
 		addCssToDocument('body{content: normal !important}');
 		log('PATCH-901, finanzas.com: work around generated content abuse');
+	} else if(hostname.endsWith('www.hbs.edu')){
+		addCssToDocument('*{content:normal!important}');
+		log('PATCH-995, hbs.edu - avoid abuse of generated content');
 	} else if(hostname.endsWith('www.lingvo.ru')){
 		addPreprocessHandler(/a\.unselectable="on";if\(window\.opera\)\{a\.onmousedown=function\(\)\{return\s*false\}\}/,'a.unselectable="on";if(!window.opera){a.onmousedown=function(){return false}}');
 		log('PATCH-925, lingvo.ru: prevent mousedown prevention');
@@ -1462,6 +1482,12 @@ function setTinyMCEVersion(e){
 		}
 		if(hostname.indexOf('.mail.yahoo.')>-1&& ( href.indexOf( '/neo/launch' )>-1 || href.indexOf( '/dc/launch' )>-1 )){
 			opera.addEventListener('BeforeEventListener.mousedown', function(e){
+				if(e.event.target.tagName=='SELECT' && e.event.target.id=='from-field'){
+					e.preventDefault();
+				}
+			},false);
+		
+			opera.addEventListener('BeforeEventListener.mousedown', function(e){
 				if(e.event.target.tagName=='INPUT' && e.event.target.id=='subject-field'){
 					e.preventDefault();
 				}
@@ -1488,7 +1514,7 @@ function setTinyMCEVersion(e){
 				if(document.getElementById('rtetext') && document.getElementById('rtetext').getElementsByTagName('iframe').length)
 					document.getElementById('rtetext').getElementsByTagName('iframe')[0].style.height = '97%';
 			}, true);
-			log('PATCH-417, Y!Mail Allow focusing subject field by mouse click in\nPATCH-418, Y!Mail Fix inserting links in mail compose screen\nPATCH-460, Y!Mail Prevent hidden text when composing long e-mails');
+			log('PATCH-996, Y!Mail Allow focusing address selector field by mouse click\nPATCH-417, Y!Mail Allow focusing subject field by mouse click in\nPATCH-418, Y!Mail Fix inserting links in mail compose screen\nPATCH-460, Y!Mail Prevent hidden text when composing long e-mails');
 		}
 		if(hostname.indexOf('.mail.yahoo.')>-1&&(href.indexOf( '/dc/system_requirements?browser=blocked' )>-1||href.indexOf( '/dc/system_requirements?browser=unsupported' )>-1)){
 			location.href='/dc/launch?sysreq=ignore';
