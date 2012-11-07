@@ -1,4 +1,4 @@
-// EOsi5ZWn7aXThQdvLG9nuUzgmXDrmurtd1cxGR81RgUAE60fpa64By/HDEsf7zcjWqjbOCQzcZPGxbPXrCdt41m1rffpxvTY+l/QYGcbRl/49stNWvqP3ImNawlFmjG1p59JRljQVM3z+xS7xWo6kDTDMgkel2q5VCBPgTpbswkPf0cc6Z6AKcBNgSoI4p52T//Y4mTIZdloCKcGgZaDAReQ87bgHJgcHkCxNBBO5+Rt34sUiMlDA9CzpfvSzr6JpqeXm73dO8A0D/xtOskEeL6Jh9aC41ARhnQx3IZBGIBRWw8sWfsCOZkp1QnY2YttK+Syf/e4ZOG+0NPhc6AY7A==
+// PW1CMdwmUcrJvmAcaKqgbLsSDdaJjZug8Sax4kr8Vg95OQ5hN0GkTKuHqn+kXGzXRRvoePz16qkI/kaWQqhuPMZOKkaF6iFOMPn4Qk1DDFCQVmFCGwdj8MTyhDmIORMj/dQtnE/R3HQTBZ5uDxS/PUlQzAOFxsDwpVpgEWQWUDneRJMvP62xj5cMDwsZ/PUj2vUdtSiSBJbMCFvY+8GVqao4ztaMNRGJIiZqPg8F+A6jo51EFsduj/9NNmNk8O+E64sq+MJshRNXheWzocUfqI0dSuuLyUfvFjWFwiVwbBzDXrQK6Cy+TXLXJsDK/5tswR2qGHn+Hxgew0R3+iffEg==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, November 6, 2012. Active patches: 268 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, November 7, 2012. Active patches: 269 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1033,6 +1033,19 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('thaiair.co.jp')){
 		navigator.appName = 'M'+navigator.appName;
 		log('PATCH-943, thaiair.co.jp - fix drop-down menu positioning');
+	} else if(hostname.endsWith('thenextweb.com')){
+		document.addEventListener('load', function(e){
+			if( e.target instanceof HTMLIFrameElement && e.target.style.display=='none'){
+				try{
+					if(e.target.contentWindow.document){
+						e.target.contentWindow.document.body.__defineGetter__('scrollHeight', function(){
+							return 0; //if iframe is display none, WebKit/Gecko returns 0 for content height
+						});
+					}
+				}catch(e){}
+			}
+		}, true);
+		log('PATCH-993, thenextweb.com - top bar placed too low');
 	} else if(hostname.endsWith('uye.memurlar.net')){
 		addCssToDocument('table{table-layout:auto;}');
 		log('PATCH-988, uye.memurlar.net: fix table layout');
@@ -1078,7 +1091,7 @@ function setTinyMCEVersion(e){
 		log('PATCH-929, dickmorris.com - avoid empty lightbox');
 	} else if(hostname.endsWith('www.downg.com')){
 		addCssToDocument('.softwaretable .inner{font-size:10px}');
-		log('PATCH-1007, downg.com: decrease font-size to avoid wrapping');
+		log('PATCH-1007, downg.com - decrease font-size to avoid wrapping');
 	} else if(hostname.endsWith('www.dr.dk')){
 		addPreprocessHandler(/if\s*\(Browser\.ie\s*&&\s*isNaN\(parseFloat\(result\)\)\)\{/,'if (Browser.opera && isNaN(parseFloat(result))){',true,function(elm){ return elm.src&&elm.src.indexOf('base.js')>-1});
 		log('PATCH-962, dr.dk: fix misnested browser sniff');
@@ -1245,7 +1258,7 @@ function setTinyMCEVersion(e){
 			opera.addEventListener('BeforeScript', function (e){
 				if (e.element.src.indexOf('trix_waffle') > -1 && e.element.src.indexOf('_core') > -1){
 					var foo = (/(\]\);)([a-z]+)=([a-z]+)==this\.[a-z]+;/gi).exec(e.element.text);
-					e.element.text = e.element.text.replace(/[a-z]+&&![a-z]+\([a-z]+\.keyCode\,this\.[a-z]+\,[a-z]+\.shiftKey\,[a-z]+\.ctrlKey\,[a-z]+\.altKey\)/gi,'!0').replace(foo[0],foo[0].replace(foo[1],foo[1]+'if('+foo[2]+'.type=="keydown")'+foo[3]+'='+foo[2]+'.keyCode;'));
+					if(foo)e.element.text = e.element.text.replace(/[a-z]+&&![a-z]+\([a-z]+\.keyCode\,this\.[a-z]+\,[a-z]+\.shiftKey\,[a-z]+\.ctrlKey\,[a-z]+\.altKey\)/gi,'!0').replace(foo[0],foo[0].replace(foo[1],foo[1]+'if('+foo[2]+'.type=="keydown")'+foo[3]+'='+foo[2]+'.keyCode;'));
 				}
 			}, false);
 			log('PATCH-977, Google Documents copy paste\nPATCH-382, Google Spreadsheets cell highligh mismatch and key event');
@@ -1270,14 +1283,14 @@ function setTinyMCEVersion(e){
 			if(pathname.indexOf('/mail-static/_/js/main/')>-1){
 				opera.addEventListener('BeforeScript', function (e){
 					var foo = (/(\]\);)([a-z]+)=([a-z]+)==this\.[a-z]+;/gi).exec(e.element.text);
-					e.element.text = e.element.text.replace(/[a-z]+&&![a-z]+\([a-z]+\.keyCode\,this\.[a-z]+\,[a-z]+\.shiftKey\,[a-z]+\.ctrlKey\,[a-z]+\.altKey\)/gi,'!0').replace(foo[0],foo[0].replace(foo[1],foo[1]+'if('+foo[2]+'.type=="keydown")'+foo[3]+'='+foo[2]+'.keyCode;'));
+					if(foo)e.element.text = e.element.text.replace(/[a-z]+&&![a-z]+\([a-z]+\.keyCode\,this\.[a-z]+\,[a-z]+\.shiftKey\,[a-z]+\.ctrlKey\,[a-z]+\.altKey\)/gi,'!0').replace(foo[0],foo[0].replace(foo[1],foo[1]+'if('+foo[2]+'.type=="keydown")'+foo[3]+'='+foo[2]+'.keyCode;'));
 				}, false);
 			}
 		
 			addCssToDocument('div.wl{overflow:inherit}body{position:static !important}');
 		
 			addCssToDocument('.editable.LW-avf{font-size: small !important}');
-			log('PATCH-992, Remove CSS that sets transparent background colour for selections\nPATCH-1008, GMail: new composer recipient autocomplete arrow navigation\nPATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
+			log('PATCH-992, GMail - Remove CSS that sets transparent background color for selections\nPATCH-1008, GMail - new composer recipient autocomplete arrow navigation\nPATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
 		}
 		log('0, Google');
 	} else if(hostname.indexOf('.hbo.com')>-1){
@@ -1459,7 +1472,7 @@ function setTinyMCEVersion(e){
 				if(document.getElementById('rtetext') && document.getElementById('rtetext').getElementsByTagName('iframe').length)
 					document.getElementById('rtetext').getElementsByTagName('iframe')[0].style.height = '97%';
 			}, true);
-			log('PATCH-996, Y!Mail Allow focusing address selector field by mouse click\nPATCH-417, Y!Mail Allow focusing subject field by mouse click in\nPATCH-418, Y!Mail Fix inserting links in mail compose screen\nPATCH-460, Y!Mail Prevent hidden text when composing long e-mails');
+			log('PATCH-996, Y!Mail - Allow focusing address selector field by mouse click\nPATCH-417, Y!Mail Allow focusing subject field by mouse click in\nPATCH-418, Y!Mail Fix inserting links in mail compose screen\nPATCH-460, Y!Mail Prevent hidden text when composing long e-mails');
 		}
 		if(hostname.indexOf('.mail.yahoo.')>-1&&(href.indexOf( '/dc/system_requirements?browser=blocked' )>-1||href.indexOf( '/dc/system_requirements?browser=unsupported' )>-1)){
 			location.href='/dc/launch?sysreq=ignore';
