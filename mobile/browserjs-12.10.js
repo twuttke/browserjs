@@ -1,4 +1,4 @@
-// m2xqX7rmogUt8epelgsA8AspdD0IJ8Oq5GIxv56uphoCoNomEleNlGgujRLAU8foIea7tlrJEBAj/gbm60xX782SPbVRVfRwJR9A+v5o5ShknicNyR8SD/mcyRYp0GpGQMykHCmcf4t5wh3hV39JmXVxazcymhc+IziUJvrxmhBTDKrE5gN0CL5pBtrZGuyHhvvh0wMgclRC4BK1Md3jaIflUZrfbUO5mo/WN1aR/5aj38AEVUsAh77o/cNUEtJnXdMV1EgsRynmEnTmlJ6kaVgeAtYjSk2yhIVY+r8lqElxI0VHFdDgZ4tg9bBAPgOQClcthgdyRj1I5yO3+t2X8w==
+// HCwJ2H7tpKcH41uu4xNpVgFMoiCZ3Xu1gtJeHPxbIawBnDVYOyMDQhRYwZUmoasneqzYO3uszXJ6nuINpkrAXBDAAGMJ2Dh5yKoG9Ytn7lLqQZvczbhaPRi+z77jfXy720TJFqAU5hFwgQJVPdb6JW+J9ZTyT0wN0DsUGatxScMuAuyHwdgT/UI74qoMuxhKuL7/pBP/T3gPnbYXn1fOv2mjJ7i/j1UUbkphYtDeWCGruyreMf1ZzGg3np15nlFrWejjoQzxlU5spGJHfzUNNIZ5ImhHVMotmqMHWAMG9spxpIV4++5lzMifQWxWntbfJH+8niwwhj8CV+V163hjsQ==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.10 core 2.11.355, November 5, 2012. Active patches: 207 ';
+	var bjsversion=' Opera Mobile 12.10 core 2.11.355, November 9, 2012. Active patches: 218 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -312,7 +312,17 @@ function stopKeypressIfDownCancelled(stopKey){
 	
 
 
-	if((hostname.indexOf('tokyo.jp')>-1)||(hostname.indexOf('lg.jp')>-1)){
+	if((hostname.indexOf('mobile.gnavi.co.jp')>-1)||(hostname.indexOf('my.gnavi.co.jp')>-1)){
+		var cssText ='';
+		cssText +='.gnaviKeywordSearchWrap,#scBtn .group01 {box-sizing:border-box;}';
+		cssText +='input[type="submit"],#topAppMd p.btn,.btnFacebook, .btnBlue {background:-o-linear-gradient(top,#888,#333);}';
+		cssText +='#gnIdentity .gnIdentityLoginButton,.gnListBg {background:-o-linear-gradient(top,#FE7,#FD2);}';
+		cssText +='#submit .btn, #comfirmBtn .btn, #memberTouroku .btn {background-image:-o-linear-gradient(top,#333,#000);}';
+		cssText +='.mapBtn a {background-color:#AAA;}';
+		cssText +='.subarea .toggle_btn a {background-size:15px 15px!important;}';
+		addCssToDocument(cssText);
+		log('PATCH-1027, mobile.gnavi.co.jp,my.gnavi.co.jp - add missing gradients and layout fix');
+	} else if((hostname.indexOf('tokyo.jp')>-1)||(hostname.indexOf('lg.jp')>-1)){
 		if (location.pathname.indexOf('citymap')>-1) {
 			window.opera.defineMagicFunction('chkBrowser',function(){
 				return true;
@@ -345,6 +355,14 @@ function stopKeypressIfDownCancelled(stopKey){
 		/* goo.ne.jp */
 	
 	
+		if((hostname.indexOf('search.goo.')>-1)||(hostname.indexOf('bsearch.goo.')>-1)){
+			var cssText ='#tab {background:-o-linear-gradient(top,#555,#222);}';
+			cssText +='.others .other_category .other_cell_time a {background-color:#DDD}';
+			cssText +='.others .other_category .other_cell_time a.crt {background:-o-linear-gradient(top,#DDD,#BBB);}';
+			cssText +='.morebtn {background:-o-linear-gradient(top,#8CF,#37D);}';
+			addCssToDocument(cssText);
+			log('PATCH-991, search.goo.ne.jp - add missing gradients');
+		}
 		if(hostname.indexOf('.goo.')>-1){
 			var cssText ='input[type="text"] {box-sizing:border-box;}';
 			cssText +='a.brc {background-image:-o-linear-gradient(top,#9FF,#09F);}';
@@ -768,6 +786,15 @@ function stopKeypressIfDownCancelled(stopKey){
 		  addPreprocessHandler('history.back()', 'location.href="pass.htm"; window.open("mytest.html");' );
 		}
 		log('YUSHAN-3774, Fix pop up issue of  CMCC IOT test');
+	} else if(hostname.indexOf('3g.cn')>-1){
+		if((location.hostname.indexOf('xlive') > -1 )&& (pathname.indexOf('liveroom.html') > -1)){
+		  addCssToDocument('#areaHeader{position:static !important;} .myTips{position:static;margin-top:'+(document.documentElement.clientHeight+20)+'px} .tempAD_area{bottom:0 !important; top:22px}');
+		}
+	
+		if(hostname.indexOf('xuan.3g.cn')>-1) {
+		 addCssToDocument('.navMain p a {width:16% !important; } .screen-gt320 h1, .screen-gt320 h1 a { font-size: 16px !important;  }');
+		}
+		log('NHSP-643, Blank page issue of liveroom on 3g.cn\nOMO-89, Fix page layout issues on 3G.cn');
 	} else if(hostname.indexOf('3g.qq.com')>-1){
 		if (hostname.indexOf('info') > -1 && pathname.indexOf('/g/s')==0) {
 		 addCssToDocument('.stock, .img-news{float:left;} .stock-up-num, .stock-down-num, .marquee {float:right;} .t-center {display: inline-block; margin-left:2px; margin-right:2px;} #div_live_content > a {font-size:12px; !important; } .qq-product a  {display: inline-block !important;} .main-nav-list li, .main-nav-list li a { display:inline-block !important; } .cont-list { clear: both;} .oly-jpb { background: url("http://3gimg.qq.com/wap30/img/info3_new/oly_jpb_bg.png") 0% 0%/320px auto no-repeat #F6F7F8 !important; } #dd_jpb, .oly-jpb dt, .oly-jpb dd, .oly-jpb h3  { display: inline-block;} .crumb-nav { display: inline-block; border: 0px; } .crumb .home, .crumb .crumb-nav, .crumb .art-set { line-height: normal !important; position: static !important; }  .art-set, .home { border-width: 0px; }  .crumb div { display : inline-block; } .home { border: 0px; height: 30px !important; background-image: none; background-color: transparent; text-indent: 0em; } .crumb-nav a { padding: 0px 16px 0px 4px;} .home::after {background-color: transparent;} header#header .crumb .home, header#header .crumb .art-set { display : none; } '); 
@@ -1079,16 +1106,23 @@ function stopKeypressIfDownCancelled(stopKey){
 		    
 		log('PENGU-745, Can not login to digg.com');
 	} else if(hostname.indexOf('facebook.com')>-1){
-		var isTouchMoving;
+		var isTouchMoving, hasoldpos, oldpos;
 		document.addEventListener('touchstart',function(){isTouchMoving=true;},false);
-		document.addEventListener('touchend',function(){isTouchMoving=false;},false);
-		document.addEventListener('touchcancel',function(){isTouchMoving=false;},false);
+		document.addEventListener('touchend',function(){isTouchMoving=false;hasoldpos=false;},false);
+		document.addEventListener('touchcancel',function(){isTouchMoving=false;hasoldpos=false;},false);
 		(function(tmp){
 				var origSetter = tmp.style.__lookupSetter__('transform');
 				CSSStyleDeclaration.prototype.__defineSetter__('transform',
 					function(e){
 						if(e.indexOf('translate3d')>-1 && isTouchMoving){
-							e=e.replace(/3d/,'').replace(/,0\)/,')');
+							if(!hasoldpos){
+								oldpos = this.transform ? parseInt(this.transform.match(/-?\d{1,3}/)) : 0;
+								hasoldpos = true;
+							}
+							var newpos = oldpos + parseInt(e.match(/-?\d{1,3}px/));
+							if(newpos>30)newpos=0; //avoid going off screen to the right
+							var newtrn = '(' + newpos +'px';
+							e=e.replace(/3d\(-?\d{1,3}px/,newtrn).replace(/,0\)/,')');
 						}
 						return origSetter.call(this,e);
 					}
@@ -1140,6 +1174,8 @@ function stopKeypressIfDownCancelled(stopKey){
 		//Pages you may like
 		cssText += '.touch .storyAggregation.ego .egoAttachment, .touch .egoAttachment .primarywrap{display:flex;flex:1}';
 		cssText += '.touch .egoAttachment > .right{display:flex;align-items:center}';
+		//like-comment-share
+		cssText += '.feedbackInlineWrap.inlineShare .ufiActions {display: flex;}';
 		addCssToDocument(cssText);
 		
 		log('PATCH-997, touch.facebook.com - make translate3d sliders work\nPATCH-618, touch.facebook.com - Fix unclickable dropdowns\nPATCH-618, touch.facebook.com - Add missing background images\nPATCH-618, touch.facebook.com - Missing opera prefixes/syntax');
@@ -1216,6 +1252,15 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('huntington.com')>-1){
 		opera.defineMagicVariable('browserOkay',function(){return true},null);
 		log('PATCH-712, huntington.com: work around browser sniff');
+	} else if(hostname.indexOf('j-cast.com')>-1){
+		var cssText ='';
+		cssText +='header#pageHeader,.subMenueBt,.channel-news .global-nav #news a,.channel-tv .global-nav #tv a,.channel-mono .global-nav #mono a,.channel-kaisha .global-nav #kaisha a,h1#headTitle,.horizonBt-red {background:-o-linear-gradient(top,#4AD,#26A);}';
+		cssText +='ul.stabs,nav li a,.bt-litegray, .bt-gray,#block-ranking #nav li.rankingAccess a, #block-ranking #nav li.rankingComment a, #block-ranking #nav li.rankingTweet a, #block-ranking #nav a:hover {background:-o-linear-gradient(top,#444,#333);}';
+		cssText +='#block-asaichi h1 {background:url(http://www.j-cast.com/tv/assets/img/heading-primal-css-sprite.png) 0 -210px no-repeat,-o-linear-gradient(top,#FFF,#FEE);}';
+		cssText +='#block-geinouBlog h1 {background:url(http://www.j-cast.com/tv/assets/img/heading-primal-css-sprite.png) no-repeat,-o-linear-gradient(top,#FFF,#FEE);}';
+		cssText +='#block-tvMisyuran h1 {background:url(http://www.j-cast.com/tv/assets/img/heading-primal-css-sprite.png) 0 -140px no-repeat,-o-linear-gradient(top,#FFF,#FEE);}';
+		addCssToDocument(cssText);
+		log('PATCH-1014, j-cast.com - add missing gradients');
 	} else if(hostname.indexOf('jabong.com')>-1){
 		opera.addEventListener('BeforeCSS', function(e){
 		  e.cssText = e.cssText.replace(/.clearfix:after,#content,#content:after,/g,'.clearfix:after,#content:after,');
@@ -1252,12 +1297,23 @@ function stopKeypressIfDownCancelled(stopKey){
 		addCssToDocument(cssText);
 		log('PATCH-944, konami.jp - add missing gradients');
 	} else if(hostname.indexOf('linkedin.com')>-1){
+		addCssToDocument('#li-header{background-image: -o-linear-gradient(top,white,#D2CFCA);}');
+	
 		var cssText = '';
 		/* Login Button */
 		cssText += '.controls .text, .controls input[type="submit"].text, .controls input[type="button"].text {background-image: -o-linear-gradient(top,#1F6A8D,#0E3E54);}';
 		cssText += '.controls .text, .controls input[type="submit"].text, .controls input[type="button"].text {background-image: linear-gradient(to bottom,#1F6A8D,#0E3E54);}';
 		addCssToDocument(cssText);
-		log('PATCH-865, linkedin.com - add missing gradients');
+		log('PATCH-1010, linkedin.com - add missing gradients top bar\nPATCH-865, linkedin.com - add missing gradients');
+	} else if(hostname.indexOf('m.dangdang.com')>-1){
+		if(hostname.contains('m.')){
+		  if(pathname == "/touch" || pathname == "/touch/"){
+		    location.href = 'http://m.dangdang.com/?source=touch';
+		  }
+		}
+		
+		addCssToDocument('input.sf_btn { margin-left: 0 !important;}');
+		log('NHSP-664, Page display issue of Dangdang.com');
 	} else if(hostname.indexOf('m.deadspin.com')>-1){
 		fixGawkerMobile();
 		log('PATCH-655, Fix Gawker Media mobile site (Deadspin)');
@@ -1407,6 +1463,11 @@ function stopKeypressIfDownCancelled(stopKey){
 				addCssToDocument('.page-content{margin-top: '+(document.getElementById('search-bar').offsetHeight/1.79)+'px} ');
 		}, false);
 		log('PATCH-747, Work around flexbox-based styling on Yelp mobile site');
+	} else if(hostname.indexOf('m.yihaodian.com')>-1){
+		if(location.href.indexOf('m.yihaodian.com/mw/?')>-1){
+		  location.href = "http://m.yihaodian.com/?websiteflag=true";
+		}
+		log('NHSP-664, Page display issue of yihaodian.com');
 	} else if(hostname.indexOf('m.zdnet.com')!=-1){
 		forceMobileView();
 		log('TWEETY-110, Mobile zdnet.com should be displayed in mobile view');
@@ -1509,6 +1570,12 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('netpia.linkprice.com')>-1){
 		addEventListener.call(document, 'load', function(){try{clear()}catch(e){}}, false);
 		log('354340, Clears popups that are visible after loading subpages on netpia.linkprice.com');
+	} else if(hostname.indexOf('news.biglobe.ne.jp')>-1){
+		var cssText = '';
+		cssText +='.navi2,.dsp,.keywordsttl01block,#keywordsblock .keywords a,#searchsubmit {background:-o-linear-gradient(top,#FFF,#EEE);}';
+		cssText +='#areasearch {background:-o-linear-gradient(top,#ABC,#68B);}';
+		addCssToDocument(cssText);
+		log('PATCH-1005, news.biglobe.ne.jp - add missing gradients');
 	} else if(hostname.indexOf('news.cn')>-1){
 		if(hostname.indexOf('3g.') > -1 || hostname.indexOf('m.') > -1){
 		  addCssToDocument('.button, .button1{background:-o-linear-gradient(to bottom, #A9CA39, #689D00);} .categories ul li.blnone{clear:left;}');
@@ -1695,6 +1762,10 @@ function stopKeypressIfDownCancelled(stopKey){
 		log('OMO-104, Fix log in issue of t.yuuquu.com');
 	} else if(hostname.indexOf('taobao.com')>-1){
 		if(hostname.indexOf('m.')>-1 || hostname.indexOf('wap.')>-1 || hostname.indexOf('3g.')>-1) {
+		  addCssToDocument('@-o-viewport {width:device-width; zoom:1; min-zoom:1; max-zoom:2; user-zoom:zoom;} @viewport {width:device-width; zoom:1; min-zoom:1; max-zoom:2; user-zoom:zoom;}');
+		}
+	
+		if(hostname.indexOf('m.')>-1 || hostname.indexOf('wap.')>-1 || hostname.indexOf('3g.')>-1) {
 			if(location.search.indexOf('v=1')<=-1 && (pathname.length <2 && (location.search.length <2 || location.search.indexOf('sprefer=sypc00')>-1))) {
 				location.replace('http://m.taobao.com/?v=1');
 			} 
@@ -1715,26 +1786,22 @@ function stopKeypressIfDownCancelled(stopKey){
 				addCssToDocument('.login .login-form li {height:auto !important;} .common-btn-full {background: -o-linear-gradient(#F94920,#EB3E13) !important;}');
 			}
 		}
-		log('NHSP-435, Fix layout messing up issue of m.taobao.com touch screen version\nOMO-267, Fix input box and layout display issue of login.m.taobao.com');
-	} else if(hostname.indexOf('teacup.com')>-1){
-		var cssText = '';
-		/* Gradient support with fallback background-color for mini */
-		cssText += '.create {background-color:#EB3436}'; 
-		cssText += '.create {background-image:-o-linear-gradient(top, #EB3436, #BE0609);}';
-		cssText += '.create {background-image:linear-gradient(to bottom, #EB3436, #BE0609);}';
-		cssText += '.login {background-color:#59A600;}';
-		cssText += '.login {background-image: -o-linear-gradient(top, #59A600, #31A200);}';
-		cssText += '.login {background-image: linear-gradient(to bottom, #59A600, #31A200);}'; 
-		/* Fix for css zoom */
-		cssText += '.special li img {transform:scale(0.62); transform-origin:top center;}';
-		addCssToDocument(cssText);
-		log('PATCH-825, www.teacup.com - add missing gradients and resizing for css zoom');
+		log('NHSP-663, Viewport issue of m.taobao.com\nNHSP-435, Fix layout messing up issue of m.taobao.com touch screen version\nOMO-267, Fix input box and layout display issue of login.m.taobao.com');
 	} else if(hostname.indexOf('time.com')>-1){
 		navigator.userAgent=navigator.userAgent.replace( /windows ce/i, '' );
 		log('229826, time.com script causes reload loop if UA contains "Windows CE"');
 	} else if(hostname.indexOf('tistory.com')!=-1){
 		addCssToDocument('#memberbox .btn-login {text-indent:-100px;}');
 		log('347990, two login buttons on tistory.com');
+	} else if(hostname.indexOf('tmall.com')>-1){
+		if(hostname.contains('m.')){
+		 addCssToDocument('@-o-viewport {width:device-width; zoom:1; min-zoom:1; max-zoom:2; user-zoom:zoom;} '+
+				'@viewport {width:device-width; zoom:1; min-zoom:1; max-zoom:2; user-zoom:zoom;}');
+		}
+		log('NHSP-671, Viewport issue of tmall.com');
+	} else if(hostname.indexOf('touch.pixiv.net')>-1){
+		addCssToDocument('.icon-search::before {-o-transform: scale(0.5);-o-transform-origin: -18% -16%;}'); 
+		log('PATCH-1003, touch.pixiv.net - css zoom fix');
 	} else if(hostname.indexOf('travel.rakuten.co.jp')>-1){
 		var cssText = '.headLink{background: -o-linear-gradient(top, #666666, #000000 45%);}';
 		cssText += '#searchArea #map{background: -o-linear-gradient(top, #FFFFFF, #9CE2EB);}';
@@ -1814,9 +1881,14 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('www.answers.com')>-1){
 		addCssToDocument('body{background-image: -o-linear-gradient(top,rgba(74,114,193,0.98),rgba(31,56,105,0.98)), url(http://en.site2.answcdn.com/templates/images/stripe.png?v=49d225d);}');
 		log('PATCH-719, answers.com: add background gradient');
-	} else if(hostname.indexOf('xuan.3g.cn')>-1){
-		addCssToDocument('.navMain p a {width:16% !important; } .screen-gt320 h1, .screen-gt320 h1 a { font-size: 16px !important;  }');
-		log('OMO-89, Fix page layout issues on 3G.cn');
+	} else if(hostname.indexOf('www.biglobe.ne.jp')>-1){
+		var cssText ='';
+		cssText +='ul.stabs li a.s_active {background:-o-linear-gradient(top,#04B,#49F);}';
+		cssText +='ul.stabs {background:-o-linear-gradient(top,#FFF,#CCC);}';
+		cssText +='div.search input.sfrm {width:98%;}';
+		cssText +='.title,a.topicsTtlBar {background:-o-linear-gradient(top,#06D,#5AF);}';
+		addCssToDocument(cssText);
+		log('PATCH-1004, www.biglobe.ne.jp - add missing gradients');
 	} else if(hostname.match(/mercadoli[vb]re\./)){
 		opera.addEventListener('BeforeCSS', function(e){
 		  e.cssText = e.cssText.replace(/\(-o-min-device-pixel-ratio:3\//, '(-o-min-device-pixel-ratio:3/2){}');
