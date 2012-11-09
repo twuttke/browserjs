@@ -1,4 +1,4 @@
-// PW1CMdwmUcrJvmAcaKqgbLsSDdaJjZug8Sax4kr8Vg95OQ5hN0GkTKuHqn+kXGzXRRvoePz16qkI/kaWQqhuPMZOKkaF6iFOMPn4Qk1DDFCQVmFCGwdj8MTyhDmIORMj/dQtnE/R3HQTBZ5uDxS/PUlQzAOFxsDwpVpgEWQWUDneRJMvP62xj5cMDwsZ/PUj2vUdtSiSBJbMCFvY+8GVqao4ztaMNRGJIiZqPg8F+A6jo51EFsduj/9NNmNk8O+E64sq+MJshRNXheWzocUfqI0dSuuLyUfvFjWFwiVwbBzDXrQK6Cy+TXLXJsDK/5tswR2qGHn+Hxgew0R3+iffEg==
+// xZitlFX6qJllzTwlJZGiU4upAfgrhD4bFRaAaNK8qmuaiJf222BPwTHRtiP4P+eSfCxjIjw860XJKqHYB3rzmlbV9z4wmTdea6CVJHcX9St9krczV41Bj9dbEusyUhIe9E7wmmuKLFD2QXb3bSqG0gSDmqasDBWfL21fOpB33bihst3W8jA0PiweXQHRazcHBsUjzbn8rJ8qtQtEPyjMAzZJ1CbRhI6CTX+7F41DqfERU9BQzyOQDqG5qAtnYc4eeXIKukeqGitecAWoDiGeiJJarTKUJZxQczNGN1XpI2WaLE1YzrwDg2TZ1MVNc83KZB4RwWsfyRgb34B2EnZEDQ==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, November 7, 2012. Active patches: 269 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, November 9, 2012. Active patches: 276 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -352,6 +352,21 @@ function setTinyMCEVersion(e){
 	// if an instance has already been created, we can read version info from it...
 	var tinyInstance='tinyMCE' in window?window.tinyMCE : 'tinymce' in window ? window.tinymce : 'tiny_mce' in window ?  window.tiny_mce : null;
 	if(tinyInstance&&tinyInstance.majorVersion)tinyMCEVersionInfo={ majorVersion:tinyInstance.majorVersion, minorVersion:tinyInstance.minorVersion };
+}
+
+function undoFunctionKeypressEventRemoval(){
+  var keys=['Up', 'Down', 'Right', 'Left', 'Home', 'End', 'Insert', 'Delete', 'Escape', 'Backspace', 'PageUp', 'PageDown'];
+  for(var i=1;i<13;i++)keys.push('F'+i);
+  opera.addEventListener('AfterEvent.keydown', function(e){
+    if(keys.indexOf(e.event.key)>-1){
+      var evt=(e.event.target.ownerDocument||e.event.target.document||document).createEvent('KeyboardEvent');
+      evt.initKeyboardEvent('keypress', true, true,window,e.event.char,e.event.key,null,null,false,null);
+      evt.__defineGetter__('keyCode', function(){return e.event.keyCode});
+      evt.__defineGetter__('ctrlKey', function(){return e.event.ctrlKey});
+      evt.__defineGetter__('shiftKey', function(){return e.event.shiftKey});
+      e.event.target.dispatchEvent(evt);
+    }
+  });
 }
 
 
@@ -744,6 +759,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('barnesandnoble.com')){
 		addCssToDocument('.styledselect-display select{min-width:100%}');
 		log('PATCH-967, barnesandnoble.com - show select arrows');
+	} else if(hostname.endsWith('book.lufthansa.com')){
+		addCssToDocument('td.fare input, td.fareOff input{position:inherit}');
+		log('PATCH-1018, lufthansa.com - fix unclickable positioned inputs');
 	} else if(hostname.endsWith('caisse-epargne.fr')){
 		addPreprocessHandler(/this\._changeHandler\);if\s*\(Sys\.Browser\.agent\s==\sSys\.Browser\.Opera\)/g, ' this._changeHandler);if(false)');
 		log('PATCH-798, Avoid browser sniffing that breaks typing');
@@ -853,6 +871,17 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('loyalbank.com')){
 		HTMLElement.prototype.onselectstart = true;
 		log('PATCH-707, loyalbank.com: prevent mousedown prevention');
+	} else if(hostname.endsWith('lucasarts.com')){
+		opera.addEventListener('BeforeScript',function(ev){
+			var name=ev.element.src; 
+			if(!name){return;}
+			if(name.indexOf('hive.min.js')>-1){
+				ev.element.text = ev.element.text.replace('e.style.animationName&&(t=!0);','e.style.animationName!==undefined&&(t=!0);');
+				ev.element.text = ev.element.text.replace('"translate3d(-"+r+"px,0,0)"','"translateX(-"+r+"px)"');
+			}
+		},false);
+		addCssToDocument('.home #landing #landing-image .gallery-item-container.closed {display: none;}');
+		log('PATCH-998, lucasarts.com - fix compatibility with hive');
 	} else if(hostname.endsWith('maerskfleet.com')){
 		navigator.userAgent = 'Firefox'+navigator.userAgent;
 		window.opera = null;
@@ -940,6 +969,9 @@ function setTinyMCEVersion(e){
 			e.event.__defineGetter__('wheelDelta', function() { return d });
 		}, false);
 		log('PATCH-1000, ozakiverse.com - inverse wheelDelta');
+	} else if(hostname.endsWith('p2pool.info')){
+		fixTransitionEndCase();
+		log('PATCH-1016, p2pool.info - transitionend');
 	} else if(hostname.endsWith('pb.com')){
 		navigator.userAgent=navigator.userAgent.replace( /Opera/g, '0pera not Mozilla' );
 	
@@ -1046,6 +1078,9 @@ function setTinyMCEVersion(e){
 			}
 		}, true);
 		log('PATCH-993, thenextweb.com - top bar placed too low');
+	} else if(hostname.endsWith('todoist.com')){
+		KeyboardEvent.prototype.__defineGetter__('key', function(e){return this.keyCode});
+		log('PATCH-1021, todoist.com - fix event.key usage');
 	} else if(hostname.endsWith('uye.memurlar.net')){
 		addCssToDocument('table{table-layout:auto;}');
 		log('PATCH-988, uye.memurlar.net: fix table layout');
@@ -1255,13 +1290,12 @@ function setTinyMCEVersion(e){
 				}
 			}, false);
 		
-			opera.addEventListener('BeforeScript', function (e){
-				if (e.element.src.indexOf('trix_waffle') > -1 && e.element.src.indexOf('_core') > -1){
-					var foo = (/(\]\);)([a-z]+)=([a-z]+)==this\.[a-z]+;/gi).exec(e.element.text);
-					if(foo)e.element.text = e.element.text.replace(/[a-z]+&&![a-z]+\([a-z]+\.keyCode\,this\.[a-z]+\,[a-z]+\.shiftKey\,[a-z]+\.ctrlKey\,[a-z]+\.altKey\)/gi,'!0').replace(foo[0],foo[0].replace(foo[1],foo[1]+'if('+foo[2]+'.type=="keydown")'+foo[3]+'='+foo[2]+'.keyCode;'));
-				}
-			}, false);
+			undoFunctionKeypressEventRemoval();
 			log('PATCH-977, Google Documents copy paste\nPATCH-382, Google Spreadsheets cell highligh mismatch and key event');
+		}
+		if(hostname.contains('play.google')){
+			undoFunctionKeypressEventRemoval();
+			log('PATCH-1022, Google Play suggest menu navigation relies on function key keypress events in Opera');
 		}
 		if(hostname.indexOf('adwords.google.') > -1){
 			window.navigator.product = 'Gecko';
@@ -1272,25 +1306,18 @@ function setTinyMCEVersion(e){
 			log('PATCH-321, Work around pre inheritance into tables on Google Code');
 		}
 		if(hostname.indexOf('mail.google.')>-1){
-			window.addEventListener('load', function(){
-			  for(var elms=document.getElementsByTagName('style'),el, i=0; el=elms[i]; i++){
-			    if(el.textContent.indexOf('::selection')>-1){
-			      el.textContent=el.textContent.replace( /:focus\[tabindex\]::selection,?/g, '' );
-			    }
-			  }
-			}, false);
+			addCssToDocument(':focus[tabindex] ::selection,:focus[tabindex]::selection{background-color:highlight!important;color:highlighttext!important}');
 		
-			if(pathname.indexOf('/mail-static/_/js/main/')>-1){
-				opera.addEventListener('BeforeScript', function (e){
-					var foo = (/(\]\);)([a-z]+)=([a-z]+)==this\.[a-z]+;/gi).exec(e.element.text);
-					if(foo)e.element.text = e.element.text.replace(/[a-z]+&&![a-z]+\([a-z]+\.keyCode\,this\.[a-z]+\,[a-z]+\.shiftKey\,[a-z]+\.ctrlKey\,[a-z]+\.altKey\)/gi,'!0').replace(foo[0],foo[0].replace(foo[1],foo[1]+'if('+foo[2]+'.type=="keydown")'+foo[3]+'='+foo[2]+'.keyCode;'));
-				}, false);
-			}
+			undoFunctionKeypressEventRemoval();
 		
 			addCssToDocument('div.wl{overflow:inherit}body{position:static !important}');
 		
 			addCssToDocument('.editable.LW-avf{font-size: small !important}');
 			log('PATCH-992, GMail - Remove CSS that sets transparent background color for selections\nPATCH-1008, GMail - new composer recipient autocomplete arrow navigation\nPATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
+		}
+		if(pathname.indexOf('/reader/')==0){
+			undoFunctionKeypressEventRemoval();
+			log('PATCH-1017, Google Reader - fix key event sniffing');
 		}
 		log('0, Google');
 	} else if(hostname.indexOf('.hbo.com')>-1){
@@ -1534,10 +1561,12 @@ function setTinyMCEVersion(e){
 		makePropertyCacheable(HTMLEmbedElement.prototype, 'src');
 		log('PATCH-653, allegro.pl: cache plugin properties to avoid performance impact from short interval');
 	} else if(hostname.indexOf('amazon.')>-1){
+		addCssToDocument('.ONETHIRTYFIVE-HERO ul{margin-bottom:0!important}');
+	
 		if (navigator.appName!=='Opera'){
 			document.documentElement.style.MozAppearance = 'Opera';
 		}
-		log('PATCH-527, Add more spoofing when masking as another browser on Amazon');
+		log('PATCH-1025, Amazon - Black Friday deals float upwards due to margin styling on UL and innerHTML updates\nPATCH-527, Add more spoofing when masking as another browser on Amazon');
 	} else if(hostname.indexOf('ameba.jp')!=-1){
 		addPreprocessHandler(/editor\.insertNodeAtSelection\(link\);\s*editor\.insertNodeAtSelection\(document\.createElement\('br'\)\);/, 'editor.insertNodeAtSelection(link);');
 		log('331093, Work around Opera bug where second BR tag overwrites newly inserted IMG');
