@@ -1,4 +1,4 @@
-// xZitlFX6qJllzTwlJZGiU4upAfgrhD4bFRaAaNK8qmuaiJf222BPwTHRtiP4P+eSfCxjIjw860XJKqHYB3rzmlbV9z4wmTdea6CVJHcX9St9krczV41Bj9dbEusyUhIe9E7wmmuKLFD2QXb3bSqG0gSDmqasDBWfL21fOpB33bihst3W8jA0PiweXQHRazcHBsUjzbn8rJ8qtQtEPyjMAzZJ1CbRhI6CTX+7F41DqfERU9BQzyOQDqG5qAtnYc4eeXIKukeqGitecAWoDiGeiJJarTKUJZxQczNGN1XpI2WaLE1YzrwDg2TZ1MVNc83KZB4RwWsfyRgb34B2EnZEDQ==
+// P1y0fclwilT0hYKWuzPMSXvOJu1NkcxZicf57YwIUIs0LmvzDH/3CIqx1se92bqpXs8rHRTlOfdMrjXD5clcu5yXAIOjreSvIpVvgH2JLxaIuzTR+UHcZtD8/x8n5yppK0iw7SS91vktkxUpm6ZnxeZp9o9ZLeV4fEflR7aAEVxM5JSt7E1Gb78E/ZD/gu+kTmirneDLJLboL9FKMNCarUCzghc5aTs3hR8vHI1C7mwfDy1D6WV/yPzfHkQiBcLoze6pyBALsaJ87m90G6FVN42CXfEUZnjHb1mf6Yi/TYqDr1g0Np8H44YgX2+NQWUrbE1IH71rYg5LP28lRbmCcQ==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, November 9, 2012. Active patches: 276 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, November 13, 2012. Active patches: 280 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -744,6 +744,9 @@ function undoFunctionKeypressEventRemoval(){
 			navigator.userAgent = navigator.userAgent.replace(/OS X (\d+).(\d+).(\d+)+;/,'OS X $1_$2_$3;');
 		}
 		log('PATCH-846, apple.com: don\'t reload from within unload handler\nPATCH-888, apple_core: CSS animations are unprefixed from Opera 12.10\nPATCH-924, apple.com - reformat OS X version string with underscores');
+	} else if(hostname.endsWith('.tsn.ca')){
+		window.addEventListener('load', function(){$(document).triggerHandler("onload.etsapi")}, false);
+		log('PATCH-1028, Dispatch of the "video player ready" event happens before event listener is added due to blocking DOM-added scripts, fire it again');
 	} else if(hostname.endsWith('aio.meb.gov.tr')){
 		navigator.appName='Netscape';
 		log('PATCH-959, Fix sniffing in old menu');
@@ -756,9 +759,6 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('antikvar.hu')){
 		addCssToDocument('#header a{font-size:11px}');
 		log('PATCH-890, antikvar.hu: font fallback breaks layout');
-	} else if(hostname.endsWith('barnesandnoble.com')){
-		addCssToDocument('.styledselect-display select{min-width:100%}');
-		log('PATCH-967, barnesandnoble.com - show select arrows');
 	} else if(hostname.endsWith('book.lufthansa.com')){
 		addCssToDocument('td.fare input, td.fareOff input{position:inherit}');
 		log('PATCH-1018, lufthansa.com - fix unclickable positioned inputs');
@@ -836,7 +836,9 @@ function undoFunctionKeypressEventRemoval(){
 		}
 		log('PATCH-862, hipmunk.com: avoid header table cell collapse. Core bug.');
 	} else if(hostname.endsWith('hotels.ctrip.com')){
-		addPreprocessHandler(/win.addEventListener/g,'ifm.addEventListener',true,function(elm){ return elm.src&&elm.src.indexOf('c_result.map.js')>-1});
+		addPreprocessHandler(/win.addEventListener/g,'ifm.addEventListener',true,function(elm){
+		 return elm.src && ( elm.src.indexOf('c_result.map.js')>-1 || elm.src.indexOf('c_detail.map.js')>-1 )
+		});
 		log('PATCH-857, hotels.ctrip.com: word around iframe load event order issue with Opera');
 	} else if(hostname.endsWith('ieee.org')){
 		(function(ac){
@@ -1062,6 +1064,9 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('skype.com')){
 		fixJQueryAutocomplete();
 		log('PATCH-613, Work around sniffing in old jQuery autocomplete plugin');
+	} else if(hostname.endsWith('surveymonkey.com')){
+		addCssToDocument('html{min-height:auto!important}');
+		log('PATCH-1031, surveymonkey.com - prevent dialog from growing on keydown');
 	} else if(hostname.endsWith('thaiair.co.jp')){
 		navigator.appName = 'M'+navigator.appName;
 		log('PATCH-943, thaiair.co.jp - fix drop-down menu positioning');
@@ -1282,6 +1287,10 @@ function undoFunctionKeypressEventRemoval(){
 		/* Google */
 	
 	
+		if(hostname.contains('.google.') && pathname.indexOf('/imghp')==0){
+			addCssToDocument('div#logocont + div{margin:auto}');
+			log('PATCH-1034, Google Image search centered');
+		}
 		if(hostname.contains('docs.google.')){
 			opera.addEventListener('BeforeScript', function (e){
 				if (e.element.src.indexOf('kix_main') > -1 && e.element.src.indexOf('_core') > -1){
@@ -1290,8 +1299,13 @@ function undoFunctionKeypressEventRemoval(){
 				}
 			}, false);
 		
+			document.addEventListener('DOMContentLoaded',function(){
+				var elm = document.querySelector('a[href="http://whatbrowser.org"] + a + a');
+				if(elm){elm.click();}
+			},false);
+		
 			undoFunctionKeypressEventRemoval();
-			log('PATCH-977, Google Documents copy paste\nPATCH-382, Google Spreadsheets cell highligh mismatch and key event');
+			log('PATCH-977, Google Documents copy paste\nPATCH-1032, Google Docs - auto-close unsupported browser message\nPATCH-382, Google Spreadsheets cell highligh mismatch and key event');
 		}
 		if(hostname.contains('play.google')){
 			undoFunctionKeypressEventRemoval();
@@ -1310,10 +1324,12 @@ function undoFunctionKeypressEventRemoval(){
 		
 			undoFunctionKeypressEventRemoval();
 		
+			addCssToDocument('div.GM{display:block!important}');
+		
 			addCssToDocument('div.wl{overflow:inherit}body{position:static !important}');
 		
 			addCssToDocument('.editable.LW-avf{font-size: small !important}');
-			log('PATCH-992, GMail - Remove CSS that sets transparent background color for selections\nPATCH-1008, GMail - new composer recipient autocomplete arrow navigation\nPATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
+			log('PATCH-992, GMail - Remove CSS that sets transparent background color for selections\nPATCH-1008, GMail - new composer recipient autocomplete arrow navigation\nPATCH-1030, GMail - force show attach file field in new composer\nPATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
 		}
 		if(pathname.indexOf('/reader/')==0){
 			undoFunctionKeypressEventRemoval();
