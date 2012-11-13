@@ -1,4 +1,4 @@
-// MTbjagbx4s96UDlp3J/1N4YIfZwqGjxy7bEERQ+DXJuXm8YcuPDt7OOLPCYMrjF83wdXaHAGgPzrcXhdDjAptJTFU4wLKWHw4YcpSI8NhRloOA9KV+pTUGW1XkD50YNvR/IZQ9OvjbeGisRMTWE8tJMBAYjhnINRKnD8d/jw8P9evPlOt3a+Rn6x8mcZEMqxj9fHn5QrSMvp3uFo7eGh7pi33OdN/6CQGH/k799cEw+zIBGQddYrpdCls8lhIWUv1NkGjF9X7Gj9iSfD2Cxv+4GuDI7I9B6JVFgDXirW6Bijid8qJxovMIg8yLZ0xt64ppJZ0X7ar13F7D1N8mB9ag==
+// BR+ZTbj/bEEEdK7MccnO5WEek0VcvD4Wn52ZzkjylFiQnl2ozb73S0Jven5MvOROTAqpQuSWuXTjOFuFZHd5nxoDT6GC1bwkxXVxhywjx5WUROfUtXgMKg18zUewH7CkpXNDCPmxNPauxns5IMyStamBqn8vwb8dwArKLNiBfenWL6RhMkyqLhKx5xOARhwgT5tKjM2QGdoIcO/91R4rR6HkGCtHuJlCduOEYd9xzmXFaOjgPzIYO+z3UdHvIvCRIWm+uLw6O4WMkgS0boItFszq0f/YXunvKF+v/Qp9S6HxUQ/5KO9wkMYsDweAisSFwtEl07XWFJ/MF4Bkr9uw5A==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, November 6, 2012. Active patches: 271 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, November 13, 2012. Active patches: 276 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -702,6 +702,9 @@ function setTinyMCEVersion(e){
 			navigator.userAgent = navigator.userAgent.replace(/OS X (\d+).(\d+).(\d+)+;/,'OS X $1_$2_$3;');
 		}
 		log('PATCH-387, Make Apple Store menu visible\nPATCH-387, Enable menu on Apple support pages\nPATCH-387, Enable menu on Apple community pages\nPATCH-924, apple.com - reformat OS X version string with underscores');
+	} else if(hostname.endsWith('.tsn.ca')){
+		window.addEventListener('load', function(){$(document).triggerHandler("onload.etsapi")}, false);
+		log('PATCH-1028, Dispatch of the "video player ready" event happens before event listener is added due to blocking DOM-added scripts, fire it again');
 	} else if(hostname.endsWith('aio.meb.gov.tr')){
 		navigator.appName='Netscape';
 		log('PATCH-959, Fix sniffing in old menu');
@@ -1118,15 +1121,7 @@ function setTinyMCEVersion(e){
 		/* Google */
 	
 	
-		if(hostname.indexOf('adwords.google.') > -1){
-			window.navigator.product = 'Gecko';
-			log(' PATCH-332, Fix disabled charts on Google AdWords');
-		}
-		if(hostname.indexOf('code.google.')>-1 && (pathname.indexOf('diff')>-1 || pathname.indexOf('detail')>-1 )){
-			addCssToDocument('div.diff>pre>table{white-space: normal;}div.diff>pre>table th, div.diff>pre>table td{white-space: pre-wrap;}');
-			log('PATCH-321, Work around pre inheritance into tables on Google Code');
-		}
-		if(hostname.indexOf('docs.google.')>-1){
+		if(hostname.contains('docs.google.')){
 			opera.addEventListener('BeforeScript', function (e) {
 			 if (e.element.src.indexOf('trix_waffle') > -1 && e.element.src.indexOf('_core') > -1) {
 			  e.element.text = e.element.text.replace(/indexOf\("Opera"\)/g, 'indexOf("Opra")').replace(/"Gecko"==/g, '"Gecko"!=').replace(/"DOMMouseScroll"/g, '"mousewheel"').replace(/\.charCode\:0\)\:[^\?]+\?/g,'.charCode:0):!0?');
@@ -1154,11 +1149,23 @@ function setTinyMCEVersion(e){
 			
 			log('PATCH-382, Google Spreadsheets cell size and column label size mismatch\nPATCH-482, Delay mousedown event on Flash file upload to make sure Flash sees it\nPATCH-517, docs.google: make document names visible\nPATCH-278, We should not send keypress events for navigation- and function keys');
 		}
+		if(hostname.indexOf('adwords.google.') > -1){
+			window.navigator.product = 'Gecko';
+			log(' PATCH-332, Fix disabled charts on Google AdWords');
+		}
+		if(hostname.indexOf('code.google.')>-1 && (pathname.indexOf('diff')>-1 || pathname.indexOf('detail')>-1 )){
+			addCssToDocument('div.diff>pre>table{white-space: normal;}div.diff>pre>table th, div.diff>pre>table td{white-space: pre-wrap;}');
+			log('PATCH-321, Work around pre inheritance into tables on Google Code');
+		}
 		if(hostname.indexOf('mail.google.')>-1){
+			addCssToDocument(':focus[tabindex] ::selection,:focus[tabindex]::selection{background-color:highlight!important;color:highlighttext!important}');
+		
+			addCssToDocument('div.GM{display:block!important}');
+		
 			addCssToDocument('div.wl{overflow:inherit}body{position:static !important}');
 		
 			addCssToDocument('.editable.LW-avf{font-size: small !important}');
-			log('PATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
+			log('PATCH-992, GMail - Remove CSS that sets transparent background color for selections\nPATCH-1030, GMail - force show attach file field in new composer\nPATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
 		}
 		if(hostname.indexOf('maps.google.')>-1 || hostname.indexOf('mapy.google.')>-1){
 			opera.addEventListener('BeforeEventListener.mousedown', function(e){if(e.event.target.tagName=='OPTION')e.preventDefault()}, false);
@@ -1380,7 +1387,7 @@ function setTinyMCEVersion(e){
 				if(document.getElementById('rtetext') && document.getElementById('rtetext').getElementsByTagName('iframe').length)
 					document.getElementById('rtetext').getElementsByTagName('iframe')[0].style.height = '97%';
 			}, true);
-			log('PATCH-996, Y!Mail Allow focusing address selector field by mouse click\nPATCH-417, Y!Mail Allow focusing subject field by mouse click in\nPATCH-418, Y!Mail Fix inserting links in mail compose screen\nPATCH-460, Y!Mail Prevent hidden text when composing long e-mails');
+			log('PATCH-996, Y!Mail - Allow focusing address selector field by mouse click\nPATCH-417, Y!Mail Allow focusing subject field by mouse click in\nPATCH-418, Y!Mail Fix inserting links in mail compose screen\nPATCH-460, Y!Mail Prevent hidden text when composing long e-mails');
 		}
 		if(hostname.indexOf('.mail.yahoo.')>-1&&(href.indexOf( '/dc/system_requirements?browser=blocked' )>-1||href.indexOf( '/dc/system_requirements?browser=unsupported' )>-1)){
 			location.href='/dc/launch?sysreq=ignore';
@@ -1498,10 +1505,12 @@ function setTinyMCEVersion(e){
 			}
 		}, false);
 	
+		addCssToDocument('.ONETHIRTYFIVE-HERO ul{margin-bottom:0!important}');
+	
 		if (navigator.appName!=='Opera'){
 			document.documentElement.style.MozAppearance = 'Opera';
 		}
-		log('PATCH-652, Fix displaying recommended items in Amazon\nPATCH-527, Add more spoofing when masking as another browser on Amazon');
+		log('PATCH-652, Fix displaying recommended items in Amazon\nPATCH-1025, Amazon - Black Friday deals float upwards due to margin styling on UL and innerHTML updates\nPATCH-527, Add more spoofing when masking as another browser on Amazon');
 	} else if(hostname.indexOf('ameba.jp')!=-1){
 		addPreprocessHandler(/editor\.insertNodeAtSelection\(link\);\s*editor\.insertNodeAtSelection\(document\.createElement\('br'\)\);/, 'editor.insertNodeAtSelection(link);');
 		log('331093, Work around Opera bug where second BR tag overwrites newly inserted IMG');
@@ -2183,6 +2192,12 @@ function setTinyMCEVersion(e){
 			}
 		}, false);
 		log('PATCH-221, Include browser.js timestamp in bug reports');
+	} else if(location.protocol == 'data:'){
+		location.reload = function(){}
+		HTMLIFrameElement.prototype.__defineGetter__('contentWindow', function(){return window;});
+		HTMLIFrameElement.prototype.__defineGetter__('contentDocument', function(){return document;});
+		
+		log('PATCH-1035, Work around Universal XSS bug for older Opera versions');
 	} else if(pathname.indexOf("Maconomy/MaconomyPortal") > -1){
 		opera.defineMagicFunction('handleKeyPresses', function (oReal, oThis, evt){
 			if(evt.ctrlKey && evt.keyCode == 71 && typeof handleOnClickSearch == 'function'){evt.preventDefault();handleOnClickSearch('');return true}
