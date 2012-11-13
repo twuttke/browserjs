@@ -1,4 +1,4 @@
-// mbOTyHHgztN6kYzsxsl/tJc9VTt5/fgo7s1cGvzq6XpI0qHUmgAadFhjwScLIYVplx7d05j4dG5CPSKnR2PkT7c6XlteZOKMPzrllDdSHMe1ep2/GM+A0Irw7c8ylatquCNdNAUXyjwO4nY2CFNGaMCYUwTHaR2wcApEgJW9sxLpG48JulMmGPGy+7fuIdWKOA8e0wP2TEJuWWyrZO2TDgohSCiE1tpcJI2z+LmViOafaWan6w3SBn7r/SMdkE1Ysr0Rsl7AYy6AT84TqutF7J+96ecKbfF+Ymup0dEMR7sJBC0lkdkuU5TfA+dUbNwqx3m3N+uwW1oWxUBuvN3Hzg==
+// bBYj6xklJbgmIuLtP+PVjXuhdMls4Ta7Kped7gzU8e9m/3R9+DTOCbVHZTWPgifAcnG6FA9ua+Sk09EERGjGUH7oBpypH9TE+Mcm8SUoupx5Kc0RSra5MAq1I5FIzN5N52x5V0M72BIdTRxihfhlAUxhbjtcfIn9VXM/R8SGqNR3w6wFGW2JHJ0Sz/l6/uQnBRpj6Q3xta0dg6UypEU8N5iJtJs/G/MGWgs84AF7qne6851QhZUyL2YEGKE/Kkuo3ink44y6Yj+0ZdfGj0p0cJUym8p+LHNp8KgUi8xSND0c8Yy/PUzEz/dVfcgc/TK1yXAR+8FWrhSrwAXE5qG/Ug==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, November 6, 2012. Active patches: 298 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, November 13, 2012. Active patches: 305 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -744,6 +744,9 @@ function setTinyMCEVersion(e){
 			navigator.userAgent = navigator.userAgent.replace(/OS X (\d+).(\d+).(\d+)+;/,'OS X $1_$2_$3;');
 		}
 		log('PATCH-387, Make Apple Store menu visible\nPATCH-387, Enable menu on Apple support pages\nPATCH-387, Enable menu on Apple community pages\nPATCH-846, apple.com: don\'t reload from within unload handler\nPATCH-924, apple.com - reformat OS X version string with underscores');
+	} else if(hostname.endsWith('.tsn.ca')){
+		window.addEventListener('load', function(){$(document).triggerHandler("onload.etsapi")}, false);
+		log('PATCH-1028, Dispatch of the "video player ready" event happens before event listener is added due to blocking DOM-added scripts, fire it again');
 	} else if(hostname.endsWith('aio.meb.gov.tr')){
 		navigator.appName='Netscape';
 		log('PATCH-959, Fix sniffing in old menu');
@@ -759,9 +762,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('antikvar.hu')){
 		addCssToDocument('#header a{font-size:11px}');
 		log('PATCH-890, antikvar.hu: font fallback breaks layout');
-	} else if(hostname.endsWith('barnesandnoble.com')){
-		addCssToDocument('.styledselect-display select{min-width:100%}');
-		log('PATCH-967, barnesandnoble.com - show select arrows');
+	} else if(hostname.endsWith('book.lufthansa.com')){
+		addCssToDocument('td.fare input, td.fareOff input{position:inherit}');
+		log('PATCH-1018, lufthansa.com - fix unclickable positioned inputs');
 	} else if(hostname.endsWith('caisse-epargne.fr')){
 		addPreprocessHandler(/this\._changeHandler\);if\s*\(Sys\.Browser\.agent\s==\sSys\.Browser\.Opera\)/g, ' this._changeHandler);if(false)');
 		log('PATCH-798, Avoid browser sniffing that breaks typing');
@@ -833,7 +836,9 @@ function setTinyMCEVersion(e){
 		}
 		log('PATCH-862, hipmunk.com: avoid header table cell collapse. Core bug.');
 	} else if(hostname.endsWith('hotels.ctrip.com')){
-		addPreprocessHandler(/win.addEventListener/g,'ifm.addEventListener',true,function(elm){ return elm.src&&elm.src.indexOf('c_result.map.js')>-1});
+		addPreprocessHandler(/win.addEventListener/g,'ifm.addEventListener',true,function(elm){
+		 return elm.src && ( elm.src.indexOf('c_result.map.js')>-1 || elm.src.indexOf('c_detail.map.js')>-1 )
+		});
 		log('PATCH-857, hotels.ctrip.com: word around iframe load event order issue with Opera');
 	} else if(hostname.endsWith('ieee.org')){
 		(function(ac){
@@ -1065,6 +1070,19 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('thaiair.co.jp')){
 		navigator.appName = 'M'+navigator.appName;
 		log('PATCH-943, thaiair.co.jp - fix drop-down menu positioning');
+	} else if(hostname.endsWith('thenextweb.com')){
+		document.addEventListener('load', function(e){
+			if( e.target instanceof HTMLIFrameElement && e.target.style.display=='none'){
+				try{
+					if(e.target.contentWindow.document){
+						e.target.contentWindow.document.body.__defineGetter__('scrollHeight', function(){
+							return 0; //if iframe is display none, WebKit/Gecko returns 0 for content height
+						});
+					}
+				}catch(e){}
+			}
+		}, true);
+		log('PATCH-993, thenextweb.com - top bar placed too low');
 	} else if(hostname.endsWith('uye.memurlar.net')){
 		addCssToDocument('table{table-layout:auto;}');
 		log('PATCH-988, uye.memurlar.net: fix table layout');
@@ -1110,7 +1128,7 @@ function setTinyMCEVersion(e){
 		log('PATCH-929, dickmorris.com - avoid empty lightbox');
 	} else if(hostname.endsWith('www.downg.com')){
 		addCssToDocument('.softwaretable .inner{font-size:10px}');
-		log('PATCH-1007, downg.com: decrease font-size to avoid wrapping');
+		log('PATCH-1007, downg.com - decrease font-size to avoid wrapping');
 	} else if(hostname.endsWith('www.dr.dk')){
 		addPreprocessHandler(/if\s*\(Browser\.ie\s*&&\s*isNaN\(parseFloat\(result\)\)\)\{/,'if (Browser.opera && isNaN(parseFloat(result))){',true,function(elm){ return elm.src&&elm.src.indexOf('base.js')>-1});
 		log('PATCH-962, dr.dk: fix misnested browser sniff');
@@ -1269,20 +1287,21 @@ function setTinyMCEVersion(e){
 		/* Google */
 	
 	
-		if(hostname.indexOf('adwords.google.') > -1){
-			window.navigator.product = 'Gecko';
-			log(' PATCH-332, Fix disabled charts on Google AdWords');
+		if(hostname.contains('.google.') && pathname.indexOf('/imghp')==0){
+			addCssToDocument('div#logocont + div{margin:auto}');
+			log('PATCH-1034, Google Image search centered');
 		}
-		if(hostname.indexOf('code.google.')>-1 && (pathname.indexOf('diff')>-1 || pathname.indexOf('detail')>-1 )){
-			addCssToDocument('div.diff>pre>table{white-space: normal;}div.diff>pre>table th, div.diff>pre>table td{white-space: pre-wrap;}');
-			log('PATCH-321, Work around pre inheritance into tables on Google Code');
-		}
-		if(hostname.indexOf('docs.google.')>-1){
+		if(hostname.contains('docs.google.')){
 			opera.addEventListener('BeforeScript', function (e) {
 			 if (e.element.src.indexOf('trix_waffle') > -1 && e.element.src.indexOf('_core') > -1) {
 			  e.element.text = e.element.text.replace(/indexOf\("Opera"\)/g, 'indexOf("Opra")').replace(/"Gecko"==/g, '"Gecko"!=').replace(/"DOMMouseScroll"/g, '"mousewheel"').replace(/\.charCode\:0\)\:[^\?]+\?/g,'.charCode:0):!0?');
 			 }
 			}, false);
+		
+			document.addEventListener('DOMContentLoaded',function(){
+				var elm = document.querySelector('a[href="http://whatbrowser.org"] + a + a');
+				if(elm){elm.click();}
+			},false);
 		
 			addCssToDocument('td.doclist-td-checkbox, td.doclist-td-name, td.doclist-td-star {width:auto !important}');
 		
@@ -1296,21 +1315,25 @@ function setTinyMCEVersion(e){
 				}
 			}, true);
 			
-			log('PATCH-382, Google Spreadsheets cell size and column label size mismatch\nPATCH-517, docs.google: make document names visible\nPATCH-278, We should not send keypress events for navigation- and function keys');
+			log('PATCH-382, Google Spreadsheets cell size and column label size mismatch\nPATCH-1032, Google Docs - auto-close unsupported browser message\nPATCH-517, docs.google: make document names visible\nPATCH-278, We should not send keypress events for navigation- and function keys');
+		}
+		if(hostname.indexOf('adwords.google.') > -1){
+			window.navigator.product = 'Gecko';
+			log(' PATCH-332, Fix disabled charts on Google AdWords');
+		}
+		if(hostname.indexOf('code.google.')>-1 && (pathname.indexOf('diff')>-1 || pathname.indexOf('detail')>-1 )){
+			addCssToDocument('div.diff>pre>table{white-space: normal;}div.diff>pre>table th, div.diff>pre>table td{white-space: pre-wrap;}');
+			log('PATCH-321, Work around pre inheritance into tables on Google Code');
 		}
 		if(hostname.indexOf('mail.google.')>-1){
-			window.addEventListener('load', function(){
-			  for(var elms=document.getElementsByTagName('style'),el, i=0; el=elms[i]; i++){
-			    if(el.textContent.indexOf('::selection')>-1){
-			      el.textContent=el.textContent.replace( /:focus\[tabindex\]::selection,?/g, '' );
-			    }
-			  }
-			}, false);
+			addCssToDocument(':focus[tabindex] ::selection,:focus[tabindex]::selection{background-color:highlight!important;color:highlighttext!important}');
+		
+			addCssToDocument('div.GM{display:block!important}');
 		
 			addCssToDocument('div.wl{overflow:inherit}body{position:static !important}');
 		
 			addCssToDocument('.editable.LW-avf{font-size: small !important}');
-			log('PATCH-992, Remove CSS that sets transparent background colour for selections\nPATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
+			log('PATCH-992, GMail - Remove CSS that sets transparent background color for selections\nPATCH-1030, GMail - force show attach file field in new composer\nPATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
 		}
 		if(hostname.indexOf('maps.google.')>-1 || hostname.indexOf('mapy.google.')>-1){
 			opera.addEventListener('BeforeEventListener.mousedown', function(e){if(e.event.target.tagName=='OPTION')e.preventDefault()}, false);
@@ -1525,7 +1548,7 @@ function setTinyMCEVersion(e){
 				if(document.getElementById('rtetext') && document.getElementById('rtetext').getElementsByTagName('iframe').length)
 					document.getElementById('rtetext').getElementsByTagName('iframe')[0].style.height = '97%';
 			}, true);
-			log('PATCH-996, Y!Mail Allow focusing address selector field by mouse click\nPATCH-417, Y!Mail Allow focusing subject field by mouse click in\nPATCH-418, Y!Mail Fix inserting links in mail compose screen\nPATCH-460, Y!Mail Prevent hidden text when composing long e-mails');
+			log('PATCH-996, Y!Mail - Allow focusing address selector field by mouse click\nPATCH-417, Y!Mail Allow focusing subject field by mouse click in\nPATCH-418, Y!Mail Fix inserting links in mail compose screen\nPATCH-460, Y!Mail Prevent hidden text when composing long e-mails');
 		}
 		if(hostname.indexOf('.mail.yahoo.')>-1&&(href.indexOf( '/dc/system_requirements?browser=blocked' )>-1||href.indexOf( '/dc/system_requirements?browser=unsupported' )>-1)){
 			location.href='/dc/launch?sysreq=ignore';
@@ -1623,10 +1646,12 @@ function setTinyMCEVersion(e){
 			}
 		}, false);
 	
+		addCssToDocument('.ONETHIRTYFIVE-HERO ul{margin-bottom:0!important}');
+	
 		if (navigator.appName!=='Opera'){
 			document.documentElement.style.MozAppearance = 'Opera';
 		}
-		log('PATCH-652, Fix displaying recommended items in Amazon\nPATCH-527, Add more spoofing when masking as another browser on Amazon');
+		log('PATCH-652, Fix displaying recommended items in Amazon\nPATCH-1025, Amazon - Black Friday deals float upwards due to margin styling on UL and innerHTML updates\nPATCH-527, Add more spoofing when masking as another browser on Amazon');
 	} else if(hostname.indexOf('ameba.jp')!=-1){
 		addPreprocessHandler(/editor\.insertNodeAtSelection\(link\);\s*editor\.insertNodeAtSelection\(document\.createElement\('br'\)\);/, 'editor.insertNodeAtSelection(link);');
 		log('331093, Work around Opera bug where second BR tag overwrites newly inserted IMG');
@@ -2233,6 +2258,12 @@ function setTinyMCEVersion(e){
 			}
 		}, false);
 		log('PATCH-221, Include browser.js timestamp in bug reports');
+	} else if(location.protocol == 'data:'){
+		location.reload = function(){}
+		HTMLIFrameElement.prototype.__defineGetter__('contentWindow', function(){return window;});
+		HTMLIFrameElement.prototype.__defineGetter__('contentDocument', function(){return document;});
+		
+		log('PATCH-1035, Work around Universal XSS bug for older Opera versions');
 	} else if(pathname.indexOf("Maconomy/MaconomyPortal") > -1){
 		opera.defineMagicFunction('handleKeyPresses', function (oReal, oThis, evt){
 			if(evt.ctrlKey && evt.keyCode == 71 && typeof handleOnClickSearch == 'function'){evt.preventDefault();handleOnClickSearch('');return true}
