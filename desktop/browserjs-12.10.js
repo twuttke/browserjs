@@ -1,4 +1,4 @@
-// P1y0fclwilT0hYKWuzPMSXvOJu1NkcxZicf57YwIUIs0LmvzDH/3CIqx1se92bqpXs8rHRTlOfdMrjXD5clcu5yXAIOjreSvIpVvgH2JLxaIuzTR+UHcZtD8/x8n5yppK0iw7SS91vktkxUpm6ZnxeZp9o9ZLeV4fEflR7aAEVxM5JSt7E1Gb78E/ZD/gu+kTmirneDLJLboL9FKMNCarUCzghc5aTs3hR8vHI1C7mwfDy1D6WV/yPzfHkQiBcLoze6pyBALsaJ87m90G6FVN42CXfEUZnjHb1mf6Yi/TYqDr1g0Np8H44YgX2+NQWUrbE1IH71rYg5LP28lRbmCcQ==
+// szwcytCbXvdkCdOdwy4xAcYFKO/7OzhWdSCspehnhuCQasScBOtYWtzjjnCvANw0fNfQBFO1kjyfRgaMPEPXPFgOppsSYV5Sjo4ypDbLRy+5rPzlGnbE4Ef4m94fR2chAMYdJKOGjWYMAErnvKy9kTgc+N194ODvHz5mHDX123HY70auAzW6AuAdvONHRHRoawaRyZ8VavW8hrXrQaZUqWytAZIiHgU9Ostoj3jyMpRmpVOjHSwxvhZyRf057twE+Mx2FIBadEpqURK1HtCFGtMMGj5psqtU3DWmtQZ1TcYxrdXPlrFq3/8jRjb+2zSqTbnu4QzIjc89l4U8UF1i5Q==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, November 13, 2012. Active patches: 280 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, November 16, 2012. Active patches: 287 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -355,7 +355,7 @@ function setTinyMCEVersion(e){
 }
 
 function undoFunctionKeypressEventRemoval(){
-  var keys=['Up', 'Down', 'Right', 'Left', 'Home', 'End', 'Insert', 'Delete', 'Escape', 'Backspace', 'PageUp', 'PageDown'];
+  var keys=['Up', 'Down', 'Right', 'Left', 'Home', 'End', 'Insert', 'Delete', 'Escape', 'Backspace', 'PageUp', 'PageDown','Tab'];
   for(var i=1;i<13;i++)keys.push('F'+i);
   opera.addEventListener('AfterEvent.keydown', function(e){
     if(keys.indexOf(e.event.key)>-1){
@@ -368,6 +368,7 @@ function undoFunctionKeypressEventRemoval(){
     }
   });
 }
+
 
 
 
@@ -744,6 +745,22 @@ function undoFunctionKeypressEventRemoval(){
 			navigator.userAgent = navigator.userAgent.replace(/OS X (\d+).(\d+).(\d+)+;/,'OS X $1_$2_$3;');
 		}
 		log('PATCH-846, apple.com: don\'t reload from within unload handler\nPATCH-888, apple_core: CSS animations are unprefixed from Opera 12.10\nPATCH-924, apple.com - reformat OS X version string with underscores');
+	} else if(hostname.endsWith('.jus.br')){
+		opera.addEventListener('BeforeEvent.keypress',function(e){
+			if(e.event.ctrlKey){
+				e.event.__defineGetter__('charCode',function(){
+					switch(e.event.keyCode){
+							case 1: return 65;
+							case 3: return 67;
+							case 22: return 86;
+							case 24: return 88;
+							case 26: return 90;
+							default: return e.event.keyCode;
+					}
+				});
+			}
+		},false);
+		log('PATCH-1052, .jus.br - block keypress event from shortcut combinations');
 	} else if(hostname.endsWith('.tsn.ca')){
 		window.addEventListener('load', function(){$(document).triggerHandler("onload.etsapi")}, false);
 		log('PATCH-1028, Dispatch of the "video player ready" event happens before event listener is added due to blocking DOM-added scripts, fire it again');
@@ -793,6 +810,27 @@ function undoFunctionKeypressEventRemoval(){
 	
 		navigator.appName="netscape";
 		log('PATCH-974, espn.go.com: make image gallery work, suppressing transform usage\nPATCH-375, Make sure the ESPN polls work');
+	} else if(hostname.endsWith('facebook.com')){
+		/* Facebook */
+	
+	
+		if(hostname.endsWith('www.facebook.com')){
+			opera.addEventListener('PluginInitialized',function(e){
+				if(e.element.id && e.element.firstChild&&e.element.firstChild.getAttribute('value')&&e.element.firstChild.getAttribute('value').indexOf('div_id')>-1)setTimeout(function(){
+					Arbiter.inform('flash/ready', {divID:e.element.id,name:"UploaderFrame",sender:null});
+				},10);
+			});
+			
+		
+			addCssToDocument('.fbMercuryChatTab .fbChatMessageGroup .metaInfoContainer { float: right; position: inherit !important;} ');
+		
+			addCssToDocument('div.videoStage + div + div#fbPhotoPageTagBoxes{visibility:hidden;}');
+		
+			addCssToDocument('div#fbProfileCover + div.groupsJumpCoverBorder{visibility:hidden;}');
+			
+			log('PATCH-1055, Facebook - Work around issue where Flash does not call JS when expected\nPATCH-852, facebook: avoid unwanted chat box scroll\nPATCH-923, facebook: work around lack of pointer-events blocking video playback\nPATCH-954, facebook: work around lack of pointer-events breaking group page photos');
+		}
+		log('0, Facebook');
 	} else if(hostname.endsWith('garmin.com')){
 		opera.defineMagicFunction('eligible', function() { return true; });
 		opera.defineMagicFunction('detectOSBrowser', function(realFunc, realThis, inOS, inBrowser) {
@@ -927,6 +965,9 @@ function undoFunctionKeypressEventRemoval(){
 		},false);
 		
 		log('PATCH-737, mog.com - report Opera as a supported browser');
+	} else if(hostname.endsWith('msn.foxsports.com')){
+		opera.defineMagicVariable('_dapUtils', function(obj){ obj.is_opera=false; return obj; }, null);
+		log('PATCH-1046, msn.foxsports.com - close iframe so comments can load.');
 	} else if(hostname.endsWith('mycoast.cccd.edu')){
 		opera.defineMagicVariable('is_fox',function(){return true},null);
 		log('PATCH-804, mycoast.cccd.edu: block browser block');
@@ -1311,6 +1352,10 @@ function undoFunctionKeypressEventRemoval(){
 			undoFunctionKeypressEventRemoval();
 			log('PATCH-1022, Google Play suggest menu navigation relies on function key keypress events in Opera');
 		}
+		if(hostname.contains('plus.google.')){
+			undoFunctionKeypressEventRemoval();
+			log('PATCH-1061, G+ - make navigation keys work');
+		}
 		if(hostname.indexOf('adwords.google.') > -1){
 			window.navigator.product = 'Gecko';
 			log(' PATCH-332, Fix disabled charts on Google AdWords');
@@ -1326,10 +1371,17 @@ function undoFunctionKeypressEventRemoval(){
 		
 			addCssToDocument('div.GM{display:block!important}');
 		
+			opera.addEventListener('AfterEvent.click', function(e) { 
+				if (e.event.target.isContentEditable && e.event.target.innerHTML=="<br>") { 
+					var f = e.event.target.parentNode; 
+					if(f)setTimeout(function(){f.click()},100); 
+				} 
+			}, false);
+		
 			addCssToDocument('div.wl{overflow:inherit}body{position:static !important}');
 		
 			addCssToDocument('.editable.LW-avf{font-size: small !important}');
-			log('PATCH-992, GMail - Remove CSS that sets transparent background color for selections\nPATCH-1008, GMail - new composer recipient autocomplete arrow navigation\nPATCH-1030, GMail - force show attach file field in new composer\nPATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
+			log('PATCH-992, GMail - Remove CSS that sets transparent background color for selections\nPATCH-1008, GMail - new composer recipient autocomplete arrow navigation\nPATCH-1030, GMail - force show attach file field in new composer\nPATCH-1059, GMail - try to focus empty mail body when clicking it\nPATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
 		}
 		if(pathname.indexOf('/reader/')==0){
 			undoFunctionKeypressEventRemoval();
@@ -1723,19 +1775,6 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.indexOf('etour.co.jp') > -1){
 		navigator.appName='Netscape';
 		log('PATCH-152, etour.co.jp fix non-disappearing overlapping image');
-	} else if(hostname.indexOf('facebook.com')>-1){
-		if(hostname.endsWith('www.facebook.com')){
-		 addCssToDocument('.fbMercuryChatTab .fbChatMessageGroup .metaInfoContainer { float: right; position: inherit !important;} ');
-		}
-	
-		if(hostname.endsWith('www.facebook.com')){
-		 addCssToDocument('div.videoStage + div + div#fbPhotoPageTagBoxes{visibility:hidden;}');
-		}
-	
-		if(hostname.endsWith('www.facebook.com')){
-		 addCssToDocument('div#fbProfileCover + div.groupsJumpCoverBorder{visibility:hidden;}');
-		}
-		log('PATCH-852, facebook: avoid unwanted chat box scroll\nPATCH-923, facebook: work around lack of pointer-events blocking video playback\nPATCH-954, facebook: work around lack of pointer-events breaking group page photos');
 	} else if(hostname.indexOf('fintyre.it')>-1){
 		navigator.appName = "Netscape";
 		log('PATCH-661, fintyre.it: work around sniffing');
@@ -2111,6 +2150,31 @@ function undoFunctionKeypressEventRemoval(){
 			else{return oReal.apply(oThis, Array.prototype.slice.call(arguments, 2));}
 		});
 	
+		function handleClipboard(e){
+			if(e.target.tagName=="INPUT" || e.target.tagName=="TEXTAREA"){
+				e.preventDefault();
+				var el = e.target;
+				var val = el.value;
+				var startPos = el.selectionStart;
+				var endPos = el.selectionEnd;
+				if(e.type=='paste'){
+					if(!el.readOnly){
+						el.value = val.slice(0,startPos) + e.clipboardData.getData('text/plain') + val.slice(endPos);
+					}
+				}else if(e.type=='copy'){
+					e.clipboardData.setData('text/plain',val.substring(startPos,endPos));
+				}else if(e.type=='cut'){
+					e.clipboardData.setData('text/plain',val.substring(startPos,endPos));
+					el.value = val.slice(0,startPos) + val.slice(endPos);
+				}
+			}
+		}
+		if('oncopy' in document){
+			document.addEventListener('cut',handleClipboard,false);
+			document.addEventListener('copy',handleClipboard,false);
+			document.addEventListener('paste',handleClipboard,false);
+		}
+	
 		opera.addEventListener("BeforeEvent.unload", function(e){
 				if(!(typeof doSubmitEmptyData==='function'))return;
 				var original_function = doSubmitEmptyData;
@@ -2159,7 +2223,7 @@ function undoFunctionKeypressEventRemoval(){
 					doSubmitEmptyData = original_function;
 			}
 		},false);
-		log('PATCH-445, Fix Ctrl-G shortcut in Maconomy\nPATCH-6, Fix unload form submit behavior on Maconomy portals');
+		log('PATCH-445, Fix Ctrl-G shortcut in Maconomy\nPATCH-1063, Maconomy: clipboard failure\nPATCH-6, Fix unload form submit behavior on Maconomy portals');
 	} else if(pathname.indexOf('/AnalyticalReporting/')==0){
 		if(pathname.indexOf('AnalyticalReporting/WebiModify.do')>-1 || pathname.indexOf('AnalyticalReporting/WebiCreate.do')>-1){
 		opera.defineMagicVariable('embed_size_attr',
