@@ -1,4 +1,4 @@
-// BR+ZTbj/bEEEdK7MccnO5WEek0VcvD4Wn52ZzkjylFiQnl2ozb73S0Jven5MvOROTAqpQuSWuXTjOFuFZHd5nxoDT6GC1bwkxXVxhywjx5WUROfUtXgMKg18zUewH7CkpXNDCPmxNPauxns5IMyStamBqn8vwb8dwArKLNiBfenWL6RhMkyqLhKx5xOARhwgT5tKjM2QGdoIcO/91R4rR6HkGCtHuJlCduOEYd9xzmXFaOjgPzIYO+z3UdHvIvCRIWm+uLw6O4WMkgS0boItFszq0f/YXunvKF+v/Qp9S6HxUQ/5KO9wkMYsDweAisSFwtEl07XWFJ/MF4Bkr9uw5A==
+// rNkIzSk2MOle1M+8LPTGDsOxp91LQdq2qqLUxKRsZ6vqfX0yjTbpARlh60slxfp6YeITLk5mwCukKviUdQXDFLw0rG0nYbWBM2IONA6KP+mSleZlomyHDtertwS+S6EKNGZQjz5ejuRNLFL1Bwx1vWj7fr9IK0U7Suw3dLEv/e3UUREzbZ0MvoXvyvuebWu86fCJ/ZjuxVJwCjBwUPUwjzXkJu/mRjM6g4UwezqV0MrZgxb2A6a9nqUsCHke2AFY+JMo+lN5FoK6sF/n89SdiJ5dPnaFyffJIIIzoAoB+0IsRMbfAOgand0pu6ya48m7uE75BXYR3AGPQRAkfXIoPA==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, November 13, 2012. Active patches: 276 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, November 16, 2012. Active patches: 279 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -338,6 +338,7 @@ function setTinyMCEVersion(e){
 	var tinyInstance='tinyMCE' in window?window.tinyMCE : 'tinymce' in window ? window.tinymce : 'tiny_mce' in window ?  window.tiny_mce : null;
 	if(tinyInstance&&tinyInstance.majorVersion)tinyMCEVersionInfo={ majorVersion:tinyInstance.majorVersion, minorVersion:tinyInstance.minorVersion };
 }
+
 
 
 
@@ -729,6 +730,85 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('espn.go.com')){
 		navigator.appName="netscape";
 		log('PATCH-375, Make sure the ESPN polls work');
+	} else if(hostname.endsWith('facebook.com')){
+		/* Facebook */
+	
+	
+		if(hostname.endsWith('facebook.com')){
+			if( top==self && location.href.indexOf('www.facebook.com/dialog/')>-1 && location.protocol==='https:' ){
+				var buggy=false;
+				try{
+					var s=typeof opener.frames['fb_xdm_frame_https'];
+				}catch(e){
+					buggy=true;
+				}
+				if(buggy){
+					addEventListener('DOMContentLoaded', function(){
+						var doFix=0;
+						for(var i=0;i<document.scripts.length;i++){
+							if( document.scripts[i].text && document.scripts[i].text.indexOf('fb_xdm_frame_https') )doFix=1;
+						}
+						if(!doFix)return;
+						var ifr=document.body.appendChild(document.createElement('iframe'));
+						ifr.src='https://s-static.ak.facebook.com/platform/page_proxy.php';
+						ifr.setAttribute('style', 'width:1px; height:1px');
+						ifr.id='_browserjsFBHack';
+					}, false);
+					opera.addEventListener('BeforeScript', function(e){
+						if(e.element.text.indexOf('ref.frames[frame].proxyMessage(fragment);}catch(e) {')>-1){
+							e.element.text = e.element.text.replace('ref.frames[frame].proxyMessage(fragment);}catch(e) {', 'ref.frames[frame].proxyMessage(fragment);}catch(e) {try{document.getElementById(\'_browserjsFBHack\').contentWindow.postMessage(fragment, \'https://s-static.ak.facebook.com\');}catch(e){}');
+						}
+					}, false);
+				}
+			}else if(location.href.indexOf('https://s-static.ak.facebook.com/connect/xd_arbiter.php')==0){
+				addEventListener('storage', function(e){
+					if(e.key==='_browserjsFBHack' && typeof proxyMessage =='function'){
+						try{
+							proxyMessage(e.newValue);
+							window.localStorage.removeItem('_browserjsFBHack')
+						}catch(e){}
+					}
+				}, false);
+			}else if( location.href==='https://s-static.ak.facebook.com/platform/page_proxy.php' ){
+				addEventListener('message', function(e){
+					if(e.origin==='https://www.facebook.com' && e.source===parent){
+						localStorage.removeItem('_browserjsFBHack');
+						localStorage['_browserjsFBHack']=e.data;
+					}
+				}, false);
+				addEventListener('storage', function(e){
+					if(e.key==='_browserjsFBHack' && e.newValue===null)parent.close();
+				}, false);
+			}
+		
+			addPreprocessHandler(/else CSS\.hide\(this\._gripper\);this\._checkContentBoundaries\(\);return this;\}/,'else CSS.hide(this._gripper);return this;}');
+			log('PATCH-630, facebook: work around Opera\'s too strict origin checks on https for https -> http(s) other site -> https IFRAME communication\nPATCH-558, Facebook avoid chat list scroll');
+		}
+		if(hostname.endsWith('www.facebook.com')){
+			addCssToDocument('div.fbNubFlyoutBody.scrollable{position:inherit}');
+		
+			opera.addEventListener('BeforeEventListener.keypress', function(e){
+				if( e.event.ctrlKey && (e.event.keyCode==86 || e.event.keyCode==118 ) ){
+					var trgt=e.event.target;
+					setTimeout(
+						function(){ 
+							var evt=document.createEvent('Event');
+							evt.initEvent('paste', true, true);
+							trgt.dispatchEvent(evt);
+						}, 10
+					);
+				}
+			}, false);
+		
+			opera.addEventListener('BeforeCSS', function(e){
+				e.cssText = e.cssText.replace(/border-(top|bottom)-(right|left)-radius:3px/g, '');
+			}, false);
+			
+		
+			addCssToDocument('div.videoStage + div + div#fbPhotoPageTagBoxes{visibility:hidden;}');
+			log('PATCH-714, facebook: prevent chat window overflow - Presto bug\nPATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status\nPATCH-573, Facebook\'s border-radius triggers hyperactive reflow bug, performance suffers\nPATCH-923, facebook: work around lack of pointer-events blocking video playback');
+		}
+		log('0, Facebook');
 	} else if(hostname.endsWith('garmin.com')){
 		opera.defineMagicFunction('eligible', function() { return true; });
 		opera.defineMagicFunction('detectOSBrowser', function(realFunc, realThis, inOS, inBrowser) {
@@ -1128,6 +1208,11 @@ function setTinyMCEVersion(e){
 			 }
 			}, false);
 		
+			document.addEventListener('DOMContentLoaded',function(){
+				var elm = document.querySelector('a[href="http://whatbrowser.org"] + a + a');
+				if(elm){elm.click();}
+			},false);
+		
 			opera.addEventListener('AfterEventListener.mousedown', function(e){
 				if( e.event.target && e.event.target.tagName=='OBJECT' ){
 					var ts=(new Date()).getTime();
@@ -1147,31 +1232,9 @@ function setTinyMCEVersion(e){
 				}
 			}, true);
 			
-			log('PATCH-382, Google Spreadsheets cell size and column label size mismatch\nPATCH-482, Delay mousedown event on Flash file upload to make sure Flash sees it\nPATCH-517, docs.google: make document names visible\nPATCH-278, We should not send keypress events for navigation- and function keys');
+			log('PATCH-382, Google Spreadsheets cell size and column label size mismatch\nPATCH-1032, Google Docs - auto-close unsupported browser message\nPATCH-482, Delay mousedown event on Flash file upload to make sure Flash sees it\nPATCH-517, docs.google: make document names visible\nPATCH-278, We should not send keypress events for navigation- and function keys');
 		}
-		if(hostname.indexOf('adwords.google.') > -1){
-			window.navigator.product = 'Gecko';
-			log(' PATCH-332, Fix disabled charts on Google AdWords');
-		}
-		if(hostname.indexOf('code.google.')>-1 && (pathname.indexOf('diff')>-1 || pathname.indexOf('detail')>-1 )){
-			addCssToDocument('div.diff>pre>table{white-space: normal;}div.diff>pre>table th, div.diff>pre>table td{white-space: pre-wrap;}');
-			log('PATCH-321, Work around pre inheritance into tables on Google Code');
-		}
-		if(hostname.indexOf('mail.google.')>-1){
-			addCssToDocument(':focus[tabindex] ::selection,:focus[tabindex]::selection{background-color:highlight!important;color:highlighttext!important}');
-		
-			addCssToDocument('div.GM{display:block!important}');
-		
-			addCssToDocument('div.wl{overflow:inherit}body{position:static !important}');
-		
-			addCssToDocument('.editable.LW-avf{font-size: small !important}');
-			log('PATCH-992, GMail - Remove CSS that sets transparent background color for selections\nPATCH-1030, GMail - force show attach file field in new composer\nPATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
-		}
-		if(hostname.indexOf('maps.google.')>-1 || hostname.indexOf('mapy.google.')>-1){
-			opera.addEventListener('BeforeEventListener.mousedown', function(e){if(e.event.target.tagName=='OPTION')e.preventDefault()}, false);
-			log('PATCH-610, GMaps: avoid autoclose of problem reporting dialog');
-		}
-		if(hostname.indexOf('plus.google')>-1){
+		if(hostname.contains('plus.google.')){
 			(function(ps){ 
 			 history.pushState=function(){
 			  var retval = ps.apply(history, arguments);
@@ -1190,6 +1253,35 @@ function setTinyMCEVersion(e){
 		
 			addCssToDocument('div.B-u-nd-nb, div.s-r-Ge-ec {display:block}');
 			log('PATCH-680, Work around bug that disregards BASE href on G+\nPATCH-526, G+: avoid tall narrow posts due to word-wrap in table ');
+		}
+		if(hostname.indexOf('adwords.google.') > -1){
+			window.navigator.product = 'Gecko';
+			log(' PATCH-332, Fix disabled charts on Google AdWords');
+		}
+		if(hostname.indexOf('code.google.')>-1 && (pathname.indexOf('diff')>-1 || pathname.indexOf('detail')>-1 )){
+			addCssToDocument('div.diff>pre>table{white-space: normal;}div.diff>pre>table th, div.diff>pre>table td{white-space: pre-wrap;}');
+			log('PATCH-321, Work around pre inheritance into tables on Google Code');
+		}
+		if(hostname.indexOf('mail.google.')>-1){
+			addCssToDocument(':focus[tabindex] ::selection,:focus[tabindex]::selection{background-color:highlight!important;color:highlighttext!important}');
+		
+			addCssToDocument('div.GM{display:block!important}');
+		
+			opera.addEventListener('AfterEvent.click', function(e) { 
+				if (e.event.target.isContentEditable && e.event.target.innerHTML=="<br>") { 
+					var f = e.event.target.parentNode; 
+					if(f)setTimeout(function(){f.click()},100); 
+				} 
+			}, false);
+		
+			addCssToDocument('div.wl{overflow:inherit}body{position:static !important}');
+		
+			addCssToDocument('.editable.LW-avf{font-size: small !important}');
+			log('PATCH-992, GMail - Remove CSS that sets transparent background color for selections\nPATCH-1030, GMail - force show attach file field in new composer\nPATCH-1059, GMail - try to focus empty mail body when clicking it\nPATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
+		}
+		if(hostname.indexOf('maps.google.')>-1 || hostname.indexOf('mapy.google.')>-1){
+			opera.addEventListener('BeforeEventListener.mousedown', function(e){if(e.event.target.tagName=='OPTION')e.preventDefault()}, false);
+			log('PATCH-610, GMaps: avoid autoclose of problem reporting dialog');
 		}
 		log('0, Google');
 	} else if(hostname.indexOf('.hbo.com')>-1){
@@ -1676,85 +1768,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('etour.co.jp') > -1){
 		navigator.appName='Netscape';
 		log('PATCH-152, etour.co.jp fix non-disappearing overlapping image');
-	} else if(hostname.indexOf('facebook.com')>-1){
-		if( top==self && location.href.indexOf('www.facebook.com/dialog/')>-1 && location.protocol==='https:' ){
-			var buggy=false;
-			try{
-				var s=typeof opener.frames['fb_xdm_frame_https'];
-			}catch(e){
-				buggy=true;
-			}
-			if(buggy){
-				addEventListener('DOMContentLoaded', function(){
-					var doFix=0;
-					for(var i=0;i<document.scripts.length;i++){
-						if( document.scripts[i].text && document.scripts[i].text.indexOf('fb_xdm_frame_https') )doFix=1;
-					}
-					if(!doFix)return;
-					var ifr=document.body.appendChild(document.createElement('iframe'));
-					ifr.src='https://s-static.ak.facebook.com/platform/page_proxy.php';
-					ifr.setAttribute('style', 'width:1px; height:1px');
-					ifr.id='_browserjsFBHack';
-				}, false);
-				opera.addEventListener('BeforeScript', function(e){
-					if(e.element.text.indexOf('ref.frames[frame].proxyMessage(fragment);}catch(e) {')>-1){
-						e.element.text = e.element.text.replace('ref.frames[frame].proxyMessage(fragment);}catch(e) {', 'ref.frames[frame].proxyMessage(fragment);}catch(e) {try{document.getElementById(\'_browserjsFBHack\').contentWindow.postMessage(fragment, \'https://s-static.ak.facebook.com\');}catch(e){}');
-					}
-				}, false);
-			}
-		}else if(location.href.indexOf('https://s-static.ak.facebook.com/connect/xd_arbiter.php')==0){
-			addEventListener('storage', function(e){
-				if(e.key==='_browserjsFBHack' && typeof proxyMessage =='function'){
-					try{
-						proxyMessage(e.newValue);
-						window.localStorage.removeItem('_browserjsFBHack')
-					}catch(e){}
-				}
-			}, false);
-		}else if( location.href==='https://s-static.ak.facebook.com/platform/page_proxy.php' ){
-			addEventListener('message', function(e){
-				if(e.origin==='https://www.facebook.com' && e.source===parent){
-					localStorage.removeItem('_browserjsFBHack');
-					localStorage['_browserjsFBHack']=e.data;
-				}
-			}, false);
-			addEventListener('storage', function(e){
-				if(e.key==='_browserjsFBHack' && e.newValue===null)parent.close();
-			}, false);
-		}
-	
-		if(hostname.endsWith('www.facebook.com')){
-		 addCssToDocument('div.fbNubFlyoutBody.scrollable{position:inherit}');
-		}
-	
-		if(hostname.endsWith('www.facebook.com')){
-		opera.addEventListener('BeforeEventListener.keypress', function(e){
-			if( e.event.ctrlKey && (e.event.keyCode==86 || e.event.keyCode==118 ) ){
-				var trgt=e.event.target;
-				setTimeout(
-					function(){ 
-						var evt=document.createEvent('Event');
-						evt.initEvent('paste', true, true);
-						trgt.dispatchEvent(evt);
-					}, 10
-				);
-			}
-		}, false);
-		}
-	
-		addPreprocessHandler(/else CSS\.hide\(this\._gripper\);this\._checkContentBoundaries\(\);return this;\}/,'else CSS.hide(this._gripper);return this;}');
-	
-		if(hostname.endsWith('www.facebook.com')){
-		 opera.addEventListener('BeforeCSS', function(e){
-			e.cssText = e.cssText.replace(/border-(top|bottom)-(right|left)-radius:3px/g, '');
-		 }, false);
-		}
-		
-	
-		if(hostname.endsWith('www.facebook.com')){
-		 addCssToDocument('div.videoStage + div + div#fbPhotoPageTagBoxes{visibility:hidden;}');
-		}
-		log('PATCH-630, facebook: work around Opera\'s too strict origin checks on https for https -> http(s) other site -> https IFRAME communication\nPATCH-714, facebook: prevent chat window overflow - Presto bug\nPATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status\nPATCH-558, Facebook avoid chat list scroll\nPATCH-573, Facebook\'s border-radius triggers hyperactive reflow bug, performance suffers\nPATCH-923, facebook: work around lack of pointer-events blocking video playback');
 	} else if(hostname.indexOf('fintyre.it')>-1){
 		navigator.appName = "Netscape";
 		log('PATCH-661, fintyre.it: work around sniffing');
