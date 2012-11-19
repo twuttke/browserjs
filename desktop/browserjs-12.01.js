@@ -1,4 +1,4 @@
-// bBYj6xklJbgmIuLtP+PVjXuhdMls4Ta7Kped7gzU8e9m/3R9+DTOCbVHZTWPgifAcnG6FA9ua+Sk09EERGjGUH7oBpypH9TE+Mcm8SUoupx5Kc0RSra5MAq1I5FIzN5N52x5V0M72BIdTRxihfhlAUxhbjtcfIn9VXM/R8SGqNR3w6wFGW2JHJ0Sz/l6/uQnBRpj6Q3xta0dg6UypEU8N5iJtJs/G/MGWgs84AF7qne6851QhZUyL2YEGKE/Kkuo3ink44y6Yj+0ZdfGj0p0cJUym8p+LHNp8KgUi8xSND0c8Yy/PUzEz/dVfcgc/TK1yXAR+8FWrhSrwAXE5qG/Ug==
+// i21PfijmwPtS0lY+OGCUYIBETz61WbFNh9GSNHeIzoXRsmkS5sGJ+F2je3aVzew4+MYwCQT2CaDAxzzmQCLvuj7D0uyKsrM5NU/j5SsEP21ZqH1szuSTn7oCYqe9GUfuduc/NGKCB4PVcB2iH6RgQp8IV8Fh6XITTE+AYzz2b7GN0rkM9sIKQst61WdI95EzyMmFkdZv3KGoDu9EBPkoNM0rOZAau6GAIt7YDwoVI+jFk3PglWONoxN4JDgmbRWuvnTby2wwvkIYMC2Jt74Sosy5GDvC35t+FdoDE8jcwQZnjpGoCbVmp8+cTgdq1tHGKq8Ooa3s3vnVVKovUUzIFA==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, November 13, 2012. Active patches: 305 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, November 16, 2012. Active patches: 308 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -361,6 +361,7 @@ function setTinyMCEVersion(e){
 	var tinyInstance='tinyMCE' in window?window.tinyMCE : 'tinymce' in window ? window.tinymce : 'tiny_mce' in window ?  window.tiny_mce : null;
 	if(tinyInstance&&tinyInstance.majorVersion)tinyMCEVersionInfo={ majorVersion:tinyInstance.majorVersion, minorVersion:tinyInstance.minorVersion };
 }
+
 
 
 
@@ -793,6 +794,45 @@ function setTinyMCEVersion(e){
 	
 		navigator.appName="netscape";
 		log('PATCH-974, espn.go.com: make image gallery work, suppressing transform usage\nPATCH-375, Make sure the ESPN polls work');
+	} else if(hostname.endsWith('facebook.com')){
+		/* Facebook */
+	
+	
+		if(hostname.endsWith('www.facebook.com')){
+			addCssToDocument('div.fbNubFlyoutBody.scrollable{position:inherit}');
+		
+			opera.addEventListener('PluginInitialized',function(e){
+				if(e.element.id && e.element.firstChild&&e.element.firstChild.getAttribute('value')&&e.element.firstChild.getAttribute('value').indexOf('div_id')>-1)setTimeout(function(){
+					Arbiter.inform('flash/ready', {divID:e.element.id,name:"UploaderFrame",sender:null});
+				},10);
+			});
+			
+		
+			opera.addEventListener('BeforeEventListener.keypress', function(e){
+				if( e.event.ctrlKey && (e.event.keyCode==86 || e.event.keyCode==118 ) ){
+					var trgt=e.event.target;
+					setTimeout(
+						function(){ 
+							var evt=document.createEvent('Event');
+							evt.initEvent('paste', true, true);
+							trgt.dispatchEvent(evt);
+						}, 10
+					);
+				}
+			}, false);
+		
+			opera.addEventListener('BeforeCSS', function(e){
+				e.cssText = e.cssText.replace(/border-(top|bottom)-(right|left)-radius:3px/g, '');
+			}, false);
+			
+		
+			addCssToDocument('div.videoStage + div + div#fbPhotoPageTagBoxes{visibility:hidden;}');
+		
+			addCssToDocument('div#fbProfileCover + div.groupsJumpCoverBorder{visibility:hidden;}');
+			
+			log('PATCH-714, facebook: prevent chat window overflow - Presto bug\nPATCH-1055, Facebook - Work around issue where Flash does not call JS when expected\nPATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status\nPATCH-573, Facebook\'s border-radius triggers hyperactive reflow bug, performance suffers\nPATCH-923, facebook: work around lack of pointer-events blocking video playback\nPATCH-954, facebook: work around lack of pointer-events breaking group page photos');
+		}
+		log('0, Facebook');
 	} else if(hostname.endsWith('garmin.com')){
 		opera.defineMagicFunction('eligible', function() { return true; });
 		opera.defineMagicFunction('detectOSBrowser', function(realFunc, realThis, inOS, inBrowser) {
@@ -1317,6 +1357,10 @@ function setTinyMCEVersion(e){
 			
 			log('PATCH-382, Google Spreadsheets cell size and column label size mismatch\nPATCH-1032, Google Docs - auto-close unsupported browser message\nPATCH-517, docs.google: make document names visible\nPATCH-278, We should not send keypress events for navigation- and function keys');
 		}
+		if(hostname.contains('plus.google.')){
+			addCssToDocument('div.B-u-nd-nb, div.s-r-Ge-ec {display:block}');
+			log('PATCH-526, G+: avoid tall narrow posts due to word-wrap in table ');
+		}
 		if(hostname.indexOf('adwords.google.') > -1){
 			window.navigator.product = 'Gecko';
 			log(' PATCH-332, Fix disabled charts on Google AdWords');
@@ -1330,18 +1374,21 @@ function setTinyMCEVersion(e){
 		
 			addCssToDocument('div.GM{display:block!important}');
 		
+			opera.addEventListener('AfterEvent.click', function(e) { 
+				if (e.event.target.isContentEditable && e.event.target.innerHTML=="<br>") { 
+					var f = e.event.target.parentNode; 
+					if(f)setTimeout(function(){f.click()},100); 
+				} 
+			}, false);
+		
 			addCssToDocument('div.wl{overflow:inherit}body{position:static !important}');
 		
 			addCssToDocument('.editable.LW-avf{font-size: small !important}');
-			log('PATCH-992, GMail - Remove CSS that sets transparent background color for selections\nPATCH-1030, GMail - force show attach file field in new composer\nPATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
+			log('PATCH-992, GMail - Remove CSS that sets transparent background color for selections\nPATCH-1030, GMail - force show attach file field in new composer\nPATCH-1059, GMail - try to focus empty mail body when clicking it\nPATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance\nPATCH-582, GMail: override workaround for old font-size bug in Opera');
 		}
 		if(hostname.indexOf('maps.google.')>-1 || hostname.indexOf('mapy.google.')>-1){
 			opera.addEventListener('BeforeEventListener.mousedown', function(e){if(e.event.target.tagName=='OPTION')e.preventDefault()}, false);
 			log('PATCH-610, GMaps: avoid autoclose of problem reporting dialog');
-		}
-		if(hostname.indexOf('plus.google')>-1){
-			addCssToDocument('div.B-u-nd-nb, div.s-r-Ge-ec {display:block}');
-			log('PATCH-526, G+: avoid tall narrow posts due to word-wrap in table ');
 		}
 		log('0, Google');
 	} else if(hostname.indexOf('.hbo.com')>-1){
@@ -1817,41 +1864,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('etour.co.jp') > -1){
 		navigator.appName='Netscape';
 		log('PATCH-152, etour.co.jp fix non-disappearing overlapping image');
-	} else if(hostname.indexOf('facebook.com')>-1){
-		if(hostname.endsWith('www.facebook.com')){
-		 addCssToDocument('div.fbNubFlyoutBody.scrollable{position:inherit}');
-		}
-	
-		if(hostname.endsWith('www.facebook.com')){
-		opera.addEventListener('BeforeEventListener.keypress', function(e){
-			if( e.event.ctrlKey && (e.event.keyCode==86 || e.event.keyCode==118 ) ){
-				var trgt=e.event.target;
-				setTimeout(
-					function(){ 
-						var evt=document.createEvent('Event');
-						evt.initEvent('paste', true, true);
-						trgt.dispatchEvent(evt);
-					}, 10
-				);
-			}
-		}, false);
-		}
-	
-		if(hostname.endsWith('www.facebook.com')){
-		 opera.addEventListener('BeforeCSS', function(e){
-			e.cssText = e.cssText.replace(/border-(top|bottom)-(right|left)-radius:3px/g, '');
-		 }, false);
-		}
-		
-	
-		if(hostname.endsWith('www.facebook.com')){
-		 addCssToDocument('div.videoStage + div + div#fbPhotoPageTagBoxes{visibility:hidden;}');
-		}
-	
-		if(hostname.endsWith('www.facebook.com')){
-		 addCssToDocument('div#fbProfileCover + div.groupsJumpCoverBorder{visibility:hidden;}');
-		}
-		log('PATCH-714, facebook: prevent chat window overflow - Presto bug\nPATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status\nPATCH-573, Facebook\'s border-radius triggers hyperactive reflow bug, performance suffers\nPATCH-923, facebook: work around lack of pointer-events blocking video playback\nPATCH-954, facebook: work around lack of pointer-events breaking group page photos');
 	} else if(hostname.indexOf('fintyre.it')>-1){
 		navigator.appName = "Netscape";
 		log('PATCH-661, fintyre.it: work around sniffing');
