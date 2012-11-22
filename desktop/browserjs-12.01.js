@@ -1,4 +1,4 @@
-// i21PfijmwPtS0lY+OGCUYIBETz61WbFNh9GSNHeIzoXRsmkS5sGJ+F2je3aVzew4+MYwCQT2CaDAxzzmQCLvuj7D0uyKsrM5NU/j5SsEP21ZqH1szuSTn7oCYqe9GUfuduc/NGKCB4PVcB2iH6RgQp8IV8Fh6XITTE+AYzz2b7GN0rkM9sIKQst61WdI95EzyMmFkdZv3KGoDu9EBPkoNM0rOZAau6GAIt7YDwoVI+jFk3PglWONoxN4JDgmbRWuvnTby2wwvkIYMC2Jt74Sosy5GDvC35t+FdoDE8jcwQZnjpGoCbVmp8+cTgdq1tHGKq8Ooa3s3vnVVKovUUzIFA==
+// W8a7iwMvkJgCe1ZJkjS33TIlUquiPV/M0xEYM6YT3JHKkkm5ehSeYfKuhorjj/2qmJSlFOjWnF+WEsEHUzXA34Bjj+CwHjPQWG7pKjhA2NwuDNiItnUMollbttKZsJ2LVzKUHeOuHXPlwyiuRviDf46DncOXENqXvznGaPp/YQCUta1wWj/moQVKlEidyOrm47atzxZj3Fp1+2QDCzbX3D17HCP4EG3GhxTXaYO1VcMlJ4SP52mBnTp1wGVpgayWVpKqZySu1LOECrinEWJM/l6C9lUag7SyO4iqCaKFxGkmgSVEB27hyRmH8g0s/uXiDKAy+9urFjW3nSp/MdsemA==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, November 16, 2012. Active patches: 308 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, November 22, 2012. Active patches: 313 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -745,6 +745,10 @@ function setTinyMCEVersion(e){
 			navigator.userAgent = navigator.userAgent.replace(/OS X (\d+).(\d+).(\d+)+;/,'OS X $1_$2_$3;');
 		}
 		log('PATCH-387, Make Apple Store menu visible\nPATCH-387, Enable menu on Apple support pages\nPATCH-387, Enable menu on Apple community pages\nPATCH-846, apple.com: don\'t reload from within unload handler\nPATCH-924, apple.com - reformat OS X version string with underscores');
+	} else if(hostname.endsWith('.polskastacja.pl')){
+		addPreprocessHandler(/dojo\.isOpera/g , 'false', false, function(el){return !el.src});
+		
+		log('PATCH-1065 , polskastacja.pl - fix stream selection drop-down.');
 	} else if(hostname.endsWith('.tsn.ca')){
 		window.addEventListener('load', function(){$(document).triggerHandler("onload.etsapi")}, false);
 		log('PATCH-1028, Dispatch of the "video player ready" event happens before event listener is added due to blocking DOM-added scripts, fire it again');
@@ -783,6 +787,25 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('dadergezocht.nl')){
 		fixIFrameSSIscriptII('resizeIframe');
 		log('PATCH-966, dadergezocht.nl - old iframe resize script');
+	} else if(hostname.endsWith('data.qz.com')){
+		var src,trgt;
+		function mouseEventProxy(e){
+			var ev = document.createEvent('MouseEvent');
+			ev.initMouseEvent(e.type, e.canBubble, e.cancelable, e.view, e.detail, e.screenX, e.screenY, e.clientX, e.clientY, e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, e.button, e.relatedTarget);
+			trgt.dispatchEvent(ev);
+		}
+		document.addEventListener('DOMContentLoaded',function(){
+			src = document.getElementById('mapOverlays');
+			trgt = document.getElementById('map');
+			if(src && ( src.currentStyle.pointerEvents=='none' ) && trgt){
+				src.addEventListener('mousedown',mouseEventProxy,false);
+				src.addEventListener('mousemove',mouseEventProxy,false);
+				src.addEventListener('mouseup',mouseEventProxy,false);
+				src.addEventListener('dblclick',mouseEventProxy,false);
+				src.addEventListener('mousewheel',mouseEventProxy,false);	
+			}
+		},false);
+		log('PATCH-1067, qz.com - make maps draggable despite pointer-events usage');
 	} else if(hostname.endsWith('directbus.com.mx')){
 		if(pathname=="/")location.href='/home.html';
 		log('PATCH-895, directbus.com.mx: avoid freezing Flash frontpage');
@@ -989,8 +1012,8 @@ function setTinyMCEVersion(e){
 		});
 		log('PATCH-513, office.microsoft.com: re-initialize video player after applying page overflow');
 	} else if(hostname.endsWith('oldspice.com')){
-		addPreprocessHandler(/has_postMessage\s*=\s*window\[postMessage\]\s*&&\s*!\$\.browser\.opera;/, 'has_postMessage = true;')
-		log('PATCH-961, Remove sniff in jQuery postMessage plugin (incorrectly assumes lack of postMessage).');
+		addPreprocessHandler(/has_postMessage\s*=\s*window\[postMessage\]\s*&&\s*!\$\.browser\.opera;/, 'has_postMessage = true;',true,function(el){return el.src.indexOf('jquery.ba-postmessage.js')>-1;});
+		log('PATCH-961, oldspice.com - remove sniff in jQuery postMessage plugin (incorrectly assumes lack of postMessage).');
 	} else if(hostname.endsWith('oly-forum.com')){
 		addCssToDocument('#navigation ul#menu li { margin-left: 0; }');
 		log('PATCH-922, oly-forum.com: better placement of menu dropdown');
@@ -1041,6 +1064,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('pinterest.com')){
 		addCssToDocument('div.NoInput input[data-text-on="On"]{display: inherit !important;visibility: hidden;}');
 		log('PATCH-811, pinterest.com: Opera fails to update status of display:none checkbox');
+	} else if(hostname.endsWith('postdanmark.dk')){
+		addPreprocessHandler(/has_postMessage\s*=\s*window\[postMessage\]\s*&&\s*!\$\.browser\.opera;/, 'has_postMessage = true;',true,function(el){return el.src.indexOf('jquery.ba-postmessage.js')>-1;});
+		log('PATCH-1069, postdanmark.dk - remove sniff in jQuery postMessage plugin (incorrectly assumes lack of postMessage).');
 	} else if(hostname.endsWith('quora.com')){
 		(function(sTo){
 			var lastEvt=new Date();
@@ -1695,10 +1721,14 @@ function setTinyMCEVersion(e){
 	
 		addCssToDocument('.ONETHIRTYFIVE-HERO ul{margin-bottom:0!important}');
 	
+		if(hostname.indexOf('wireless.')>-1){
+		addPreprocessHandler(/\$\.browser\.mozilla\?hash:decodeURIComponent\(hash\)/,'decodeURIComponent(hash)',true,function(el){return el.src.indexOf('js/build/browse-r1')>-1;});
+		}
+	
 		if (navigator.appName!=='Opera'){
 			document.documentElement.style.MozAppearance = 'Opera';
 		}
-		log('PATCH-652, Fix displaying recommended items in Amazon\nPATCH-1025, Amazon - Black Friday deals float upwards due to margin styling on UL and innerHTML updates\nPATCH-527, Add more spoofing when masking as another browser on Amazon');
+		log('PATCH-652, Fix displaying recommended items in Amazon\nPATCH-1025, Amazon - Black Friday deals float upwards due to margin styling on UL and innerHTML updates\nPATCH-1068, amazon - avoid looping hash decode\nPATCH-527, Add more spoofing when masking as another browser on Amazon');
 	} else if(hostname.indexOf('ameba.jp')!=-1){
 		addPreprocessHandler(/editor\.insertNodeAtSelection\(link\);\s*editor\.insertNodeAtSelection\(document\.createElement\('br'\)\);/, 'editor.insertNodeAtSelection(link);');
 		log('331093, Work around Opera bug where second BR tag overwrites newly inserted IMG');
@@ -2194,7 +2224,15 @@ function setTinyMCEVersion(e){
 		log('PATCH-274, TVGuide doesn\'t show program descriptions, due to browser sniffing');
 	} else if(hostname.indexOf('twitter.com')>-1){
 		addCssToDocument('strong.fullname + span:not([class]){content:""}');
-		log('PATCH-671, Twitter: avoid ghost @ before username');
+	
+		window.addEventListener('focus',function(){
+			if(document.activeElement==document.querySelector('textarea.tweet-box')){
+				var ev = document.createEvent('Event');
+				ev.initEvent('focus',true,true);
+				document.activeElement.dispatchEvent(ev);
+			}
+		},false);
+		log('PATCH-671, Twitter: avoid ghost @ before username\nPATCH-1064, twitter - restart counter after defocus');
 	} else if(hostname.indexOf('uol.com.br')>-1){
 		addCssToDocument('#moduloTopoRotativo ul li div.texto{top:225px}');
 		log('PATCH-636, uol.com.br: work around abs.pos.bottom.align core bug');
