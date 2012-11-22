@@ -1,4 +1,4 @@
-// rNkIzSk2MOle1M+8LPTGDsOxp91LQdq2qqLUxKRsZ6vqfX0yjTbpARlh60slxfp6YeITLk5mwCukKviUdQXDFLw0rG0nYbWBM2IONA6KP+mSleZlomyHDtertwS+S6EKNGZQjz5ejuRNLFL1Bwx1vWj7fr9IK0U7Suw3dLEv/e3UUREzbZ0MvoXvyvuebWu86fCJ/ZjuxVJwCjBwUPUwjzXkJu/mRjM6g4UwezqV0MrZgxb2A6a9nqUsCHke2AFY+JMo+lN5FoK6sF/n89SdiJ5dPnaFyffJIIIzoAoB+0IsRMbfAOgand0pu6ya48m7uE75BXYR3AGPQRAkfXIoPA==
+// u7n0ieZAdxPYnE6NeaENejcf/WQzm0GN1aQ3OgdhAQ8WHjuC3oW+hRJFGpVFxsJ+GlbACo1KmZXlo+F9dclAzFOo4y3Y3EDh1Q2hIhP4NQ+m5oaI7RSiqBAuYOagn56jaoaL00/RrKCU9vnSEp988fIEYvMYrTtW/7hfOer4mAkW/5KFgXm2HM2IeJ3xHn5O7pym669Q9LnFUGAE9CGgO73QqKgi9XR+QgGEb63P1HW6GyjGB2oNPDxyLOYUIlnNJLdq4xoPiQrS6FK8+hbsaJ+Tw6sfP5+RDozBwEtc+K1pRTEnmlE6sYV/f5V0c3SAKv4LHCKe4gSStv6/a4KINQ==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, November 16, 2012. Active patches: 279 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, November 22, 2012. Active patches: 282 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -703,6 +703,10 @@ function setTinyMCEVersion(e){
 			navigator.userAgent = navigator.userAgent.replace(/OS X (\d+).(\d+).(\d+)+;/,'OS X $1_$2_$3;');
 		}
 		log('PATCH-387, Make Apple Store menu visible\nPATCH-387, Enable menu on Apple support pages\nPATCH-387, Enable menu on Apple community pages\nPATCH-924, apple.com - reformat OS X version string with underscores');
+	} else if(hostname.endsWith('.polskastacja.pl')){
+		addPreprocessHandler(/dojo\.isOpera/g , 'false', false, function(el){return !el.src});
+		
+		log('PATCH-1065 , polskastacja.pl - fix stream selection drop-down.');
 	} else if(hostname.endsWith('.tsn.ca')){
 		window.addEventListener('load', function(){$(document).triggerHandler("onload.etsapi")}, false);
 		log('PATCH-1028, Dispatch of the "video player ready" event happens before event listener is added due to blocking DOM-added scripts, fire it again');
@@ -936,8 +940,8 @@ function setTinyMCEVersion(e){
 		});
 		log('PATCH-513, office.microsoft.com: re-initialize video player after applying page overflow');
 	} else if(hostname.endsWith('oldspice.com')){
-		addPreprocessHandler(/has_postMessage\s*=\s*window\[postMessage\]\s*&&\s*!\$\.browser\.opera;/, 'has_postMessage = true;')
-		log('PATCH-961, Remove sniff in jQuery postMessage plugin (incorrectly assumes lack of postMessage).');
+		addPreprocessHandler(/has_postMessage\s*=\s*window\[postMessage\]\s*&&\s*!\$\.browser\.opera;/, 'has_postMessage = true;',true,function(el){return el.src.indexOf('jquery.ba-postmessage.js')>-1;});
+		log('PATCH-961, oldspice.com - remove sniff in jQuery postMessage plugin (incorrectly assumes lack of postMessage).');
 	} else if(hostname.endsWith('pb.com')){
 		navigator.userAgent=navigator.userAgent.replace( /Opera/g, '0pera not Mozilla' );
 	
@@ -970,6 +974,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('pinterest.com')){
 		addCssToDocument('div.NoInput input[data-text-on="On"]{display: inherit !important;visibility: hidden;}');
 		log('PATCH-811, pinterest.com: Opera fails to update status of display:none checkbox');
+	} else if(hostname.endsWith('postdanmark.dk')){
+		addPreprocessHandler(/has_postMessage\s*=\s*window\[postMessage\]\s*&&\s*!\$\.browser\.opera;/, 'has_postMessage = true;',true,function(el){return el.src.indexOf('jquery.ba-postmessage.js')>-1;});
+		log('PATCH-1069, postdanmark.dk - remove sniff in jQuery postMessage plugin (incorrectly assumes lack of postMessage).');
 	} else if(hostname.endsWith('quora.com')){
 		(function(sTo){
 			var lastEvt=new Date();
@@ -1599,10 +1606,14 @@ function setTinyMCEVersion(e){
 	
 		addCssToDocument('.ONETHIRTYFIVE-HERO ul{margin-bottom:0!important}');
 	
+		if(hostname.indexOf('wireless.')>-1){
+		addPreprocessHandler(/\$\.browser\.mozilla\?hash:decodeURIComponent\(hash\)/,'decodeURIComponent(hash)',true,function(el){return el.src.indexOf('js/build/browse-r1')>-1;});
+		}
+	
 		if (navigator.appName!=='Opera'){
 			document.documentElement.style.MozAppearance = 'Opera';
 		}
-		log('PATCH-652, Fix displaying recommended items in Amazon\nPATCH-1025, Amazon - Black Friday deals float upwards due to margin styling on UL and innerHTML updates\nPATCH-527, Add more spoofing when masking as another browser on Amazon');
+		log('PATCH-652, Fix displaying recommended items in Amazon\nPATCH-1025, Amazon - Black Friday deals float upwards due to margin styling on UL and innerHTML updates\nPATCH-1068, amazon - avoid looping hash decode\nPATCH-527, Add more spoofing when masking as another browser on Amazon');
 	} else if(hostname.indexOf('ameba.jp')!=-1){
 		addPreprocessHandler(/editor\.insertNodeAtSelection\(link\);\s*editor\.insertNodeAtSelection\(document\.createElement\('br'\)\);/, 'editor.insertNodeAtSelection(link);');
 		log('331093, Work around Opera bug where second BR tag overwrites newly inserted IMG');
