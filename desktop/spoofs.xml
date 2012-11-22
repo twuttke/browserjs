@@ -1016,4 +1016,29 @@
 		<pref name="Spoof UserAgent ID" value="2"/>
 	</section>
 </host>
+<host name="vpn.deltaware.com">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="ebookjapan.jp">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="fashionism.ca">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
+<host name="rankers.co.nz">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="4"/>
+	</section>
+</host>
+<host name="meo.pt">
+	<section name="User Agent">
+		<pref name="Spoof UserAgent ID" value="2"/>
+	</section>
+</host>
 </preferences>
