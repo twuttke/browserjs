@@ -1,4 +1,4 @@
-// pRfjuBADBOSocECczl+G0dj18+Xrh1fBzkA/JA3X+VPCgTkq7KEVdJzfcydryW2jb0Ct08xmQHs5i7HIuyf5/NJ4C4p2UR6VlRjghBO40UPam4A1CW2iLeDtqf3z51T4isM3k9+HAgVfSsH/fdLBEvX8kj+13sqeLW4C1xOGR6CwzHJm1m1v5v+V8eVxtCqOrBUg5cWDqj4vvAHqgbhZPmzPxY/7KRIKGECnKaVEvLyu2BSETmFeWhqdLxrb1mIRIlgDOysRRBs+b/g9+fv/s0CSHrInvQ73KBY/z9OgZmB4upLSrdXy9lOuWiFmq6k0sFVXLPQsqhf3qkYeYbmoPw==
+// AH/psLMnCIYt5G4uPG/JzFrVqmmYXby9WK3RelrebV5cimgtC2osr5ARnab2SBrGWnwPCVE4/rwMi4zDnzDbDOajSV2t2jBBtLbfpGV2oAf9UZkIBa7Y54zUK0syVzydE9KVmgoT0n4qX63m/Fp6nykGVzU8/0WIWBGgC6f8rHsdyCMw9eKvD36KYNc8ZCLMp/h6xMr03pimVPp07PsCoes2oO+zaDFNpZ4/vS6/vXjwt9YUd8noAVNe+eJYYVQrxaHK8Jn6NatPqg8nHvalJQTwLcCFaGrMY7wHpl/3YRe+qnu5WoN9Uh0sfaMnNogmpslDM4qJ6dW/508J3Yi+/A==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, November 22, 2012. Active patches: 292 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, November 28, 2012. Active patches: 296 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -525,6 +525,14 @@ function undoFunctionKeypressEventRemoval(){
 			}
 		}else if(!fixed && (indexOf.call(name, 'jquery.autocomplete')>-1 || indexOf.call(name, 'highslide.js')>-1 )){
 			fixJQueryAutocomplete();
+		}else if(indexOf.call(name,'/wclib.js')>-1){
+			addEventListener.call(opera, 'BeforeEventListener.load', function(e){
+				var trgt = e.event.target;
+				if(trgt.tagName=="IFRAME" && trgt.id && trgt.id.indexOf('wcframable')==0){
+					preventDefault.call(e);
+				}
+			},false);
+			log('PATCH-1070 - fix infinite load issue with webcollage script');
 		}
 		if( typeof window._jive_plain_quote_text!='undefined' ){
 			opera.addEventListener('BeforeScript', function(e){
@@ -765,6 +773,15 @@ function undoFunctionKeypressEventRemoval(){
 		addPreprocessHandler(/dojo\.isOpera/g , 'false', false, function(el){return !el.src});
 		
 		log('PATCH-1065 , polskastacja.pl - fix stream selection drop-down.');
+	} else if(hostname.endsWith('.qidian.com')){
+		opera.addEventListener('BeforeCSS',function(e){
+			var ohref = e.element.getAttribute('href');
+			var rhref = e.element.href;
+			if( rhref!=ohref && rhref.indexOf(hostname)==-1 && rhref.match(/(default|Channel|BookStore2)\.css/) ){
+				e.element.href = location.protocol+'//'+hostname+ohref;
+			}
+		},false);
+		log('PATCH-1072, qidian.com - work around base resolving issue in Presto');
 	} else if(hostname.endsWith('.tsn.ca')){
 		window.addEventListener('load', function(){$(document).triggerHandler("onload.etsapi")}, false);
 		log('PATCH-1028, Dispatch of the "video player ready" event happens before event listener is added due to blocking DOM-added scripts, fire it again');
@@ -774,6 +791,9 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('aldoshoes.com')){
 		document.__defineSetter__('domain', function(){});
 		log('PATCH-808, aldoshoes.com - fix broken document.domain settings');
+	} else if(hostname.endsWith('aliorbank.pl')){
+		addCssToDocument('input,textarea,select{border-width: 0.1em;}');
+		log('PATCH-1071, aliorbank.pl - show invisible borders');
 	} else if(hostname.endsWith('allbankonline.in')){
 		HTMLElement.prototype.onselectstart = true;
 		log('PATCH-889, allbankonline.in: prevent mousedown prevention');
@@ -786,6 +806,30 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('caisse-epargne.fr')){
 		addPreprocessHandler(/this\._changeHandler\);if\s*\(Sys\.Browser\.agent\s==\sSys\.Browser\.Opera\)/g, ' this._changeHandler);if(false)');
 		log('PATCH-798, Avoid browser sniffing that breaks typing');
+	} else if(hostname.endsWith('carrefour.it')){
+		opera.addEventListener('AfterEvent.DOMContentLoaded',function(){
+			(function($){
+				$.fn.sortOptions = function(){
+					this.each(function(){
+						var el = this;
+						var ar = new Array();
+						for (var i=0;i<el.options.length;i++) {
+							ar[i] = new Array(el.options[i].text, el.options[i].value);
+						}
+						ar.sort();
+						while (el.options.length > 0) {
+							el.options[0] = null;
+						}
+						for (var i=0;i<ar.length;i++) {
+							el.options[i] = new Option(ar[i][0], ar[i][1]);
+						}
+					});
+					return this;
+				}
+			})(jQuery);
+		},false);
+		addCssToDocument('ul.combobox_summary{margin-top:1em;}');
+		log('PATCH-1077, carrefour.it - speed up sort function');
 	} else if(hostname.endsWith('cfe.urssaf.fr')){
 		opera.defineMagicFunction('navigateurAutorise',function(){return true});
 		log('PATCH-807, urssaf.fr: block browser block');
@@ -963,11 +1007,13 @@ function undoFunctionKeypressEventRemoval(){
 	
 		addCssToDocument('.c_is { display: inline-block }');
 	
+		addCssToDocument('#c_memenu { width: 350px; }.c_m_l { float: left !important; }.c_m_r { float: right !important; }');
+	
 		var styleSetterLookupMethod = document.createElement('span').style.__lookupSetter__;
 		 CSSStyleDeclaration.prototype.__lookupSetter__ = function(prop){
 			return styleSetterLookupMethod.call(document.createElement('span').style, prop);
 		 };
-		log('CORE-17444, Fix drag and drop in Hotmail\nCORE-17447, Mispositioned sprites due to missing CSS\nDSK-235885, Hotmail uses lookupGetter on prototypes, not instances');
+		log('CORE-17444, Fix drag and drop in Hotmail\nCORE-17447, Mispositioned sprites due to missing CSS\nPATCH-1075, mail.live.com - make Facebook status flyout clickable\nDSK-235885, Hotmail uses lookupGetter on prototypes, not instances');
 	} else if(hostname.endsWith('members.webs.com')){
 		opera.addEventListener('BeforeScript', function (e) {
 			if (e.element.src.indexOf('underscore-base.js') > -1) {
@@ -976,18 +1022,6 @@ function undoFunctionKeypressEventRemoval(){
 		}, false);
 		
 		log('PATCH-743, webs.com - fix reference to stylesheet variable');
-	} else if(hostname.endsWith('mog.com')){
-		opera.addEventListener('BeforeScript',function(ev){
-			var name=ev.element.src; 
-			if(!name){return;}
-			if(name.indexOf('player.min.js')>-1){
-				ev.element.text = ev.element.text.replace(/a.supported_browsers\s*=\s*\[/,'a.supported_browsers=["Opera",');
-			}else if(name.indexOf('global.js')>-1){
-				ev.element.text = ev.element.text.replace(/Mog.supported_browsers\s*=\s*\[/,'Mog.supported_browsers=["Opera",');
-			}
-		},false);
-		
-		log('PATCH-737, mog.com - report Opera as a supported browser');
 	} else if(hostname.endsWith('msn.foxsports.com')){
 		opera.defineMagicVariable('_dapUtils', function(obj){ obj.is_opera=false; return obj; }, null);
 		log('PATCH-1046, msn.foxsports.com - close iframe so comments can load.');
@@ -1153,6 +1187,10 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('todoist.com')){
 		KeyboardEvent.prototype.__defineGetter__('key', function(e){return this.keyCode});
 		log('PATCH-1021, todoist.com - fix event.key usage');
+	} else if(hostname.endsWith('usbank.com')){
+		opera.defineMagicVariable('is_opera',function(){return false},null);
+		opera.defineMagicVariable('is_nav6up',function(){return true},null);
+		log('PATCH-1076, usbank.com - avoid unsupported browser alert');
 	} else if(hostname.endsWith('uye.memurlar.net')){
 		addCssToDocument('table{table-layout:auto;}');
 		log('PATCH-988, uye.memurlar.net: fix table layout');
@@ -1354,10 +1392,6 @@ function undoFunctionKeypressEventRemoval(){
 		/* Google */
 	
 	
-		if(hostname.contains('.google.') && pathname.indexOf('/imghp')==0){
-			addCssToDocument('div#logocont + div{margin:auto}');
-			log('PATCH-1034, Google Image search centered');
-		}
 		if(hostname.contains('docs.google.')){
 			opera.addEventListener('BeforeScript', function (e){
 				if (e.element.src.indexOf('kix_main') > -1 && e.element.src.indexOf('_core') > -1){
@@ -1373,6 +1407,10 @@ function undoFunctionKeypressEventRemoval(){
 		
 			undoFunctionKeypressEventRemoval();
 			log('PATCH-977, Google Documents copy paste\nPATCH-1032, Google Docs - auto-close unsupported browser message\nPATCH-382, Google Spreadsheets cell highligh mismatch and key event');
+		}
+		if(hostname.contains('images.google') || pathname.indexOf('/imghp')==0){
+			addCssToDocument('div#logocont + div{margin:auto}');
+			log('PATCH-1034, Google Image search centered');
 		}
 		if(hostname.contains('play.google')){
 			undoFunctionKeypressEventRemoval();
