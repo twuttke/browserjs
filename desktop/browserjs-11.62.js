@@ -1,4 +1,4 @@
-// u7n0ieZAdxPYnE6NeaENejcf/WQzm0GN1aQ3OgdhAQ8WHjuC3oW+hRJFGpVFxsJ+GlbACo1KmZXlo+F9dclAzFOo4y3Y3EDh1Q2hIhP4NQ+m5oaI7RSiqBAuYOagn56jaoaL00/RrKCU9vnSEp988fIEYvMYrTtW/7hfOer4mAkW/5KFgXm2HM2IeJ3xHn5O7pym669Q9LnFUGAE9CGgO73QqKgi9XR+QgGEb63P1HW6GyjGB2oNPDxyLOYUIlnNJLdq4xoPiQrS6FK8+hbsaJ+Tw6sfP5+RDozBwEtc+K1pRTEnmlE6sYV/f5V0c3SAKv4LHCKe4gSStv6/a4KINQ==
+// kZ1KPVF2FQJlkAPVedH4aZYGl0WVFkjNhuf/g83EMdY3K4vWNscVEMRUQMtreWZPNKpOTGH3I2v/qfNPVBvP6/renwZv+PmnSjeImqW7EeDtDTYwHhhiUJRTRsb+hqFc7cENZdJpyGfQX7Pxk6fXbcdP1Ox+SCL5wFF6Ly5i38s/S//wduVy0f3xi57SgnLmS4XTj3B9P2DtM7tkdSvITVJfApQN4wfrvad9dt/fZz+o5dKLSkMhaIxEMuxal2tUDWx0nOYlZZQ5wbHs1ttLb9QmdZ8DAvho6isx/A55M+/MSduakdfvF3k9VIw/dEQ27s14K0SBGpi8Vz8DMGctyw==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, November 22, 2012. Active patches: 282 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, November 28, 2012. Active patches: 284 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -497,6 +497,14 @@ function setTinyMCEVersion(e){
 			}
 		}else if(!fixed && (indexOf.call(name, 'jquery.autocomplete')>-1 || indexOf.call(name, 'highslide.js')>-1 )){
 			fixJQueryAutocomplete();
+		}else if(indexOf.call(name,'/wclib.js')>-1){
+			addEventListener.call(opera, 'BeforeEventListener.load', function(e){
+				var trgt = e.event.target;
+				if(trgt.tagName=="IFRAME" && trgt.id && trgt.id.indexOf('wcframable')==0){
+					preventDefault.call(e);
+				}
+			},false);
+			log('fix infinite load issue with webcollage script');
 		}
 		if( typeof window._jive_plain_quote_text!='undefined' ){
 			opera.addEventListener('BeforeScript', function(e){
@@ -716,6 +724,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('aldoshoes.com')){
 		document.__defineSetter__('domain', function(){});
 		log('PATCH-808, aldoshoes.com - fix broken document.domain settings');
+	} else if(hostname.endsWith('aliorbank.pl')){
+		addCssToDocument('input,textarea,select{border-width: 0.1em;}');
+		log('PATCH-1071, aliorbank.pl - show invisible borders');
 	} else if(hostname.endsWith('antikvar.hu')){
 		addCssToDocument('#header a{font-size:11px}');
 		log('PATCH-890, antikvar.hu: font fallback breaks layout');
@@ -885,6 +896,8 @@ function setTinyMCEVersion(e){
 	
 		addCssToDocument('.c_is { display: inline-block }');
 	
+		addCssToDocument('#c_memenu { width: 350px; }.c_m_l { float: left !important; }.c_m_r { float: right !important; }');
+	
 		opera.addEventListener('BeforeScript', function (e) {
 			if (e.element.src.indexOf('fullex.js') > -1) {
 				e.element.text = e.element.text.replace('for(i.isArray(t)||(t in e?t=[t]:(t=i.camelCase(t),t=t in e?[t]:t.split(" "))),', 'if (!i.isArray(t))(t in e?t=[t]:(t=i.camelCase(t),t=t in e?[t]:t.split(" ")));for(');
@@ -898,7 +911,7 @@ function setTinyMCEVersion(e){
 		 CSSStyleDeclaration.prototype.__lookupSetter__ = function(prop){
 			return styleSetterLookupMethod.call(document.createElement('span').style, prop);
 		 };
-		log('CORE-17444, Fix drag and drop in Hotmail\nCORE-17447, Mispositioned sprites due to missing CSS\nPATCH-770, Fix minified jQuery on Hotmail\nPATCH-823, img.complete must be false while loading a .js file\nDSK-235885, Hotmail uses lookupGetter on prototypes, not instances');
+		log('CORE-17444, Fix drag and drop in Hotmail\nCORE-17447, Mispositioned sprites due to missing CSS\nPATCH-1075, mail.live.com - make Facebook status flyout clickable\nPATCH-770, Fix minified jQuery on Hotmail\nPATCH-823, img.complete must be false while loading a .js file\nDSK-235885, Hotmail uses lookupGetter on prototypes, not instances');
 	} else if(hostname.endsWith('members.webs.com')){
 		opera.addEventListener('BeforeScript', function (e) {
 			if (e.element.src.indexOf('underscore-base.js') > -1) {
@@ -907,18 +920,6 @@ function setTinyMCEVersion(e){
 		}, false);
 		
 		log('PATCH-743, webs.com - fix reference to stylesheet variable');
-	} else if(hostname.endsWith('mog.com')){
-		opera.addEventListener('BeforeScript',function(ev){
-			var name=ev.element.src; 
-			if(!name){return;}
-			if(name.indexOf('player.min.js')>-1){
-				ev.element.text = ev.element.text.replace(/a.supported_browsers\s*=\s*\[/,'a.supported_browsers=["Opera",');
-			}else if(name.indexOf('global.js')>-1){
-				ev.element.text = ev.element.text.replace(/Mog.supported_browsers\s*=\s*\[/,'Mog.supported_browsers=["Opera",');
-			}
-		},false);
-		
-		log('PATCH-737, mog.com - report Opera as a supported browser');
 	} else if(hostname.endsWith('mycoast.cccd.edu')){
 		opera.defineMagicVariable('is_fox',function(){return true},null);
 		log('PATCH-804, mycoast.cccd.edu: block browser block');
@@ -1040,6 +1041,10 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('thaiair.co.jp')){
 		navigator.appName = 'M'+navigator.appName;
 		log('PATCH-943, thaiair.co.jp - fix drop-down menu positioning');
+	} else if(hostname.endsWith('usbank.com')){
+		opera.defineMagicVariable('is_opera',function(){return false},null);
+		opera.defineMagicVariable('is_nav6up',function(){return true},null);
+		log('PATCH-1076, usbank.com - avoid unsupported browser alert');
 	} else if(hostname.endsWith('washingtonpost.com')){
 		addPreprocessHandler(  /if\(\(b\.webkit\|\|b\.gecko\)&&y\.type==="css"\)/  ,'if((b.webkit||b.gecko||b.opera)&&y.type==="css")' , true, function(el){return el.src.indexOf('yui/yui-min.js')>-1;} );
 	
