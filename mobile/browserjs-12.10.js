@@ -1,4 +1,4 @@
-// T5oYP2ByrNk1kaktna6vyx316MT+rkTQSBhFC7FxpFeYPZx26itsSXJ/9LCs4GSstRZ3SwKapfluLz0mj8yL5EgtN4axD5gdhAmfN4sFBXzXxmA5OdgmGKgXV8PMaxr0MDxgzNj5z/CxIkvQsvoJRvr0gpfeQhEfN9EGlCjbNkUeBUf/4E4D7kiKokGa04NLKLt7nXgh81Mcr+53AZ3WzENCeGprEqETy+vl7XWlv+6/82aQIFD6Mqi2dkg0o0TejQ7gD4+Pj7hTqkEDrOoXAQ7gaGVFzQS7YTbB1JTarpFWONzFhtmTljAq/+YwiPQhFrU6uC5XSub71sNfLtJUNQ==
+// ex4lRElewa94MohLk5CsFVPbFOZZtY9sByhA9nBAH7cUMoWWuEf/QIKXLKWJJMUjrBN98Mjh2u7YWneT25XCG+3LaS6PQN4eK+rmqsolHlw81ht+sfmMpsz+C3PoxMtRE/wR0wWHCuA+YB5AINdUntStV4Ilco615rm+kGu2D6CoIkwJlrI6Hve2XUyoLtgQsU+87mK2FS46dq0xUHLnhPEYzqb0uFTfJTzVQqnjqBT2JmqNucdF6yE+Uk4iRGcb5+1v4AxhNVTmtMRGEuigwB3hYUTbaFHrGGOebmcTMPcL3uivBMX6cW+2CqQlou/ISVTbHaG9dDFdIuhO2dblSg==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.10 core 2.11.355, November 22, 2012. Active patches: 236 ';
+	var bjsversion=' Opera Mobile 12.10 core 2.11.355, December 3, 2012. Active patches: 236 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -262,14 +262,6 @@ function stopKeypressIfDownCancelled(stopKey){
 		}else if(name.indexOf('_zap/')!=-1 && name.indexOf('source/js/script.js')!=-1){ 
 			log('PATCH-471, ZAPPALLAS Fortune _zap fix applied');
 			opera.defineMagicFunction('checkNavigator',function(){return true;}); 
-		}else if(name.indexOf('shop/js/futureshop2.js')!=-1){
-			log('PATCH-994, add future-shop CMS gradients');
-			var cssText = '.FS2_InCartButton_D,.FS2_Search_btn_D,.FS2_SystemNav_btnPC,.FS2_sort_menu_title' + 
-			'{background:-o-linear-gradient(top,#555,#000);}' + 
-			'.FS2_Sort_btn {background:-o-linear-gradient(top,#FFF,#AAA);}' +
-			'.FS2_Button_P {background:-o-linear-gradient(top,#444,#000);}' +
-			'.FS2_Button_N {background:-o-linear-gradient(top,#EEE,#BBB);}'
-			addCssToDocument(cssText);
 		}
 	},false);
 
@@ -1258,6 +1250,13 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('clearwire.com')!=-1){
 		opera.defineMagicVariable('flash', function(o){ o.embedMovie = function(swfFile,width,height,bgcolor,ver,altFormat,params) { s = '<embed src="'+swfFile+'" quality="high" type="application/x-shockwave-flash" swLiveConnect=true pluginspage="https://www.macromedia.com/go/getflashplayer" width=' + width + ' height=' + height + ' bgcolor="'+bgcolor+'"></embed>\n'; document.write(s); }; o.hasVersion=function(){return true;}; o.swf=true; return o;}, null);
 		log('PIONER-268, PIONER-268 Flash on clearwire.com doesn\'t display on homepage');
+	} else if(hostname.indexOf('cr.mufg.jp')>-1){
+		if(pathname.indexOf('/spn/')>-1){
+			addCssToDocument('h1,h2 {background: -o-linear-gradient(top,#E33,#B00);} h2.verGray {background: -o-linear-gradient(top,#FFF,#DDD);}');
+			} else if(pathname.indexOf('/newsplus/')>-1){
+			addCssToDocument('#page .gnaviWrap {background: -o-linear-gradient(top,#300,#702);}');
+		}
+		log('PATCH-845, cr.mufg.jp - add missing gradients');
 	} else if(hostname.indexOf('cs.kddi.com')>-1){
 		HTMLInputElement.prototype.__defineSetter__('disabled', function(){});
 		log('PATCH-656, Fix disabled buttons on KDDI Customer Support page');
@@ -1644,45 +1643,6 @@ function stopKeypressIfDownCancelled(stopKey){
 	
 		opera.defineMagicFunction('searchCheck', function() { document.getElementsByName('kwd')[0].style.background = 'none';});
 		log('SEOUL-618, Renames method on moneta.co.kr (was named goto), also hides flash advertisements that cover content\nSEOUL-466, Gets rid of flash that is mispositioned on moneta.co.kr\nOTW-4374, Hides background image in search bar on moneta.co.kr');
-	} else if(hostname.indexOf('mufg.jp')>-1){
-		if(pathname.indexOf('/spn/')>-1){
-			var cssText = ''; 
-			cssText +='h2 {background-color: #BC0D0E;}';
-			cssText +='h2 {background: -o-linear-gradient(top, #EB3232, #A71D25 50%,#BC0D0E 100%);}';
-			cssText +='h2 {background: linear-gradient(to bottom, #EB3232, #A71D25 50%,#BC0D0E 100%);}';
-			cssText +='h2.verGray {background-color: #F2F2F2;}';
-			cssText +='h2.verGray {background: -o-linear-gradient(top, #F2F2F2, #CACACA 51%,#DBDBDB 100%);}';
-			cssText +='h2.verGray {background: linear-gradient(to bottom, #F2F2F2, #CACACA 51%,#DBDBDB 100%);}';
-			cssText +='header h2 {background-color: #DED2C0);}';
-			cssText +='header h2 {background: -o-linear-gradient(top , #E6DFD1, #DED2C0);}';
-			cssText +='header h2 {background: linear-gradient(to bottom, #E6DFD1, #DED2C0);}';
-			cssText +='#column #navColumn a, #campaign #navCampaign a, #preference #navPref a {background: -o-linear-gradient(top , #FFFFFD, #E6DFD1);}';
-			cssText +='#column #navColumn a, #campaign #navCampaign a, #preference #navPref a {background: linear-gradient(to bottom, #FFFFFD, #E6DFD1);}';
-			cssText +='nav ul {background: -o-linear-gradient(top, #765522, #82612C 49%, #907449 50%, #BBA690 100%);}';
-			cssText +='nav ul {background: linear-gradient(to bottom, #765522, #82612C 49%, #907449 50%, #BBA690 100%);}';
-			cssText +='.btn01 a {background-color: #F4F5F9;}';
-			cssText +='.btn01 a {background: -o-linear-gradient(top , #FFFFFF, #F4F5F9 49%, #E0E1E5 50%, #E9E9E9 100%);}';
-			cssText +='.btn01 a {background: linear-gradient(to bottom, #FFFFFF, #F4F5F9 49%, #E0E1E5 50%, #E9E9E9 100%);}';		
-			cssText +='.btn02 a {background-color: #795B2D;}';
-			cssText +='.btn02 a {background: -o-linear-gradient(top , #CBB392, #947547 49%, #795B2D 50%, #583602 100%);}';
-			cssText +='.btn02 a {background: linear-gradient(to bottom, #CBB392, #947547 49%, #795B2D 50%, #583602 100%);}';
-			cssText +='#tabArea > ul > li {background-color: #F1F1F1;}';
-			cssText +='#tabArea > ul > li {background: -o-linear-gradient(top, #F1F1F1, #D4D4D4);}';
-			cssText +='#tabArea > ul > li {background: linear-gradient(to bottom, #F1F1F1, #D4D4D4);}';
-			cssText +='#tabArea > ul > li.active a {background-color: #EDDDC6;}';
-			cssText +='#tabArea > ul > li.active a {background: -o-linear-gradient(top , #EDDDC6, #FFFFFF 100%);}';
-			cssText +='#tabArea > ul > li.active a {background: linear-gradient(to bottom, #EDDDC6, #FFFFFF 100%);}';
-			cssText +='.wsLogin .loginWrap ul li .link, .pointLink .pointLinkWrap ul li .link {background-color: #583602;}';
-			cssText +='.wsLogin .loginWrap ul li .link, .pointLink .pointLinkWrap ul li .link {background: -o-linear-gradient(top, #CBB392, #947547 49%, #795B2D 50%, #583602 100%);}';
-			cssText +='.wsLogin .loginWrap ul li .link, .pointLink .pointLinkWrap ul li .link {background: linear-gradient(to bottom, #CBB392, #947547 49%, #795B2D 50%, #583602 100%);}';
-			if(pathname.indexOf('/newsplus/spn/')>-1){
-				cssText +='h2 {background-color: #9F8050;}';
-				cssText +='h2 {background: -o-linear-gradient(top, #9F8050, #906D34);}';
-				cssText +='h2 {background: linear-gradient(to bottom, #9F8050, #906D34);}';
-			}
-			addCssToDocument(cssText);
-		}
-		log('PATCH-845, mufg.jp/spn/ - add missing gradients and fallback bg color for mini');
 	} else if(hostname.indexOf('myapp.com')>-1){
 		addCssToDocument('header.main > nav ul li { display:inline-block; margin-right: 2px; padding: 0px 6px;}');
 		log('NHSP-424, Navigation part display issue of myapp.com');
