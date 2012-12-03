@@ -1,4 +1,4 @@
-// AH/psLMnCIYt5G4uPG/JzFrVqmmYXby9WK3RelrebV5cimgtC2osr5ARnab2SBrGWnwPCVE4/rwMi4zDnzDbDOajSV2t2jBBtLbfpGV2oAf9UZkIBa7Y54zUK0syVzydE9KVmgoT0n4qX63m/Fp6nykGVzU8/0WIWBGgC6f8rHsdyCMw9eKvD36KYNc8ZCLMp/h6xMr03pimVPp07PsCoes2oO+zaDFNpZ4/vS6/vXjwt9YUd8noAVNe+eJYYVQrxaHK8Jn6NatPqg8nHvalJQTwLcCFaGrMY7wHpl/3YRe+qnu5WoN9Uh0sfaMnNogmpslDM4qJ6dW/508J3Yi+/A==
+// yVawijgXI2DqCqnEWRvK0qS4Kku0V7VcO1JcahRpPF4wVcEr/gdDC3T3Wt32+nsB8o6XcBKgrzexYFqfoThKcyRC5KZRW0eVFuwlPD+m7L4PwnkU5H3oiReZmntQlVHrij4G+hayV4aalL8tpU/4WL7GUgDsbTuvEPSA5u0/8Ix3uxYlhsVJepHQ/pOg0FMqRUe0gXlEgeKhohwq+NakKZJxOiPYq/AXPQ+ayeS7AUzykEaAbzNPSzuSwD4laabuEkGPTLuq8tgyGERXhQp/XcXfU67GQcWOT8VIT82wG+j+VmuS3hccv+C0GqbMEx4bu9MgJovIOwOmzkXvB32LEQ==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, November 28, 2012. Active patches: 296 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, December 3, 2012. Active patches: 297 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -652,14 +652,6 @@ function undoFunctionKeypressEventRemoval(){
 		}else if(name.indexOf('_zap/')!=-1 && name.indexOf('source/js/script.js')!=-1){ 
 			log('PATCH-471, ZAPPALLAS Fortune _zap fix applied');
 			opera.defineMagicFunction('checkNavigator',function(){return true;}); 
-		}else if(name.indexOf('shop/js/futureshop2.js')!=-1){
-			log('PATCH-994, add future-shop CMS gradients');
-			var cssText = '.FS2_InCartButton_D,.FS2_Search_btn_D,.FS2_SystemNav_btnPC,.FS2_sort_menu_title' + 
-			'{background:-o-linear-gradient(top,#555,#000);}' + 
-			'.FS2_Sort_btn {background:-o-linear-gradient(top,#FFF,#AAA);}' +
-			'.FS2_Button_P {background:-o-linear-gradient(top,#444,#000);}' +
-			'.FS2_Button_N {background:-o-linear-gradient(top,#EEE,#BBB);}'
-			addCssToDocument(cssText);
 		}
 	},false);
 
@@ -2251,6 +2243,26 @@ function undoFunctionKeypressEventRemoval(){
 			document.addEventListener('paste',handleClipboard,false);
 		}
 	
+		opera.addEventListener("BeforeEvent.click", function(e){
+			/*
+			Opera doesn't send unload events in all cases. Check if
+			a mouse click is about to replace a named frame (target). 
+			If it will, iterate over the subframes and send an unload event.
+			*/
+			if(e.event.target.nodeName=="A" && e.event.target.getAttribute('target')!=null){
+				trgt = e.event.target.getAttribute('target');
+				if(trgt.indexOf('_rightside')>-1){
+					f = parent.frames[trgt];
+					for(i=0;i<f.frames.length;i++){
+						var evt=document.createEvent('Event');
+						evt.initEvent('unload', true, true);
+						f.frames[i].dispatchEvent(evt);
+					}
+				}
+			}
+		}
+		,false);
+	
 		opera.addEventListener("BeforeEvent.unload", function(e){
 				if(!(typeof doSubmitEmptyData==='function'))return;
 				var original_function = doSubmitEmptyData;
@@ -2299,7 +2311,7 @@ function undoFunctionKeypressEventRemoval(){
 					doSubmitEmptyData = original_function;
 			}
 		},false);
-		log('PATCH-445, Fix Ctrl-G shortcut in Maconomy\nPATCH-1063, Maconomy: clipboard failure\nPATCH-6, Fix unload form submit behavior on Maconomy portals');
+		log('PATCH-445, Fix Ctrl-G shortcut in Maconomy\nPATCH-1063, Maconomy: clipboard failure\nPATCH-838, Maconomy: nested frameset unload\nPATCH-6, Fix unload form submit behavior on Maconomy portals');
 	} else if(pathname.indexOf('/AnalyticalReporting/')==0){
 		if(pathname.indexOf('AnalyticalReporting/WebiModify.do')>-1 || pathname.indexOf('AnalyticalReporting/WebiCreate.do')>-1){
 		opera.defineMagicVariable('embed_size_attr',
