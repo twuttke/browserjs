@@ -1,4 +1,4 @@
-// yVawijgXI2DqCqnEWRvK0qS4Kku0V7VcO1JcahRpPF4wVcEr/gdDC3T3Wt32+nsB8o6XcBKgrzexYFqfoThKcyRC5KZRW0eVFuwlPD+m7L4PwnkU5H3oiReZmntQlVHrij4G+hayV4aalL8tpU/4WL7GUgDsbTuvEPSA5u0/8Ix3uxYlhsVJepHQ/pOg0FMqRUe0gXlEgeKhohwq+NakKZJxOiPYq/AXPQ+ayeS7AUzykEaAbzNPSzuSwD4laabuEkGPTLuq8tgyGERXhQp/XcXfU67GQcWOT8VIT82wG+j+VmuS3hccv+C0GqbMEx4bu9MgJovIOwOmzkXvB32LEQ==
+// Nj1sPnmHxmMb1gWfywp9ZrSh3IkrmxTc5Yy+MBUpmvISu08yFre4aBT4f/FrcF9lsG2krcPdIcBAb3UVE1n5b623MS5UJ5Y09fftbUIf/N5ElbliPERixYmYAN8ys4k985Po3fA4zwee+qF/q+BKbU0sM6kMlGM5YmGE95O0f3SLJMp2l15OeoalT6j+5Suk3C6Ct7mpSG1m/gbIJoapONQsshswJJNjwsoz6q/nkGSSx1kU8T4WSd6V2tjl+IDSZNmZpNOMoU6aUBotQ9cisC00O0CFOs68jHGfElCrqeruyrzyE3QI/uWMIkrWzL4fj1WTATuF2LoILudNaM5DEA==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, December 3, 2012. Active patches: 297 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, December 7, 2012. Active patches: 298 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -389,7 +389,6 @@ function undoFunctionKeypressEventRemoval(){
 // PATCH-554, Workaround for jquery.jsonp plugin's workaround against missing onerror support
 // PATCH-298, Disable sniffing in old HTMLArea editors
 // PATCH-138, Asia-region Generic Patches
-// PATCH-581, Make getUserMedia() scripts written according to current spec work
 // PATCH-373, TinyMCE double IFRAME init problem, some versions
 // PATCH-622, Unblock iCongo Platform product image zoom
 
@@ -654,11 +653,6 @@ function undoFunctionKeypressEventRemoval(){
 			opera.defineMagicFunction('checkNavigator',function(){return true;}); 
 		}
 	},false);
-
-	if( navigator.getUserMedia ){
-		if( ! window.URL )window.URL={};
-		if( ! window.URL.createObjectURL)window.URL.createObjectURL=function(obj){return obj;}
-	}
 
 	opera.addEventListener('bjsOnTinyMCEScript', function(e){
 	  if( tinyMCEVersionInfo && tinyMCEVersionInfo.majorVersion==3 && tinyMCEVersionInfo.minorVersion>1.0 ){
@@ -961,6 +955,9 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('insubuy.com')){
 		HTMLElement.prototype.onselectstart = true;
 		log('PATCH-703, insubuy.com: don\'t prevent mouse click');
+	} else if(hostname.endsWith('itslearning.com')){
+		addCssToDocument('ul.tab-menu{float:left}');
+		log('PATCH-1078, itslearning.com - fix menu. Presto bug.');
 	} else if(hostname.endsWith('khanacademy.org')){
 		fixTransitionEndCase();
 		log('PATCH-892, Fix transition event case to un-confuse jQuery');
@@ -1442,6 +1439,10 @@ function undoFunctionKeypressEventRemoval(){
 		if(pathname.indexOf('/reader/')==0){
 			undoFunctionKeypressEventRemoval();
 			log('PATCH-1017, Google Reader - fix key event sniffing');
+		}
+		if(pathname.indexOf('/voice/')==0){
+			addCssToDocument('div.fillcontainer, div.scrollable{overflow:visible;}.manager-page .frame{background-color:#fff;}');
+			log('PATCH-1079, Google voice - invisible contacts. Presto bug.');
 		}
 		log('0, Google');
 	} else if(hostname.indexOf('.hbo.com')>-1){
