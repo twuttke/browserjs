@@ -1,4 +1,4 @@
-// XJrQtHc/RBa0nFE03uPY4bPAp9hWVtuEbBj0Uc6r1K3VrA9kQ4NpIPTTSXEDP5IGotyHopBk/xn1CJ8QFWNiB5EFeUSBol370AKBBlLqhzLTimaEZDIHYqnUz7E5ydbTmyQ62DEs3OVdt+PyAmZaY4Q4X27eMynZPbEyMyhz2MGt6yvWV3wsnfXenjs+MIGmzi2OtS2j18JLCmb5ZeitkUxMRv+Q8PGVpdZr7Zyr4yKGHkQEN55zjnXce6XI+daUJ5veKKls3XxFx5bungC1YLQslz1BDgWlS1Q96o71pEAwdjuqELdf7J+MZYx1HhUEmnBM5QFl3ouj+tqcCmkTSA==
+// ILLEIBCjQjF9njd6ns2EDj81nsXC2vXnxBMUoQxePNgBtkgxKc9GCdURbrYubzK8LIIekdsT8aJkoeVLrFfO4doV6UWUzQUOBZ/CI73e6JaGM2vPom1wiOsp/9z57c0dP2FmI7JLj+AHvoAGupBd7p+CGT2qSYqa17TXqpQBxmGRD5QnneHzTgTrDIEilPZthFKBHkRxIZS5VvXesldhyBj7Hw2+4gSo9BEAtFs45IHy9Ve/wjFYYjSPg71N+1GGvFpqFFdp3ZOzHX4ym+A+s1AOfKDCYRF3yNFG1DAIJMprNYECmpeimcCOC2vg0rMfthUdssCYYyPtraALyar0qQ==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, November 28, 2012. Active patches: 316 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, December 7, 2012. Active patches: 315 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -383,7 +383,6 @@ function setTinyMCEVersion(e){
 // PATCH-554, Workaround for jquery.jsonp plugin's workaround against missing onerror support
 // PATCH-298, Disable sniffing in old HTMLArea editors
 // PATCH-138, Asia-region Generic Patches
-// PATCH-581, Make getUserMedia() scripts written according to current spec work
 // PATCH-604, Facebook: work around iframe load event issue
 // PATCH-605, remove document.charset
 // PATCH-373, TinyMCE double IFRAME init problem, some versions
@@ -528,7 +527,7 @@ function setTinyMCEVersion(e){
 					preventDefault.call(e);
 				}
 			},false);
-			log('fix infinite load issue with webcollage script');
+			log('PATCH-1070 - fix infinite load issue with webcollage script');
 		}
 		if( typeof window._jive_plain_quote_text!='undefined' ){
 			opera.addEventListener('BeforeScript', function(e){
@@ -650,21 +649,8 @@ function setTinyMCEVersion(e){
 		}else if(name.indexOf('_zap/')!=-1 && name.indexOf('source/js/script.js')!=-1){ 
 			log('PATCH-471, ZAPPALLAS Fortune _zap fix applied');
 			opera.defineMagicFunction('checkNavigator',function(){return true;}); 
-		}else if(name.indexOf('shop/js/futureshop2.js')!=-1){
-			log('PATCH-994, add future-shop CMS gradients');
-			var cssText = '.FS2_InCartButton_D,.FS2_Search_btn_D,.FS2_SystemNav_btnPC,.FS2_sort_menu_title' + 
-			'{background:-o-linear-gradient(top,#555,#000);}' + 
-			'.FS2_Sort_btn {background:-o-linear-gradient(top,#FFF,#AAA);}' +
-			'.FS2_Button_P {background:-o-linear-gradient(top,#444,#000);}' +
-			'.FS2_Button_N {background:-o-linear-gradient(top,#EEE,#BBB);}'
-			addCssToDocument(cssText);
 		}
 	},false);
-
-	if( navigator.getUserMedia ){
-		if( ! window.URL )window.URL={};
-		if( ! window.URL.createObjectURL)window.URL.createObjectURL=function(obj){return obj;}
-	}
 
 	opera.addEventListener( 'BeforeExternalScript', function(ev){
 		indexOf.call=addEventListener.call=removeEventListener.call=call;
@@ -2357,7 +2343,7 @@ function setTinyMCEVersion(e){
 			*/
 			if(e.event.target.nodeName=="A" && e.event.target.getAttribute('target')!=null){
 				trgt = e.event.target.getAttribute('target');
-				if(trgt.indexOf('_rightside')){
+				if(trgt.indexOf('_rightside')>-1){
 					f = parent.frames[trgt];
 					for(i=0;i<f.frames.length;i++){
 						var evt=document.createEvent('Event');
