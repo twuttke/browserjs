@@ -1,4 +1,4 @@
-// ILLEIBCjQjF9njd6ns2EDj81nsXC2vXnxBMUoQxePNgBtkgxKc9GCdURbrYubzK8LIIekdsT8aJkoeVLrFfO4doV6UWUzQUOBZ/CI73e6JaGM2vPom1wiOsp/9z57c0dP2FmI7JLj+AHvoAGupBd7p+CGT2qSYqa17TXqpQBxmGRD5QnneHzTgTrDIEilPZthFKBHkRxIZS5VvXesldhyBj7Hw2+4gSo9BEAtFs45IHy9Ve/wjFYYjSPg71N+1GGvFpqFFdp3ZOzHX4ym+A+s1AOfKDCYRF3yNFG1DAIJMprNYECmpeimcCOC2vg0rMfthUdssCYYyPtraALyar0qQ==
+// uBphl6B8QntrPt8DhvWGQMl2HEYrTrRjAfUQ5dqial1ycpXmsvLSxe+pK0MaQ8IQgwiZ8xt1VenIiAFY/HOJ43u/kD/SvUGZSWrSSj4Ng6NvBPRU6GAc0IpINI4yyVp2c5pFj2Qf55chRbzKYakNYOHWJwBW8qNToAXbM9HyRSgRtbH8FEFQqM29fXd3ZfvId/4n4dMoIx6V7fnEDGc5VF0xR7cEcInabJHAnYqc8XDnrVa4bc/64LO1EUoMJBY1y+obwkBlQuBOgfL1V26c4Z435m1KrhgewwpmUV/A+2nuorIOwq7OdDUMhn8SZlgRSpkgqns1MQAYUGma7QH5dA==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, December 7, 2012. Active patches: 315 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, December 11, 2012. Active patches: 319 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -739,6 +739,16 @@ function setTinyMCEVersion(e){
 			navigator.userAgent = navigator.userAgent.replace(/OS X (\d+).(\d+).(\d+)+;/,'OS X $1_$2_$3;');
 		}
 		log('PATCH-387, Make Apple Store menu visible\nPATCH-387, Enable menu on Apple support pages\nPATCH-387, Enable menu on Apple community pages\nPATCH-846, apple.com: don\'t reload from within unload handler\nPATCH-924, apple.com - reformat OS X version string with underscores');
+	} else if(hostname.endsWith('.coe.int')){
+		fixTransitionEndCase();
+		log('PATCH-1082, coe.int - transitionend casing');
+	} else if(hostname.endsWith('.hp.com')){
+		if(hostname.indexOf('passport2.')>-1){
+		 navigator.appName='Netscape';
+		}
+	
+		addCssToDocument('div.hotspot-overlay{background: #37383A;}');
+		log('PATCH-738, Work around sniffing hiding submit buttons on passport2.hp.com\nPATCH-1080, hp.com - missing background gradient');
 	} else if(hostname.endsWith('.polskastacja.pl')){
 		addPreprocessHandler(/dojo\.isOpera/g , 'false', false, function(el){return !el.src});
 		
@@ -877,6 +887,9 @@ function setTinyMCEVersion(e){
 			log('PATCH-714, facebook: prevent chat window overflow - Presto bug\nPATCH-1055, Facebook - Work around issue where Flash does not call JS when expected\nPATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status\nPATCH-573, Facebook\'s border-radius triggers hyperactive reflow bug, performance suffers\nPATCH-923, facebook: work around lack of pointer-events blocking video playback\nPATCH-954, facebook: work around lack of pointer-events breaking group page photos');
 		}
 		log('0, Facebook');
+	} else if(hostname.endsWith('forcechange.com')){
+		addCssToDocument('div.post{content:normal !important}');
+		log('PATCH-1084, forcechange.com - generated content on real element');
 	} else if(hostname.endsWith('garmin.com')){
 		opera.defineMagicFunction('eligible', function() { return true; });
 		opera.defineMagicFunction('detectOSBrowser', function(realFunc, realThis, inOS, inBrowser) {
@@ -1253,6 +1266,9 @@ function setTinyMCEVersion(e){
 			}
 		}, false); 
 		log('PATCH-853, udemy.com: Opera doesn\'t support 3Dtransforms yet\nPATCH-871, udemy.com: work around lack of pointer-events in Opera');
+	} else if(hostname.endsWith('www.zebra.com')){
+		addCssToDocument('div.tabs{content:normal !important}');
+		log('PATCH-1083, zebra.com - generated content on real elements');
 	} else if(hostname.indexOf("cang.baidu.com") != -1 ){
 		window.opera.defineMagicFunction(
 			"top",
@@ -2087,9 +2103,6 @@ function setTinyMCEVersion(e){
 			}
 		})(window.setTimeout);
 		log('CORE-19206, orkut avatar image crop does not happen because of timing issue');
-	} else if(hostname.indexOf('passport2.hp.com')>-1){
-		navigator.appName='Netscape';
-		log('PATCH-738, Work around sniffing hiding submit buttons on passport2.hp.com');
 	} else if(hostname.indexOf('pb.yamada-denki.jp')>-1){
 		Element.prototype.attachEvent = null;
 		window.opera = null;
