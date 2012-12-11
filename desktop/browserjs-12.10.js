@@ -1,4 +1,4 @@
-// Nj1sPnmHxmMb1gWfywp9ZrSh3IkrmxTc5Yy+MBUpmvISu08yFre4aBT4f/FrcF9lsG2krcPdIcBAb3UVE1n5b623MS5UJ5Y09fftbUIf/N5ElbliPERixYmYAN8ys4k985Po3fA4zwee+qF/q+BKbU0sM6kMlGM5YmGE95O0f3SLJMp2l15OeoalT6j+5Suk3C6Ct7mpSG1m/gbIJoapONQsshswJJNjwsoz6q/nkGSSx1kU8T4WSd6V2tjl+IDSZNmZpNOMoU6aUBotQ9cisC00O0CFOs68jHGfElCrqeruyrzyE3QI/uWMIkrWzL4fj1WTATuF2LoILudNaM5DEA==
+// QiZYaa+pbsAqAQOpMG0wlFq0IzwULfUebhT70g9Uawo8PlcuSLMVQHmH/Fcp/xGmhoBX5fc4PlaG3SmUvb1rY5RgxPwNzbx/ncerHE2nsejO8n5/wH6NjqGAscoloUkRyyx2ikvM2CQYbfjVBkX+Cw3bMXEj4b2oZZWsKeJm3HHp+37gzdAQqBhqMKTo04KC6ec4j4d198Pp71ZcMU7oCaxf3KG05EPXjoKnjzs7j730YRSz/vm9XI0q5WsQYJKNWuMZqkEaw6IHkUg7wf7fHlNfp/Aj1ssj9ZuMVwMPtyys7y0dNtQYQlI7PyxBy/W7iXWIU/eOaM+k+QW19mEQUQ==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, December 7, 2012. Active patches: 298 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, December 11, 2012. Active patches: 304 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -739,6 +739,16 @@ function undoFunctionKeypressEventRemoval(){
 			navigator.userAgent = navigator.userAgent.replace(/OS X (\d+).(\d+).(\d+)+;/,'OS X $1_$2_$3;');
 		}
 		log('PATCH-846, apple.com: don\'t reload from within unload handler\nPATCH-888, apple_core: CSS animations are unprefixed from Opera 12.10\nPATCH-924, apple.com - reformat OS X version string with underscores');
+	} else if(hostname.endsWith('.coe.int')){
+		fixTransitionEndCase();
+		log('PATCH-1082, coe.int - transitionend casing');
+	} else if(hostname.endsWith('.hp.com')){
+		if(hostname.indexOf('passport2.')>-1){
+		 navigator.appName='Netscape';
+		}
+	
+		addCssToDocument('div.hotspot-overlay{background: #37383A;}');
+		log('PATCH-738, Work around sniffing hiding submit buttons on passport2.hp.com\nPATCH-1080, hp.com - missing background gradient');
 	} else if(hostname.endsWith('.jus.br')){
 		opera.addEventListener('BeforeEvent.keypress',function(e){
 			if(e.event.ctrlKey){
@@ -884,6 +894,9 @@ function undoFunctionKeypressEventRemoval(){
 			log('PATCH-1055, Facebook - Work around issue where Flash does not call JS when expected\nPATCH-852, facebook: avoid unwanted chat box scroll\nPATCH-923, facebook: work around lack of pointer-events blocking video playback\nPATCH-954, facebook: work around lack of pointer-events breaking group page photos');
 		}
 		log('0, Facebook');
+	} else if(hostname.endsWith('forcechange.com')){
+		addCssToDocument('div.post{content:normal !important}');
+		log('PATCH-1084, forcechange.com - generated content on real element');
 	} else if(hostname.endsWith('garmin.com')){
 		opera.defineMagicFunction('eligible', function() { return true; });
 		opera.defineMagicFunction('detectOSBrowser', function(realFunc, realThis, inOS, inBrowser) {
@@ -1269,6 +1282,9 @@ function undoFunctionKeypressEventRemoval(){
 			}
 		}, false); 
 		log('PATCH-853, udemy.com: Opera doesn\'t support 3Dtransforms yet\nPATCH-871, udemy.com: work around lack of pointer-events in Opera');
+	} else if(hostname.endsWith('www.zebra.com')){
+		addCssToDocument('div.tabs{content:normal !important}');
+		log('PATCH-1083, zebra.com - generated content on real elements');
 	} else if(hostname.indexOf("cang.baidu.com") != -1 ){
 		window.opera.defineMagicFunction(
 			"top",
@@ -1394,8 +1410,12 @@ function undoFunctionKeypressEventRemoval(){
 				if(elm){elm.click();}
 			},false);
 		
+			opera.addEventListener('BeforeEvent.keydown',function(e){
+				if(e.event.key=="Tab"){e.event.preventDefault();}
+			},false);
+		
 			undoFunctionKeypressEventRemoval();
-			log('PATCH-977, Google Documents copy paste\nPATCH-1032, Google Docs - auto-close unsupported browser message\nPATCH-382, Google Spreadsheets cell highligh mismatch and key event');
+			log('PATCH-977, Google Documents copy paste\nPATCH-1032, Google Docs - auto-close unsupported browser message\nPATCH-1081, Google Docs - Tab key only works once\nPATCH-382, Google Spreadsheets cell highligh mismatch and key event');
 		}
 		if(hostname.contains('images.google') || pathname.indexOf('/imghp')==0){
 			addCssToDocument('div#logocont + div{margin:auto}');
@@ -1667,6 +1687,15 @@ function undoFunctionKeypressEventRemoval(){
 			log('PATCH-325, Y!Mail work around browser blocking');
 		}
 		log('0, Yahoo!');
+	} else if(hostname.indexOf('.youtube.com')>-1){
+		// Opera bug - document.onfullscreenchange not enumerable.
+		HTMLDocument.prototype.onfullscreenchange = null;
+		// YouTube following old spec.
+		HTMLDocument.prototype.__defineGetter__('fullScreenElement', function() { return this.fullscreenElement; });
+		HTMLDocument.prototype.__defineGetter__('fullScreenEnabled', function() { return this.fullscreenEnabled; });
+		HTMLElement.prototype.requestFullScreen = HTMLElement.prototype.requestFullscreen;
+		HTMLDocument.prototype.cancelFullScreen = HTMLDocument.prototype.exitFullscreen;
+		log('PATCH-1086, youtube - work around old fullscreen spec usage');
 	} else if(hostname.indexOf('265.com')>-1){
 		addCssToDocument('#coolSites .body li, #coolSites .body li a{line-height:2em !important}')
 		log('PATCH-475, Avoid overflowing text on 265.com');
@@ -2007,9 +2036,6 @@ function undoFunctionKeypressEventRemoval(){
 			}
 		})(window.setTimeout);
 		log('CORE-19206, orkut avatar image crop does not happen because of timing issue');
-	} else if(hostname.indexOf('passport2.hp.com')>-1){
-		navigator.appName='Netscape';
-		log('PATCH-738, Work around sniffing hiding submit buttons on passport2.hp.com');
 	} else if(hostname.indexOf('pb.yamada-denki.jp')>-1){
 		Element.prototype.attachEvent = null;
 		window.opera = null;
