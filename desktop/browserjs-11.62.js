@@ -1,4 +1,4 @@
-// kZ1KPVF2FQJlkAPVedH4aZYGl0WVFkjNhuf/g83EMdY3K4vWNscVEMRUQMtreWZPNKpOTGH3I2v/qfNPVBvP6/renwZv+PmnSjeImqW7EeDtDTYwHhhiUJRTRsb+hqFc7cENZdJpyGfQX7Pxk6fXbcdP1Ox+SCL5wFF6Ly5i38s/S//wduVy0f3xi57SgnLmS4XTj3B9P2DtM7tkdSvITVJfApQN4wfrvad9dt/fZz+o5dKLSkMhaIxEMuxal2tUDWx0nOYlZZQ5wbHs1ttLb9QmdZ8DAvho6isx/A55M+/MSduakdfvF3k9VIw/dEQ27s14K0SBGpi8Vz8DMGctyw==
+// rNOGxJ9vffJp9/PQkQdcZwV1gGLCkmtpj4HrUiHW+SXbeFEJyia4jwr6xRRkaa7kANcBXb53mGOoM22RvF9K/o+Gl9t3nGpMdmuVQrW921U5NvVAxamjhttkT0zyep04MuFkrL8jqFvVPPH9tjfXi0Tc+uBSJEhw5KKYNNSsM9zOSJsKp2PW7W/FrqcdZvxLQVe5PwVYDp0ppcZ4FFjBQw/S+cmO2X9amxW9uKYGoQ4zrciWzIJ7fQyMrizZ2qhatOom0TNxPBIbA/lbrqQ/e3vtufEPLMNLSptLm33YNOqO+heVvNCYaQsbmUosTovQ322CSmzGXwy2T2jK+6Mfvw==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, November 28, 2012. Active patches: 284 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, December 11, 2012. Active patches: 286 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -504,7 +504,7 @@ function setTinyMCEVersion(e){
 					preventDefault.call(e);
 				}
 			},false);
-			log('fix infinite load issue with webcollage script');
+			log('PATCH-1070 - fix infinite load issue with webcollage script');
 		}
 		if( typeof window._jive_plain_quote_text!='undefined' ){
 			opera.addEventListener('BeforeScript', function(e){
@@ -626,14 +626,6 @@ function setTinyMCEVersion(e){
 		}else if(name.indexOf('_zap/')!=-1 && name.indexOf('source/js/script.js')!=-1){ 
 			log('PATCH-471, ZAPPALLAS Fortune _zap fix applied');
 			opera.defineMagicFunction('checkNavigator',function(){return true;}); 
-		}else if(name.indexOf('shop/js/futureshop2.js')!=-1){
-			log('PATCH-994, add future-shop CMS gradients');
-			var cssText = '.FS2_InCartButton_D,.FS2_Search_btn_D,.FS2_SystemNav_btnPC,.FS2_sort_menu_title' + 
-			'{background:-o-linear-gradient(top,#555,#000);}' + 
-			'.FS2_Sort_btn {background:-o-linear-gradient(top,#FFF,#AAA);}' +
-			'.FS2_Button_P {background:-o-linear-gradient(top,#444,#000);}' +
-			'.FS2_Button_N {background:-o-linear-gradient(top,#EEE,#BBB);}'
-			addCssToDocument(cssText);
 		}
 	},false);
 
@@ -711,6 +703,11 @@ function setTinyMCEVersion(e){
 			navigator.userAgent = navigator.userAgent.replace(/OS X (\d+).(\d+).(\d+)+;/,'OS X $1_$2_$3;');
 		}
 		log('PATCH-387, Make Apple Store menu visible\nPATCH-387, Enable menu on Apple support pages\nPATCH-387, Enable menu on Apple community pages\nPATCH-924, apple.com - reformat OS X version string with underscores');
+	} else if(hostname.endsWith('.hp.com')){
+		if(hostname.indexOf('passport2.')>-1){
+		 navigator.appName='Netscape';
+		}
+		log('PATCH-738, Work around sniffing hiding submit buttons on passport2.hp.com');
 	} else if(hostname.endsWith('.polskastacja.pl')){
 		addPreprocessHandler(/dojo\.isOpera/g , 'false', false, function(el){return !el.src});
 		
@@ -824,6 +821,9 @@ function setTinyMCEVersion(e){
 			log('PATCH-714, facebook: prevent chat window overflow - Presto bug\nPATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status\nPATCH-573, Facebook\'s border-radius triggers hyperactive reflow bug, performance suffers\nPATCH-923, facebook: work around lack of pointer-events blocking video playback');
 		}
 		log('0, Facebook');
+	} else if(hostname.endsWith('forcechange.com')){
+		addCssToDocument('div.post{content:normal !important}');
+		log('PATCH-1084, forcechange.com - generated content on real element');
 	} else if(hostname.endsWith('garmin.com')){
 		opera.defineMagicFunction('eligible', function() { return true; });
 		opera.defineMagicFunction('detectOSBrowser', function(realFunc, realThis, inOS, inBrowser) {
@@ -1095,6 +1095,9 @@ function setTinyMCEVersion(e){
 		,false);
 		
 		log('PATCH-853, udemy.com: Opera doesn\'t support 3Dtransforms yet');
+	} else if(hostname.endsWith('www.zebra.com')){
+		addCssToDocument('div.tabs{content:normal !important}');
+		log('PATCH-1083, zebra.com - generated content on real elements');
 	} else if(hostname.indexOf("cang.baidu.com") != -1 ){
 		window.opera.defineMagicFunction(
 			"top",
@@ -1958,9 +1961,6 @@ function setTinyMCEVersion(e){
 			}
 		})(window.setTimeout);
 		log('CORE-19206, orkut avatar image crop does not happen because of timing issue');
-	} else if(hostname.indexOf('passport2.hp.com')>-1){
-		navigator.appName='Netscape';
-		log('PATCH-738, Work around sniffing hiding submit buttons on passport2.hp.com');
 	} else if(hostname.indexOf('pb.yamada-denki.jp')>-1){
 		Element.prototype.attachEvent = null;
 		window.opera = null;
@@ -2241,7 +2241,7 @@ function setTinyMCEVersion(e){
 			*/
 			if(e.event.target.nodeName=="A" && e.event.target.getAttribute('target')!=null){
 				trgt = e.event.target.getAttribute('target');
-				if(trgt.indexOf('_rightside')){
+				if(trgt.indexOf('_rightside')>-1){
 					f = parent.frames[trgt];
 					for(i=0;i<f.frames.length;i++){
 						var evt=document.createEvent('Event');
