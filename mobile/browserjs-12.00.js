@@ -1,4 +1,4 @@
-// SC3v05LGb6PIRKff5yU+q0cZpvpAhWUVMDU9aTqGDn4RTExT5gG8o/rPMkuUAxq5wp/kAUC3ef2T3w8OiaxNsT0b6dYBHg5YG0RnCzs5qMQMzoLpemWwSvnegPNHCjVz+Fi50uSd1kc6l5G6jyciCouq1jUxlUupC40FUJKpqY6Q5L0v4m0cmQ+8yMtLzhlyHxrRzgnK1HfUzCFMpah3YHPtRY4wu0WQB326tieElcEIplPvfnRmkWWi8FOcHivVCGR91dwboyBDd4qCTYy4PKFozIXLZ0Do8HnMv6mXdHxPkzo+8zpEbZsaPO0+xZ8iXtTnr7tQuLpSck26nNz1Tw==
+// J+cCm3cNpMBxzH7znAnvlh16dQozHH7nt13DZmSqtRbnv5I5rnESrn1o1YcB8GW/G93B22cf/h/NVAc+2xezfytAMjYWuymKyUnIPukjANRr+vzm08lE7A6fYR/eZyyFrrksX/YkopdU5CV5uYrE7nH+1PDxlGJsMpzscoV+cLhc2kGPLCenkaVwSt7cX9LkWZ1Xk8G6C3HutLPXp54uUQ8U2fTlUpb7J9oDRlXgpih5bkMzszoHjRr0msbw4jXj0KEk6HwMQyuEzMmWFYROv0cMBxR0t2xZEvwN1+10toVMKJT6kA2pUtDSpHOq1lJ3V6GaiGca8Ia5HZtlhEbqmQ==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.00 core 2.10.254, November 22, 2012. Active patches: 229 ';
+	var bjsversion=' Opera Mobile 12.00 core 2.10.254, December 11, 2012. Active patches: 228 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -245,7 +245,6 @@ function stopKeypressIfDownCancelled(stopKey){
 // 0, Generic patches (Windows mobile)
 // PATCH-372, Work around Facebook's attachEvent usage in all.js
 // PATCH-4, Make sure plugin sniffers detect the correct Flash API version
-// PATCH-581, Make getUserMedia() scripts written according to current spec work
 // PATCH-369, Generic key event patch for better spatnav
 
 	var funcCount=0;
@@ -329,14 +328,6 @@ function stopKeypressIfDownCancelled(stopKey){
 		}else if(name.indexOf('_zap/')!=-1 && name.indexOf('source/js/script.js')!=-1){ 
 			log('PATCH-471, ZAPPALLAS Fortune _zap fix applied');
 			opera.defineMagicFunction('checkNavigator',function(){return true;}); 
-		}else if(name.indexOf('shop/js/futureshop2.js')!=-1){
-			log('PATCH-994, add future-shop CMS gradients');
-			var cssText = '.FS2_InCartButton_D,.FS2_Search_btn_D,.FS2_SystemNav_btnPC,.FS2_sort_menu_title' + 
-			'{background:-o-linear-gradient(top,#555,#000);}' + 
-			'.FS2_Sort_btn {background:-o-linear-gradient(top,#FFF,#AAA);}' +
-			'.FS2_Button_P {background:-o-linear-gradient(top,#444,#000);}' +
-			'.FS2_Button_N {background:-o-linear-gradient(top,#EEE,#BBB);}'
-			addCssToDocument(cssText);
 		}
 	},false);
 
@@ -413,11 +404,6 @@ function stopKeypressIfDownCancelled(stopKey){
 		});
 	};
 
-	if( navigator.getUserMedia ){
-		if( ! window.URL )window.URL={};
-		if( ! window.URL.createObjectURL)window.URL.createObjectURL=function(obj){return obj;}
-	}
-
 	stopKeypressIfDownCancelled();
 	
 
@@ -461,6 +447,13 @@ function stopKeypressIfDownCancelled(stopKey){
 		}
 		
 		log('PNGLAI-864, overlap issue of migAlerts');
+	} else if(hostname.endsWith('bbc.co.uk')){
+		addCssToDocument(" #disclaimer { bottom: 6px !important; white-space:nowrap; } ");
+	
+		if(pathname.match( /^\/mobile\// )){
+		 forceMobileView();
+		}
+		log('YUSHAN-226, Fix page footer text overlap issue for bbc.co.uk\nTWEETY-118, Mobile BBC should default to mobile view');
 	} else if(hostname.endsWith('cooliris.com')){
 		document.addEventListener('DOMContentLoaded',
 			function(){
@@ -685,9 +678,6 @@ function stopKeypressIfDownCancelled(stopKey){
 	
 		addCssToDocument(".chn_nav { white-space:nowrap !important; }");
 		log('YUSHAN-232, Fix search button position issues for 56.com\nYUSHAN-233, Fix hyperlinks position issue of 56.com');
-	} else if(hostname.indexOf( 'bbc.co.uk' )>-1){
-		addCssToDocument(" #disclaimer { bottom: 6px !important; white-space:nowrap; } ");
-		log('YUSHAN-226, Fix page footer text overlap issue for bbc.co.uk');
 	} else if(hostname.indexOf( 'windowsmedia.com' )!=-1 && pathname.match( /^\/mobile\// )){
 		forceMobileView();
 		log('OSAN-91, Mobile Windowsmedia site does not trigger mobile view');
@@ -1064,11 +1054,8 @@ function stopKeypressIfDownCancelled(stopKey){
 		addPreprocessHandler(/var el = win \? \$\.browser\.opera \? document\.body : document\.documentElement : elem;/, 'var el = win ? document.documentElement : elem;', true, function(elm){ return elm.src&&elm.src.indexOf('scroll.js')>-1&&elm.text.indexOf('Opera 9.22')>-1; });
 		log('PATCH-88, Make links work on Aeonretail (outdated jQuery plugin detects Opera and scrolls up)');
 	} else if(hostname.indexOf('ameblo.jp')>-1){
-		var cssText = 'div.btnRegist a.sbmt2 {background-color: #FD8B40;}'; 
-		cssText += 'div.btnRegist a.sbmt2 {background: -o-linear-gradient(bottom,#FF6500, #FD8B40 75%, #FD8B40 100%);}'; 
-		cssText += 'div.btnRegist a.sbmt2 {background: linear-gradient(to top,#FF6500, #FD8B40 75%, #FD8B40 100%);}'; 		
-		addCssToDocument(cssText);
-		log('PATCH-839, ameblo.jp - add missing gradients and fallback background color');
+		addCssToDocument('.startBtn,.registBtn {background:-o-linear-gradient(top,#5C0,#3A0);} .socialLoginBtn li {background-size: 135px 30px!important;}'); 
+		log('PATCH-839, ameblo.jp - add missing gradients and background-size');
 	} else if(hostname.indexOf('ana.co.jp')>-1){
 		var cssText = '';
 		cssText += 'img:not([width]) {transform: scale(0.5); transform-origin:top;}';
@@ -1236,9 +1223,6 @@ function stopKeypressIfDownCancelled(stopKey){
 		    }, false);
 		}
 		log('YUSHAN-3971, Fix search result page display issue of baidu.com\nYUSHAN-2320, Fix links display inside searchbox - image.baidu.com\nNHSP-402, Fix image display issue on baidu news\nYUSHAN-278, Text truncation in blog/forum module - news.baidu.com\nNHSP-478, Page display issue of music.baidu.com\nOMO-102, Fix "more" link issue of m.baidu.com');
-	} else if(hostname.indexOf('bbc.co.uk')!=-1 && pathname.match( /^\/mobile\// )){
-		forceMobileView();
-		log('TWEETY-118, Mobile BBC should default to mobile view');
 	} else if(hostname.indexOf('bloog.pl')>-1){
 		var cssText = '';
 		cssText += '.cnt {background: -o-linear-gradient(top, #FFF, #E4E4E4)}';
@@ -1265,6 +1249,13 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('clearwire.com')!=-1){
 		opera.defineMagicVariable('flash', function(o){ o.embedMovie = function(swfFile,width,height,bgcolor,ver,altFormat,params) { s = '<embed src="'+swfFile+'" quality="high" type="application/x-shockwave-flash" swLiveConnect=true pluginspage="https://www.macromedia.com/go/getflashplayer" width=' + width + ' height=' + height + ' bgcolor="'+bgcolor+'"></embed>\n'; document.write(s); }; o.hasVersion=function(){return true;}; o.swf=true; return o;}, null);
 		log('PIONER-268, PIONER-268 Flash on clearwire.com doesn\'t display on homepage');
+	} else if(hostname.indexOf('cr.mufg.jp')>-1){
+		if(pathname.indexOf('/spn/')>-1){
+			addCssToDocument('h1,h2 {background: -o-linear-gradient(top,#E33,#B00);} h2.verGray {background: -o-linear-gradient(top,#FFF,#DDD);}');
+			} else if(pathname.indexOf('/newsplus/')>-1){
+			addCssToDocument('#page .gnaviWrap {background: -o-linear-gradient(top,#300,#702);}');
+		}
+		log('PATCH-845, cr.mufg.jp - add missing gradients');
 	} else if(hostname.indexOf('cs.kddi.com')>-1){
 		HTMLInputElement.prototype.__defineSetter__('disabled', function(){});
 		log('PATCH-656, Fix disabled buttons on KDDI Customer Support page');
@@ -1398,6 +1389,38 @@ function stopKeypressIfDownCancelled(stopKey){
 		cssText += '.controls .text, .controls input[type="submit"].text, .controls input[type="button"].text {background-image: linear-gradient(to bottom,#1F6A8D,#0E3E54);}';
 		addCssToDocument(cssText);
 		log('PATCH-1010, linkedin.com - add missing gradients top bar\nPATCH-865, linkedin.com - add missing gradients');
+	} else if(hostname.indexOf('m.chase.com')>-1){
+		var cssText = '';
+		/* Fixes for ATM and Branch icon*/
+		cssText += '.branch {background-position: 0 0 !important;}';
+		cssText += '.atm {background-position: 0 -80px !important;}';
+		/* Fixes for dialogs and containers */	
+		cssText += '.ui-dialog-datebox .ui-datebox-container .ui-datebox-gridminus .ui-icon-minus {background-position: -144px !important;}';
+		cssText += '.ui-dialog-datebox .ui-datebox-container .ui-datebox-gridplus .ui-icon-plus {background-position: -108px !important;}';
+		/* Fixes for Home and More Menu */
+		cssText += '.home-logon-icon{background-position: -375px !important;}';
+		cssText += '.more-find-atm-branch-icon,.home-find-atm-branch-icon {background-position: -409px !important;}';
+		cssText += '.more-contactus-icon,.home-contactus-icon {background-position: -511px !important;}';
+		cssText += '.more-alerts-icon {background-position: -579px !important;}';
+		cssText += '.more-faqs-icon {background-position: -443px !important;}';
+		cssText += '.more-privacy-icon {background-position: -239px !important;}';
+		cssText += '.more-disclosures-icon {background-position: -477px !important;}';
+		cssText += '.tel-icon .ui-icon {background-position: -648px 0 !important;}';
+		/* QuickPay Menu */
+		cssText += '.qp-send-money-icon {background-position: -137px !important;}';
+		cssText += '.qp-request-money-icon {background-position: -171px !important;}';
+		cssText += '.qp-todo-list-icon {background-position: -103px !important;}';
+		cssText += '.qp-manage-recipients-icon {background-position: -35px !important;}';
+		cssText += '.qp-change-pending-icon {background-position: -545px !important;}';
+		cssText += '.qp-view-activity-icon {background-position: -69px !important;}';
+		/* Pay & Transfer Menu */
+		cssText += '.pt-credit-card {background-position: -307px !important;}';
+		cssText += '.pt-bill-pay {background-position: -341px !important;}';
+		cssText += '.pt-quick-pay {background-position: -205px !important;}';
+		cssText += '.pt-transfer-money {background-position: -273px !important;}';
+		cssText += '.pt-wire-transfer {background-position: -1px !important;}';
+		addCssToDocument(cssText);
+		log('PATCH-792, m.chase.com - Positional fixes for images');
 	} else if(hostname.indexOf('m.dangdang.com')>-1){
 		if(hostname.contains('m.')){
 		  if(pathname == "/touch" || pathname == "/touch/"){
@@ -1634,45 +1657,6 @@ function stopKeypressIfDownCancelled(stopKey){
 	
 		opera.defineMagicFunction('searchCheck', function() { document.getElementsByName('kwd')[0].style.background = 'none';});
 		log('SEOUL-618, Renames method on moneta.co.kr (was named goto), also hides flash advertisements that cover content\nSEOUL-466, Gets rid of flash that is mispositioned on moneta.co.kr\nOTW-4374, Hides background image in search bar on moneta.co.kr');
-	} else if(hostname.indexOf('mufg.jp')>-1){
-		if(pathname.indexOf('/spn/')>-1){
-			var cssText = ''; 
-			cssText +='h2 {background-color: #BC0D0E;}';
-			cssText +='h2 {background: -o-linear-gradient(top, #EB3232, #A71D25 50%,#BC0D0E 100%);}';
-			cssText +='h2 {background: linear-gradient(to bottom, #EB3232, #A71D25 50%,#BC0D0E 100%);}';
-			cssText +='h2.verGray {background-color: #F2F2F2;}';
-			cssText +='h2.verGray {background: -o-linear-gradient(top, #F2F2F2, #CACACA 51%,#DBDBDB 100%);}';
-			cssText +='h2.verGray {background: linear-gradient(to bottom, #F2F2F2, #CACACA 51%,#DBDBDB 100%);}';
-			cssText +='header h2 {background-color: #DED2C0);}';
-			cssText +='header h2 {background: -o-linear-gradient(top , #E6DFD1, #DED2C0);}';
-			cssText +='header h2 {background: linear-gradient(to bottom, #E6DFD1, #DED2C0);}';
-			cssText +='#column #navColumn a, #campaign #navCampaign a, #preference #navPref a {background: -o-linear-gradient(top , #FFFFFD, #E6DFD1);}';
-			cssText +='#column #navColumn a, #campaign #navCampaign a, #preference #navPref a {background: linear-gradient(to bottom, #FFFFFD, #E6DFD1);}';
-			cssText +='nav ul {background: -o-linear-gradient(top, #765522, #82612C 49%, #907449 50%, #BBA690 100%);}';
-			cssText +='nav ul {background: linear-gradient(to bottom, #765522, #82612C 49%, #907449 50%, #BBA690 100%);}';
-			cssText +='.btn01 a {background-color: #F4F5F9;}';
-			cssText +='.btn01 a {background: -o-linear-gradient(top , #FFFFFF, #F4F5F9 49%, #E0E1E5 50%, #E9E9E9 100%);}';
-			cssText +='.btn01 a {background: linear-gradient(to bottom, #FFFFFF, #F4F5F9 49%, #E0E1E5 50%, #E9E9E9 100%);}';		
-			cssText +='.btn02 a {background-color: #795B2D;}';
-			cssText +='.btn02 a {background: -o-linear-gradient(top , #CBB392, #947547 49%, #795B2D 50%, #583602 100%);}';
-			cssText +='.btn02 a {background: linear-gradient(to bottom, #CBB392, #947547 49%, #795B2D 50%, #583602 100%);}';
-			cssText +='#tabArea > ul > li {background-color: #F1F1F1;}';
-			cssText +='#tabArea > ul > li {background: -o-linear-gradient(top, #F1F1F1, #D4D4D4);}';
-			cssText +='#tabArea > ul > li {background: linear-gradient(to bottom, #F1F1F1, #D4D4D4);}';
-			cssText +='#tabArea > ul > li.active a {background-color: #EDDDC6;}';
-			cssText +='#tabArea > ul > li.active a {background: -o-linear-gradient(top , #EDDDC6, #FFFFFF 100%);}';
-			cssText +='#tabArea > ul > li.active a {background: linear-gradient(to bottom, #EDDDC6, #FFFFFF 100%);}';
-			cssText +='.wsLogin .loginWrap ul li .link, .pointLink .pointLinkWrap ul li .link {background-color: #583602;}';
-			cssText +='.wsLogin .loginWrap ul li .link, .pointLink .pointLinkWrap ul li .link {background: -o-linear-gradient(top, #CBB392, #947547 49%, #795B2D 50%, #583602 100%);}';
-			cssText +='.wsLogin .loginWrap ul li .link, .pointLink .pointLinkWrap ul li .link {background: linear-gradient(to bottom, #CBB392, #947547 49%, #795B2D 50%, #583602 100%);}';
-			if(pathname.indexOf('/newsplus/spn/')>-1){
-				cssText +='h2 {background-color: #9F8050;}';
-				cssText +='h2 {background: -o-linear-gradient(top, #9F8050, #906D34);}';
-				cssText +='h2 {background: linear-gradient(to bottom, #9F8050, #906D34);}';
-			}
-			addCssToDocument(cssText);
-		}
-		log('PATCH-845, mufg.jp/spn/ - add missing gradients and fallback bg color for mini');
 	} else if(hostname.indexOf('myapp.com')>-1){
 		addCssToDocument('header.main > nav ul li { display:inline-block; margin-right: 2px; padding: 0px 6px;}');
 		log('NHSP-424, Navigation part display issue of myapp.com');
@@ -1795,13 +1779,6 @@ function stopKeypressIfDownCancelled(stopKey){
 		}},true);
 		
 		log('363232, hides id and password background images that are text input backgrounds');
-	} else if(hostname.indexOf('searchina.ne.jp')>-1){
-		var cssText = '';
-		cssText += 'header {background:-o-linear-gradient(top,#36C,#48F);}';
-		cssText += '#button,.mod_dropnavi ul.topmenu,#button1,#pclink {background:-o-linear-gradient(top,#FFF,#DDD);}';
-		cssText += '#reload {background-image: -o-linear-gradient(top,#D02,#F35);}';
-		addCssToDocument(cssText);
-		log('PATCH-1060, searchina.ne.jp - add missing gradients');
 	} else if(hostname.indexOf('sina.cn')>-1){
 		addCssToDocument('body, #mainpage, .headbox .mate, .nav_content_list, .nav_content_list .nav_content_item, .wrap, header,nav,section,footer { min-width: 320px; width: auto !important;  } .nav_content_list .nav_content_item { display: block !important; float: none !important;} .wrapper .scroller ul.slide_img_list { width: auto !important;} .tit { clear: both; } .headnav { white-space: nowrap; } ');
 		
