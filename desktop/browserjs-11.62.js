@@ -1,4 +1,4 @@
-// rNOGxJ9vffJp9/PQkQdcZwV1gGLCkmtpj4HrUiHW+SXbeFEJyia4jwr6xRRkaa7kANcBXb53mGOoM22RvF9K/o+Gl9t3nGpMdmuVQrW921U5NvVAxamjhttkT0zyep04MuFkrL8jqFvVPPH9tjfXi0Tc+uBSJEhw5KKYNNSsM9zOSJsKp2PW7W/FrqcdZvxLQVe5PwVYDp0ppcZ4FFjBQw/S+cmO2X9amxW9uKYGoQ4zrciWzIJ7fQyMrizZ2qhatOom0TNxPBIbA/lbrqQ/e3vtufEPLMNLSptLm33YNOqO+heVvNCYaQsbmUosTovQ322CSmzGXwy2T2jK+6Mfvw==
+// MEKHEooXxmejhA24Rcbh1gSKbQlPjeqi0IHJfnSb+rgpTvS/kbpF7FWSdieFE9krYmy6mYAALRbiiskEiCGlxKbSFGboymBLUQlr6DI/0E8Dig4EnzYJL0clcmN0EuSrp1pDfJGDiqO4vKxYDbYhzahIyj3eXlqWF/Wigz5RNf1Gk5ZfsgEwGCOuY5ksNQrf46JxMJU/pHYigEHJU3Mhe43U+FCK7qwNvLOq/Sz5ZjXegOPtel+3nqt+fTERscyrBYMcWioZ4jIYQ/j4Y0P3GjU/eaa8Dc8nt6Ob7Rb9vrp+lhg46jP4/dQFRcUp609ysE0OGkwDDnC5Ib9Kxa26+Q==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, December 11, 2012. Active patches: 286 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, December 17, 2012. Active patches: 289 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -727,6 +727,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('antikvar.hu')){
 		addCssToDocument('#header a{font-size:11px}');
 		log('PATCH-890, antikvar.hu: font fallback breaks layout');
+	} else if(hostname.endsWith('bnpparibasfortis.be')){
+		if(pathname.indexOf('/portal/Start')==0){addCssToDocument('tr#steps{z-index:2}')}
+		log('PATCH-1094, bnpparibasfortis.be - unclickable radio buttons');
 	} else if(hostname.endsWith('caisse-epargne.fr')){
 		addPreprocessHandler(/this\._changeHandler\);if\s*\(Sys\.Browser\.agent\s==\sSys\.Browser\.Opera\)/g, ' this._changeHandler);if(false)');
 		log('PATCH-798, Avoid browser sniffing that breaks typing');
@@ -1494,7 +1497,13 @@ function setTinyMCEVersion(e){
 				if(document.getElementById('rtetext') && document.getElementById('rtetext').getElementsByTagName('iframe').length)
 					document.getElementById('rtetext').getElementsByTagName('iframe')[0].style.height = '97%';
 			}, true);
-			log('PATCH-996, Y!Mail - Allow focusing address selector field by mouse click\nPATCH-417, Y!Mail Allow focusing subject field by mouse click in\nPATCH-418, Y!Mail Fix inserting links in mail compose screen\nPATCH-460, Y!Mail Prevent hidden text when composing long e-mails');
+		
+			opera.addEventListener('BeforeEventListener.unload', function(e){
+				if(self==top&&e.event.target==document)e.preventDefault();
+			}, false);
+		
+			addCssToDocument('.list-view-item .cbox input[type="checkbox"]{opacity:1 !important}.list-view-item .cbox input[type="checkbox"] + span{background:none !important}');
+			log('PATCH-996, Y!Mail - Allow focusing address selector field by mouse click\nPATCH-417, Y!Mail Allow focusing subject field by mouse click in\nPATCH-418, Y!Mail Fix inserting links in mail compose screen\nPATCH-460, Y!Mail Prevent hidden text when composing long e-mails\nPATCH-1092, Y!Mail removes event listeners on unload, Opera sends too many unload events\nPATCH-1093, Y!Mail - Presto redraw bug inverts checkbox selection');
 		}
 		if(hostname.indexOf('.mail.yahoo.')>-1&&(href.indexOf( '/dc/system_requirements?browser=blocked' )>-1||href.indexOf( '/dc/system_requirements?browser=unsupported' )>-1)){
 			location.href='/dc/launch?sysreq=ignore';
