@@ -1,4 +1,4 @@
-// uBphl6B8QntrPt8DhvWGQMl2HEYrTrRjAfUQ5dqial1ycpXmsvLSxe+pK0MaQ8IQgwiZ8xt1VenIiAFY/HOJ43u/kD/SvUGZSWrSSj4Ng6NvBPRU6GAc0IpINI4yyVp2c5pFj2Qf55chRbzKYakNYOHWJwBW8qNToAXbM9HyRSgRtbH8FEFQqM29fXd3ZfvId/4n4dMoIx6V7fnEDGc5VF0xR7cEcInabJHAnYqc8XDnrVa4bc/64LO1EUoMJBY1y+obwkBlQuBOgfL1V26c4Z435m1KrhgewwpmUV/A+2nuorIOwq7OdDUMhn8SZlgRSpkgqns1MQAYUGma7QH5dA==
+// MbjzbVB9sBqCjVBFYiOTKKG4IjhpJuNnixfz/NybrZZl3awMVmnkRoyV6sNFQue31kB56zfFSg3L6spiHmikrgU/fW9tOdUYEDkcgOpqcOF/hy6iN02RF+VOXAlgk6yWbPcf5BlHYGmGMSYIbepG6LR08HU/rjPNtOYUj39ZGniYH5De7PJezNTWa6+IlLAje3PlJyWoup0a8gAIAUdr1EC6oRI8mTYEvmvBBMwHXr99MTAGzQ43/5WUOGIfil7NvA22maN2O4LGv1DeMVOwbBY3LLUb91LEFPy7YrffPkHySUSIrMsfBczRDVBYo42G/Emi5QLtNgBfdUYvze8ZFw==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, December 11, 2012. Active patches: 319 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, December 17, 2012. Active patches: 324 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -774,6 +774,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('antikvar.hu')){
 		addCssToDocument('#header a{font-size:11px}');
 		log('PATCH-890, antikvar.hu: font fallback breaks layout');
+	} else if(hostname.endsWith('bnpparibasfortis.be')){
+		if(pathname.indexOf('/portal/Start')==0){addCssToDocument('tr#steps{z-index:2}')}
+		log('PATCH-1094, bnpparibasfortis.be - unclickable radio buttons');
 	} else if(hostname.endsWith('book.lufthansa.com')){
 		addCssToDocument('td.fare input, td.fareOff input{position:inherit}');
 		log('PATCH-1018, lufthansa.com - fix unclickable positioned inputs');
@@ -1091,6 +1094,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('postdanmark.dk')){
 		addPreprocessHandler(/has_postMessage\s*=\s*window\[postMessage\]\s*&&\s*!\$\.browser\.opera;/, 'has_postMessage = true;',true,function(el){return el.src.indexOf('jquery.ba-postmessage.js')>-1;});
 		log('PATCH-1069, postdanmark.dk - remove sniff in jQuery postMessage plugin (incorrectly assumes lack of postMessage).');
+	} else if(hostname.endsWith('pulse.me')){
+		navigator.userAgent = 'Mozilla/5.0 (Windows NT 5.1; rv:16.0) Gecko/20100101 Firefox/16.0';
+		log('PATCH-1091, pulse.me - work around browser blocking');
 	} else if(hostname.endsWith('quora.com')){
 		(function(sTo){
 			var lastEvt=new Date();
@@ -1238,6 +1244,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.lingvo.ru')){
 		addPreprocessHandler(/a\.unselectable="on";if\(window\.opera\)\{a\.onmousedown=function\(\)\{return\s*false\}\}/,'a.unselectable="on";if(!window.opera){a.onmousedown=function(){return false}}');
 		log('PATCH-925, lingvo.ru: prevent mousedown prevention');
+	} else if(hostname.endsWith('www.myntra.com')){
+		addCssToDocument('div.mk-category-page{width:980px}');
+		log('PATCH-1089, myntra.com - content wraps');
 	} else if(hostname.endsWith('www.nfl.com')){
 		addPreprocessHandler( /if\(y&&y\["display"\]==="none"\)\{w=true;\}/ , '' , true , function(el){return ( el.src.indexOf('&g=nflbase')>-1 && el.src.indexOf('yui/min2/index.php')>-1 );} );
 		log('PATCH-936, nfl.com: avoid hundreds of reflows');
@@ -1652,7 +1661,13 @@ function setTinyMCEVersion(e){
 				if(document.getElementById('rtetext') && document.getElementById('rtetext').getElementsByTagName('iframe').length)
 					document.getElementById('rtetext').getElementsByTagName('iframe')[0].style.height = '97%';
 			}, true);
-			log('PATCH-996, Y!Mail - Allow focusing address selector field by mouse click\nPATCH-417, Y!Mail Allow focusing subject field by mouse click in\nPATCH-418, Y!Mail Fix inserting links in mail compose screen\nPATCH-460, Y!Mail Prevent hidden text when composing long e-mails');
+		
+			opera.addEventListener('BeforeEventListener.unload', function(e){
+				if(self==top&&e.event.target==document)e.preventDefault();
+			}, false);
+		
+			addCssToDocument('.list-view-item .cbox input[type="checkbox"]{opacity:1 !important}.list-view-item .cbox input[type="checkbox"] + span{background:none !important}');
+			log('PATCH-996, Y!Mail - Allow focusing address selector field by mouse click\nPATCH-417, Y!Mail Allow focusing subject field by mouse click in\nPATCH-418, Y!Mail Fix inserting links in mail compose screen\nPATCH-460, Y!Mail Prevent hidden text when composing long e-mails\nPATCH-1092, Y!Mail removes event listeners on unload, Opera sends too many unload events\nPATCH-1093, Y!Mail - Presto redraw bug inverts checkbox selection');
 		}
 		if(hostname.indexOf('.mail.yahoo.')>-1&&(href.indexOf( '/dc/system_requirements?browser=blocked' )>-1||href.indexOf( '/dc/system_requirements?browser=unsupported' )>-1)){
 			location.href='/dc/launch?sysreq=ignore';
