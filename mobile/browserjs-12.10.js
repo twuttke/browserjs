@@ -1,4 +1,4 @@
-// C1mRI7neZhRFimRbtepku8/r2DlUAn84avXCuofoPQA/R/k8OR9Lb6NDOaSvFiORsFXSw4snHDGrgHY4R/SFToNiRrETQeQHcznEFLS/h6SlbSrsXA8XCid4EZnN5qSoSuVAPW/ABgOQPfbFxI9cAP7KPOT2AcFosrHjKOZ1m65krkVbS2zRUAt5CqKHLd38tZus+qcnGvxxk13NULjwDuzD+tyosesw14/hrmr5TejwO6NWT+UAdEaP1mx2O6UDX/DhDIMSrUlNTQW1MpM8xU0H3U2AVmx4vHg8dfddZ4ASEoJjwzIltgs8yTuib7ENd20G0A66GrbTPfCWcnnA3Q==
+// b+aJfMTpo9eZiBdaUzEryXYJkpc2T3CxkRKSUlQPRyxBvGDHhCGpkK2o2vlptXm5HtRNDloHoUr7MWw9gWt8uTiSJxvP7XrX748KD1avoMrbjCbZCenhLrG7kR0svyN9rS3JRICrX7jomdX8FjK4m1lsJFFgTh8v3Su8IFJPb2qzNftqq8nyteZKrkfcHB590/lOHrczVz5GafdwMukzbhbeumy69LBR5ruXIZ43Cez/5z9qiKwjbpsON6KiiuiF9kg8SVbygQ5ZX8usD1IkzfR9PkNNfCGe83zkf7rA6waAE05ieXDQvl7wl7Lj6RO5VCsPRR8ZdrF/Ripd/hGKug==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.10 core 2.11.355, December 11, 2012. Active patches: 235 ';
+	var bjsversion=' Opera Mobile 12.10 core 2.11.355, December 20, 2012. Active patches: 236 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -440,19 +440,15 @@ function stopKeypressIfDownCancelled(stopKey){
 		/* goo.ne.jp */
 	
 	
-		if((hostname.indexOf('search.goo.')>-1)||(hostname.indexOf('bsearch.goo.')>-1)){
-			var cssText ='#tab {background:-o-linear-gradient(top,#555,#222);}';
-			cssText +='.others .other_category .other_cell_time a {background-color:#DDD}';
-			cssText +='.others .other_category .other_cell_time a.crt {background:-o-linear-gradient(top,#DDD,#BBB);}';
-			cssText +='.morebtn {background:-o-linear-gradient(top,#8CF,#37D);}';
-			addCssToDocument(cssText);
-			log('PATCH-991, search.goo.ne.jp - add missing gradients');
-		}
 		if(hostname.indexOf('.goo.')>-1){
 			var cssText ='input[type="text"] {box-sizing:border-box;}';
 			cssText +='a.brc {background-image:-o-linear-gradient(top,#9FF,#09F);}';
 			addCssToDocument(cssText);
 			log('PATCH-987, goo.ne.jp - generic patch');
+		}
+		if(hostname.indexOf('bsearch.goo.')>-1){
+			addCssToDocument('.morebtn {background:-o-linear-gradient(top,#8CF,#37D);}');
+			log('PATCH-991, search.goo.ne.jp - add missing gradients');
 		}
 		if(hostname.indexOf('dictionary.goo.')>-1){
 			var cssText = '.dicResultTitle {background:-o-linear-gradient(top,#61A6F1,#3D74B5);}';
@@ -602,6 +598,9 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.endsWith('postdanmark.dk')){
 		addPreprocessHandler(/has_postMessage\s*=\s*window\[postMessage\]\s*&&\s*!\$\.browser\.opera;/, 'has_postMessage = true;',true,function(el){return el.src.indexOf('jquery.ba-postmessage.js')>-1;});
 		log('PATCH-1069, postdanmark.dk - remove sniff in jQuery postMessage plugin (incorrectly assumes lack of postMessage).');
+	} else if(hostname.endsWith('pulse.me')){
+		navigator.userAgent = 'Mozilla/5.0 (Windows NT 5.1; rv:16.0) Gecko/20100101 Firefox/16.0';
+		log('PATCH-1091, pulse.me - work around browser blocking');
 	} else if(hostname.endsWith('thaiair.co.jp')){
 		navigator.appName = 'M'+navigator.appName;
 		log('PATCH-943, thaiair.co.jp - fix drop-down menu positioning');
