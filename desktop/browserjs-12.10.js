@@ -1,4 +1,4 @@
-// ZhQOaJMJTEQEjUNrz0mn0L9S90MfHT+3B7geKwLIQyN88ZKrlRzzGVdcBT6BRjKIxnUU5qJd8gaoBrAESjPC1W+YqfqS5KJMtV0aLQTgFNX6UR6rnoih9wxu3EPnhOFPIblaS3FoM/gVbHyJZU2367HwLgceB4g/yBZ/OjtHdFLXbE+BbgyeDXL73E2/m1tl4zZJvLMK2hlTp4dAVHZtINMEt6Nw6KvgEvqRIo0cnOItvywKmv2DbNYzi/nqKDodCZIeB6JJZ7llpvmWNv1bXXXoSEXDLBGxW70x4aprYKiSiJ2OQVoKBzDm4ichgax8dQMAjdtYLO8Hn8RS0tHUXg==
+// Scqp8xjMXXnj0DZdumEvohJa5WMHDKpRFgNZTW9ITcMgdzyCoMHoYySMdLMZSyPOf9TGH0pfjRlnA+I1dqgRsfwJBEZ1FajhK8TVaSPbWKr7svYiZ0jtDDTFOVNoO3l+BBRotp2ZjmPGdeaOBo1o6e/+u0r/+JkDZgfTzF4ArjcU13DOM2zAV8Y/BCn4EyBvuqqR7wQEvq4rlin6nDcdKLw/eBvw2vLw4dyBwnaE9LA04VThG/zz3Ejgog1AVdOhWVgnNgcoFmJ0OZNo7ht00TxD+KpErGdnVmYyESC2eq5k9hL387at3dChq3BV1rD19BfjRmbzVM+6BxfdJcVp0w==
 /**
 ** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, December 17, 2012. Active patches: 309 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, December 20, 2012. Active patches: 310 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1607,6 +1607,10 @@ function undoFunctionKeypressEventRemoval(){
 		/* Yahoo! */
 	
 	
+		if(hostname.endsWith('sg.news.yahoo.com')){
+			addPreprocessHandler(/window\.onunload\s*=\s*function\(\)\{\s*\/\/alert\("unload\s*event\s*detected!"\);\s*window\.location\.reload\(true\);\s*\}/,'');
+			log('PATCH-1095, Yahoo!SG - reload in unload handler');
+		}
 		if(hostname.indexOf('.mail.yahoo.')>-1){
 			if(self==top&&location.search.indexOf('reason=ignore')==-1){
 				document.addEventListener('DOMContentLoaded',function(){
