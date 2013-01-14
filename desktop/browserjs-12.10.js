@@ -1,6 +1,6 @@
-// Scqp8xjMXXnj0DZdumEvohJa5WMHDKpRFgNZTW9ITcMgdzyCoMHoYySMdLMZSyPOf9TGH0pfjRlnA+I1dqgRsfwJBEZ1FajhK8TVaSPbWKr7svYiZ0jtDDTFOVNoO3l+BBRotp2ZjmPGdeaOBo1o6e/+u0r/+JkDZgfTzF4ArjcU13DOM2zAV8Y/BCn4EyBvuqqR7wQEvq4rlin6nDcdKLw/eBvw2vLw4dyBwnaE9LA04VThG/zz3Ejgog1AVdOhWVgnNgcoFmJ0OZNo7ht00TxD+KpErGdnVmYyESC2eq5k9hL387at3dChq3BV1rD19BfjRmbzVM+6BxfdJcVp0w==
+// GXQra+rsH3WcDXinP4lnNhYLxinUI9GZDZ9MvTVhGVBc2Kz3qAl6FZXCynhftPTzGKre6VUjfF/STv7vugdAxE5aMAbkFHFIovx27h7M1Ciqt14Sa4D8yx6Hsu5QX7hOrD8woqh0KLnX7aMmU/iGIuRvp776HgD09Spj7I80d0NA6y1beEDpTc5DhE8CGO43Jb6iPDazVo0NQYLL9p5ps/svIs337pYa/Q/UDa7p5clm2hQhFhOk09bX/w55Agt5MGbsK9MpzowPHT6XbNntCmiJ8FgoKdi3vGcwh3X7SvMvjlkg7V9oMvlUDiyuYuyc7LkaedPfzYqcPz14p4gaXw==
 /**
-** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
+** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
 ** This file is part of the Opera web browser.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, December 20, 2012. Active patches: 310 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, January 14, 2013. Active patches: 311 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -140,6 +140,23 @@ function avoidDocumentWriteAbuse(contentRegexp){
 		var filterObj={apply:function(){}, play:function(){}, Apply:function(){}, Play:function(){}}; // some of the common functions
 		HTMLElement.prototype.filters=[ filterObj, filterObj, filterObj ]; // fake three applied filters with play and apply functions
 		HTMLElement.prototype.filters['blendTrans']=filterObj; // we also fake a named blendTrans filter
+	}
+
+	function fixCoolmenus(name){
+		if(fixed){return;}fixed=true;
+		defineMagicVariable.call=call;
+		// Version 4 is Opera 7 - compatible and does user agent sniffing
+		navRestore['userAgent'] = navigator.userAgent;
+		navigator.userAgent +=' msie 6';
+		shouldRestore = true;
+		defineMagicVariable.call(opera, 'bw', function(o){
+			// we need to override yet some more browser detection, and disable CSS filters
+			// usedom must be 0 to make frameset menus work
+			o.filter=o.op7=o.op=o.usedom=o.ns6=0;
+			o.ie=o.ie6=1;
+			return o}, function(o){return o});
+		addPreprocessHandler(  'this.win.document.body.appendChild(oNS)',  'try{this.win.document.body.appendChild(oNS)}catch(e){oNS=this.win.document.body.appendChild(this.win.document.importNode(oNS, true))}' );
+		addPreprocessHandler(  'oNS.appendChild(oNS2)',  'try{oNS.appendChild(oNS2);}catch(e){oNS2=oNS.appendChild(oNS.document.importNode(oNS2, true));}' );
 	}
 
 	function fixHVMenu(name){
@@ -464,6 +481,10 @@ function undoFunctionKeypressEventRemoval(){
 			fixHVMenu(name);
 			log('HVMenu fix');
 			return;
+		}else if(  match.call(name, /coolmenus\d?.js$/)   ){ 
+			  // coolmenus menu
+			  fixCoolmenus(name);
+			  return;
 		}else if(  match.call(name, /udm[_-]/)  || (  match.call(name, /(sniffer|control)\.js$/)   )    ){
 			if(hostname.indexOf('usatoday.com')>-1)return; // PATCH-465
 			// UDM menu
@@ -746,9 +767,7 @@ function undoFunctionKeypressEventRemoval(){
 		if(hostname.indexOf('passport2.')>-1){
 		 navigator.appName='Netscape';
 		}
-	
-		addCssToDocument('div.hotspot-overlay{background: #37383A;}');
-		log('PATCH-738, Work around sniffing hiding submit buttons on passport2.hp.com\nPATCH-1080, hp.com - missing background gradient');
+		log('PATCH-738, Work around sniffing hiding submit buttons on passport2.hp.com');
 	} else if(hostname.endsWith('.jus.br')){
 		opera.addEventListener('BeforeEvent.keypress',function(e){
 			if(e.event.ctrlKey){
@@ -1137,6 +1156,9 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('razr.com')){
 		addPreprocessHandler(/b=b\.substring\(c\+4,b\.length\);c=b\.indexOf\("\)"\);/,'b=b.substring(c+5,b.length);c = b.indexOf(\'")\');', true, function(elm){return elm.src&&elm.src.indexOf('main.js')>-1});
 		log('PATCH-876, razr.com: CSS url() argument takes quotes');
+	} else if(hostname.endsWith('razri.com')){
+		addPreprocessHandler(/b=b\.substring\(c\+4,b\.length\);c=b\.indexOf\("\)"\);/,'b=b.substring(c+5,b.length);c = b.indexOf(\'")\');', true, function(elm){return elm.src&&elm.src.indexOf('main.min.js')>-1});
+		log('PATCH-1097, razri.com: CSS url() argument takes quotes');
 	} else if(hostname.endsWith('rememberthemilk.com')){
 		addPreprocessHandler(/if\(is_safari_31\|\|is_chrome\)\{return true\}utility\.stopEvent\(J\);/,'if(is_safari_31||is_chrome||is_opera){return true}utility.stopEvent(J);');
 		log('PATCH-905, rememberthemilk.com: adapt to Opera12.10\'s more compliant key event code');
@@ -1714,7 +1736,15 @@ function undoFunctionKeypressEventRemoval(){
 		HTMLDocument.prototype.__defineGetter__('fullScreenEnabled', function() { return this.fullscreenEnabled; });
 		HTMLElement.prototype.requestFullScreen = HTMLElement.prototype.requestFullscreen;
 		HTMLDocument.prototype.cancelFullScreen = HTMLDocument.prototype.exitFullscreen;
-		log('PATCH-1086, youtube - work around old fullscreen spec usage');
+	
+		if(pathname.indexOf('/all_comments')==0){
+		opera.addEventListener('BeforeCSS',function(e){
+			if (String(e.element.href).indexOf("www-hitchhiker")>-1){
+				e.cssText = e.cssText.replace(/;animation:pulse 2s ease-out 0s infinite}/g,';}');
+			}
+		},false);
+		}
+		log('PATCH-1086, youtube - work around old fullscreen spec usage\nPATCH-1099, YouTube comments: bad opacity animation performance in Presto');
 	} else if(hostname.indexOf('265.com')>-1){
 		addCssToDocument('#coolSites .body li, #coolSites .body li a{line-height:2em !important}')
 		log('PATCH-475, Avoid overflowing text on 265.com');
