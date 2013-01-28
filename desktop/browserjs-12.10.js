@@ -1,4 +1,4 @@
-// GXQra+rsH3WcDXinP4lnNhYLxinUI9GZDZ9MvTVhGVBc2Kz3qAl6FZXCynhftPTzGKre6VUjfF/STv7vugdAxE5aMAbkFHFIovx27h7M1Ciqt14Sa4D8yx6Hsu5QX7hOrD8woqh0KLnX7aMmU/iGIuRvp776HgD09Spj7I80d0NA6y1beEDpTc5DhE8CGO43Jb6iPDazVo0NQYLL9p5ps/svIs337pYa/Q/UDa7p5clm2hQhFhOk09bX/w55Agt5MGbsK9MpzowPHT6XbNntCmiJ8FgoKdi3vGcwh3X7SvMvjlkg7V9oMvlUDiyuYuyc7LkaedPfzYqcPz14p4gaXw==
+// J+KMyjAcVB7xv1Y1HW2ops6OG8C/tRcj6KeyYeK5dg3BF/Xmxkra/UPIUIr0olzsJKr2r/kuQC/RPD5sT9J0j8fEMjP+LZgBIdRdXkCvnC9TIOIZngr3Kgg07WML7ggNOG2AQabmw8pwjEfzGoqXPGXdvXyY75IH9nvHGYJnvR5cZSlB3M6uL4aQolE+FV+rIWK1GvBJXBo0IG/d6O9P+41WIT5mvVfVVeFd+etix3a4ZhRYVX9zaGbnIhvYCYIc8DDMTC+5ODbknbWXyNlDAijXJtcCC2EbkBzHoppxidscAq+uAuXHwFE2ULxKvD7zKEz4xxUC56Gu98MsTJ79dw==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, January 14, 2013. Active patches: 311 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, January 28, 2013. Active patches: 313 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -784,6 +784,9 @@ function undoFunctionKeypressEventRemoval(){
 			}
 		},false);
 		log('PATCH-1052, .jus.br - block keypress event from shortcut combinations');
+	} else if(hostname.endsWith('.nexoneu.com')){
+		fixIFrameSSIscriptII('resizeIframe');
+		log('PATCH-1103, Nexon: fix old iframe resize script');
 	} else if(hostname.endsWith('.polskastacja.pl')){
 		addPreprocessHandler(/dojo\.isOpera/g , 'false', false, function(el){return !el.src});
 		
@@ -916,6 +919,30 @@ function undoFunctionKeypressEventRemoval(){
 			log('PATCH-1055, Facebook - Work around issue where Flash does not call JS when expected\nPATCH-852, facebook: avoid unwanted chat box scroll\nPATCH-923, facebook: work around lack of pointer-events blocking video playback\nPATCH-954, facebook: work around lack of pointer-events breaking group page photos');
 		}
 		log('0, Facebook');
+	} else if(hostname.endsWith('flipkart.com')){
+		(function(){
+		  var deferredEvents=[];
+		  opera.addEventListener('BeforeEvent.load', function(e){
+		    if(e.event.target.tagName=='IFRAME'){
+		      try{ 
+			var d=e.event.target.contentDocument; 
+			if(e.event.ujs)return;
+			if(d.URL=='about:blank'){
+			  deferredEvents.push( { trgt:e.event.target, ev:e.event } );
+			  e.preventDefault();
+			  setTimeout( function(){ if(deferredEvents.length)while(deferredEvents[i]){ var o=deferredEvents.shift(); o.ev.ujs=true; o.trgt.dispatchEvent(o.ev); } }, 800 );
+			}else{
+			  for(var i=0;i<deferredEvents.length;i++){
+			    if( deferredEvents[i].trgt == e.event.target ){ // if a new load event fires on the same IFRAME we forget about the one we almost fired for about:blank
+			      deferredEvents.splice(i,1);
+			    }
+			  }
+			}
+		      }catch(err){}
+		    }
+		  }, false);
+		})();
+		log('PATCH-1105, Try to prevent double load events on initially empty IFRAMEs');
 	} else if(hostname.endsWith('forcechange.com')){
 		addCssToDocument('div.post{content:normal !important}');
 		log('PATCH-1084, forcechange.com - generated content on real element');
@@ -940,9 +967,6 @@ function undoFunctionKeypressEventRemoval(){
 			},false);
 		}
 		log('PATCH-855, garmin.com - allow Opera to install and use Garmin Communicator Plugin\nPATCH-856, garmin.com - go back multiple pages after saving POI');
-	} else if(hostname.endsWith('gay.com')){
-		opera.defineMagicFunction('isSupportedBrowser', function() { return true; });
-		log('PATCH-879, gay.com - work around browser blocking');
 	} else if(hostname.endsWith('github.com')){
 		addCssToDocument('.social-count::before {margin-right:14px;margin-top:0;}.social-count::after {margin-right:13px;margin-top:0;}');
 		log('PATCH-815, github: work around misplaced arrows (Opera bug)');
@@ -1195,6 +1219,9 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('skype.com')){
 		fixJQueryAutocomplete();
 		log('PATCH-613, Work around sniffing in old jQuery autocomplete plugin');
+	} else if(hostname.endsWith('steelarm.ua')){
+		addCssToDocument('.roktabs-links{text-align:inherit !important}');
+		log('PATCH-1104, steelarm.ua - text-align breaks hover detection');
 	} else if(hostname.endsWith('surveymonkey.com')){
 		addCssToDocument('html{min-height:auto!important}');
 		log('PATCH-1031, surveymonkey.com - prevent dialog from growing on keydown');
@@ -1291,6 +1318,11 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('www.omv.cz')){
 		fixIFrameSSIscriptII('resizeIframeToFitContent');
 		log('PATCH-937, omv.cz: old iframe resize script');
+	} else if(hostname.endsWith('www.state.gov')){
+		opera.addEventListener('BeforeScript',function(e){
+			if(e.element.src.indexOf('sifr-config.js')>-1){e.preventDefault();}
+		},false);
+		log('PATCH-1107, state.gov: avoid sifr usage');
 	} else if(hostname.endsWith('www.udemy.com')){
 		window.addEventListener('load',
 		function(){
@@ -1629,10 +1661,6 @@ function undoFunctionKeypressEventRemoval(){
 		/* Yahoo! */
 	
 	
-		if(hostname.endsWith('sg.news.yahoo.com')){
-			addPreprocessHandler(/window\.onunload\s*=\s*function\(\)\{\s*\/\/alert\("unload\s*event\s*detected!"\);\s*window\.location\.reload\(true\);\s*\}/,'');
-			log('PATCH-1095, Yahoo!SG - reload in unload handler');
-		}
 		if(hostname.indexOf('.mail.yahoo.')>-1){
 			if(self==top&&location.search.indexOf('reason=ignore')==-1){
 				document.addEventListener('DOMContentLoaded',function(){
@@ -1974,11 +2002,6 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.indexOf('investordaily.com.au')>-1){
 		opera.defineMagicFunction('minmax_scan', function(){});
 		log('PATCH-238, Override minmax IE helper script');
-	} else if(hostname.indexOf('jabong.com')>-1){
-		opera.addEventListener('BeforeCSS', function(e){
-		  e.cssText = e.cssText.replace(/.clearfix:after,#content,#content:after,/g,'.clearfix:after,#content:after,');
-		}, false);
-		log('PATCH-658, jabong.com: override usage of CSS content property on element content');
 	} else if(hostname.indexOf('journalism.org')>-1){
 		fixIFrameSSIscriptII('resizeIframe');
 		log('PATCH-523, journalism.org: fix old IFrame SSI script');
@@ -2121,7 +2144,7 @@ function undoFunctionKeypressEventRemoval(){
 		);
 		log('PATCH-176, Allow upload of workspace resources in Salesforce');
 	} else if(hostname.indexOf('sbrf.ru')>-1){
-		addEventListener('DOMContentLoaded', function(){s
+		addEventListener('DOMContentLoaded', function(){
 			var nodes=document.evaluate('//*[@onmouseover | @onmouseout]', document.body, null, 4, null), node;
 			while(node=nodes.iterateNext()){
 				node.onmouseenter = node.onmouseover;
@@ -2239,7 +2262,34 @@ function undoFunctionKeypressEventRemoval(){
 				document.activeElement.dispatchEvent(ev);
 			}
 		},false);
-		log('PATCH-671, Twitter: avoid ghost @ before username\nPATCH-1064, twitter - restart counter after defocus');
+	
+		(function(){
+			var theSetter=(document.createElement('div').__lookupSetter__('innerHTML'));
+			var theGetter=(document.createElement('div').__lookupGetter__('innerHTML'));
+			var lastStr, lastElm;
+			HTMLDivElement.prototype.__defineGetter__('innerHTML', function(){
+				if( this===lastElm && lastStr )return lastStr;
+				return theGetter.apply(this,arguments);
+			});
+			HTMLDivElement.prototype.__defineSetter__('innerHTML', function(str){
+				if(this.contentEditable==='true' && /[^\x00-\x80]+/.test(str) ){ // if there's non-ASCII code in input, disable innerHTML updates (or, rather, postphone them until blur event)
+					lastElm=this, lastStr=str; 
+					return str;
+				}
+				return theSetter.apply(this,arguments);
+			});
+			
+			document.addEventListener('blur', function(e){
+				if( e.target === lastElm )theSetter.call( e.target, lastStr );
+			}, true);
+				
+			opera.addEventListener('AfterEvent.keyup', function(e){
+				if( lastElm && e.event.target == lastElm){
+					lastStr=theGetter.call(lastElm); // This is required to fake innerHTML having been changed by the input
+				}
+			}, false);
+		})();
+		log('PATCH-671, Twitter: avoid ghost @ before username\nPATCH-1064, twitter - restart counter after defocus\nPATCH-1109, Disable innerHTML updates of the contentEditable element\'s DOM if we presume an IME is active, prevents crashes');
 	} else if(hostname.indexOf('virginamerica.com')>-1){
 		navigator.appName='Netscape';
 		opera.defineMagicVariable('browserType',function(){return 'gecko'},null);
