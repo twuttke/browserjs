@@ -1,6 +1,6 @@
-// MEKHEooXxmejhA24Rcbh1gSKbQlPjeqi0IHJfnSb+rgpTvS/kbpF7FWSdieFE9krYmy6mYAALRbiiskEiCGlxKbSFGboymBLUQlr6DI/0E8Dig4EnzYJL0clcmN0EuSrp1pDfJGDiqO4vKxYDbYhzahIyj3eXlqWF/Wigz5RNf1Gk5ZfsgEwGCOuY5ksNQrf46JxMJU/pHYigEHJU3Mhe43U+FCK7qwNvLOq/Sz5ZjXegOPtel+3nqt+fTERscyrBYMcWioZ4jIYQ/j4Y0P3GjU/eaa8Dc8nt6Ob7Rb9vrp+lhg46jP4/dQFRcUp609ysE0OGkwDDnC5Ib9Kxa26+Q==
+// SO9JEQWQ1uiykp+Bb2BZZ9vJ41qvYwbUc/bbzji2njqovE5AXMpR1YnY0u43ydIt7jFGR7rb8y3WAO+Ae17KCdAMjFaovSu9Vr7t+8uY5/8Fhp1wadP2Skh+LgmfI8ism2YZK/+cp2bHZat18xvnpNV9mNmz41Nvnwi4T/URWkk9wFK7Cb0ApuVphWedeeXlFeRTsUkzYI0bMG3O45W7LizJd8FPe1kHMmOR7cw7HEGuUnI164j2MCDgy4Lc5b1UVOczp8fluhbFrcrzZ7ydBXkhkJs9OvurJVfWkf9AxdX45fBj+YsYkMNZWf0m0F+cNZbeEOPkXVONd9RObGNsxQ==
 /**
-** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
+** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
 ** This file is part of the Opera web browser.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, December 17, 2012. Active patches: 289 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, January 28, 2013. Active patches: 289 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -140,6 +140,23 @@ function avoidDocumentWriteAbuse(contentRegexp){
 		var filterObj={apply:function(){}, play:function(){}, Apply:function(){}, Play:function(){}}; // some of the common functions
 		HTMLElement.prototype.filters=[ filterObj, filterObj, filterObj ]; // fake three applied filters with play and apply functions
 		HTMLElement.prototype.filters['blendTrans']=filterObj; // we also fake a named blendTrans filter
+	}
+
+	function fixCoolmenus(name){
+		if(fixed){return;}fixed=true;
+		defineMagicVariable.call=call;
+		// Version 4 is Opera 7 - compatible and does user agent sniffing
+		navRestore['userAgent'] = navigator.userAgent;
+		navigator.userAgent +=' msie 6';
+		shouldRestore = true;
+		defineMagicVariable.call(opera, 'bw', function(o){
+			// we need to override yet some more browser detection, and disable CSS filters
+			// usedom must be 0 to make frameset menus work
+			o.filter=o.op7=o.op=o.usedom=o.ns6=0;
+			o.ie=o.ie6=1;
+			return o}, function(o){return o});
+		addPreprocessHandler(  'this.win.document.body.appendChild(oNS)',  'try{this.win.document.body.appendChild(oNS)}catch(e){oNS=this.win.document.body.appendChild(this.win.document.importNode(oNS, true))}' );
+		addPreprocessHandler(  'oNS.appendChild(oNS2)',  'try{oNS.appendChild(oNS2);}catch(e){oNS2=oNS.appendChild(oNS.document.importNode(oNS2, true));}' );
 	}
 
 	function fixHVMenu(name){
@@ -437,6 +454,10 @@ function setTinyMCEVersion(e){
 			fixHVMenu(name);
 			log('HVMenu fix');
 			return;
+		}else if(  match.call(name, /coolmenus\d?.js$/)   ){ 
+			  // coolmenus menu
+			  fixCoolmenus(name);
+			  return;
 		}else if(  match.call(name, /udm[_-]/)  || (  match.call(name, /(sniffer|control)\.js$/)   )    ){
 			if(hostname.indexOf('usatoday.com')>-1)return; // PATCH-465
 			// UDM menu
@@ -708,6 +729,9 @@ function setTinyMCEVersion(e){
 		 navigator.appName='Netscape';
 		}
 		log('PATCH-738, Work around sniffing hiding submit buttons on passport2.hp.com');
+	} else if(hostname.endsWith('.nexoneu.com')){
+		fixIFrameSSIscriptII('resizeIframe');
+		log('PATCH-1103, Nexon: fix old iframe resize script');
 	} else if(hostname.endsWith('.polskastacja.pl')){
 		addPreprocessHandler(/dojo\.isOpera/g , 'false', false, function(el){return !el.src});
 		
@@ -848,9 +872,6 @@ function setTinyMCEVersion(e){
 			},false);
 		}
 		log('PATCH-855, garmin.com - allow Opera to install and use Garmin Communicator Plugin\nPATCH-856, garmin.com - go back multiple pages after saving POI');
-	} else if(hostname.endsWith('gay.com')){
-		opera.defineMagicFunction('isSupportedBrowser', function() { return true; });
-		log('PATCH-879, gay.com - work around browser blocking');
 	} else if(hostname.endsWith('github.com')){
 		addCssToDocument('.social-count::before {margin-right:14px;margin-top:0;}.social-count::after {margin-right:13px;margin-top:0;}');
 		log('PATCH-815, github: work around misplaced arrows (Opera bug)');
@@ -1041,6 +1062,9 @@ function setTinyMCEVersion(e){
 		})();
 		
 		log('PATCH-769, Opera throws when XSL variable has disable-output-escaping attribute, breaks sorting on staples.com');
+	} else if(hostname.endsWith('steelarm.ua')){
+		addCssToDocument('.roktabs-links{text-align:inherit !important}');
+		log('PATCH-1104, steelarm.ua - text-align breaks hover detection');
 	} else if(hostname.endsWith('thaiair.co.jp')){
 		navigator.appName = 'M'+navigator.appName;
 		log('PATCH-943, thaiair.co.jp - fix drop-down menu positioning');
@@ -1864,11 +1888,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('investordaily.com.au')>-1){
 		opera.defineMagicFunction('minmax_scan', function(){});
 		log('PATCH-238, Override minmax IE helper script');
-	} else if(hostname.indexOf('jabong.com')>-1){
-		opera.addEventListener('BeforeCSS', function(e){
-		  e.cssText = e.cssText.replace(/.clearfix:after,#content,#content:after,/g,'.clearfix:after,#content:after,');
-		}, false);
-		log('PATCH-658, jabong.com: override usage of CSS content property on element content');
 	} else if(hostname.indexOf('journalism.org')>-1){
 		fixIFrameSSIscriptII('resizeIframe');
 		log('PATCH-523, journalism.org: fix old IFrame SSI script');
@@ -2039,7 +2058,7 @@ function setTinyMCEVersion(e){
 		);
 		log('PATCH-176, Allow upload of workspace resources in Salesforce');
 	} else if(hostname.indexOf('sbrf.ru')>-1){
-		addEventListener('DOMContentLoaded', function(){s
+		addEventListener('DOMContentLoaded', function(){
 			var nodes=document.evaluate('//*[@onmouseover | @onmouseout]', document.body, null, 4, null), node;
 			while(node=nodes.iterateNext()){
 				node.onmouseenter = node.onmouseover;
