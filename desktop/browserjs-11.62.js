@@ -1,4 +1,4 @@
-// SO9JEQWQ1uiykp+Bb2BZZ9vJ41qvYwbUc/bbzji2njqovE5AXMpR1YnY0u43ydIt7jFGR7rb8y3WAO+Ae17KCdAMjFaovSu9Vr7t+8uY5/8Fhp1wadP2Skh+LgmfI8ism2YZK/+cp2bHZat18xvnpNV9mNmz41Nvnwi4T/URWkk9wFK7Cb0ApuVphWedeeXlFeRTsUkzYI0bMG3O45W7LizJd8FPe1kHMmOR7cw7HEGuUnI164j2MCDgy4Lc5b1UVOczp8fluhbFrcrzZ7ydBXkhkJs9OvurJVfWkf9AxdX45fBj+YsYkMNZWf0m0F+cNZbeEOPkXVONd9RObGNsxQ==
+// WN8IplALTRWJgSQtOpiKPIOIuu3Mp9HuLpudVJEn7AkfL6iaL6rZ188JkA4By9qcx9VHBlSbkDW24DVnt8GOu+Mk2LC4WQBWLbMcyk4F09+Rb0CITR2JxX8cQjZDA6CcbAKKnY7YM42s5fMtI6cmf0ZuuK5KpBfbUvVSA70Vh4ClRXtIqdxMaivZq9Qm+tjik8jL2j2DON4pTcE5W/C//OnAcZx9o6p5a6F8ZFesLF+J85/9lNZZYQVbc+hUk4ydTwGoXI1cxpgh6DANN4LxdxcYH9I497IWAx70N8kdF1uB8BUqEPOZEitu8Jps5bcaIPLLWoYAtqdA7Uav49I5yQ==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, January 28, 2013. Active patches: 289 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, February 6, 2013. Active patches: 289 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -769,6 +769,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('espn.go.com')){
 		navigator.appName="netscape";
 		log('PATCH-375, Make sure the ESPN polls work');
+	} else if(hostname.endsWith('essent.nl')){
+		opera.addEventListener('BeforeEventListener.unload', function(e){e.preventDefault();}, false);
+		log('PATCH-1114, Don\'t reload during unload, you\'ll confuse users and yourself');
 	} else if(hostname.endsWith('facebook.com')){
 		/* Facebook */
 	
@@ -872,9 +875,6 @@ function setTinyMCEVersion(e){
 			},false);
 		}
 		log('PATCH-855, garmin.com - allow Opera to install and use Garmin Communicator Plugin\nPATCH-856, garmin.com - go back multiple pages after saving POI');
-	} else if(hostname.endsWith('github.com')){
-		addCssToDocument('.social-count::before {margin-right:14px;margin-top:0;}.social-count::after {margin-right:13px;margin-top:0;}');
-		log('PATCH-815, github: work around misplaced arrows (Opera bug)');
 	} else if(hostname.endsWith('gsmtronix.com')){
 		fixHVMenu('dummy.js');
 		log('PATCH-842, gsmtronix.com: HVmenu');
@@ -902,6 +902,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('loyalbank.com')){
 		HTMLElement.prototype.onselectstart = true;
 		log('PATCH-707, loyalbank.com: prevent mousedown prevention');
+	} else if(hostname.endsWith('lymingtonharbour.co.uk')){
+		fixHVMenu();
+		log('PATCH-1110, lymingtonharbour.co.uk - HVmenu');
 	} else if(hostname.endsWith('maerskfleet.com')){
 		navigator.userAgent = 'Firefox'+navigator.userAgent;
 		window.opera = null;
@@ -1658,9 +1661,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('ameba.jp')!=-1){
 		addPreprocessHandler(/editor\.insertNodeAtSelection\(link\);\s*editor\.insertNodeAtSelection\(document\.createElement\('br'\)\);/, 'editor.insertNodeAtSelection(link);');
 		log('331093, Work around Opera bug where second BR tag overwrites newly inserted IMG');
-	} else if(hostname.indexOf('archives.aisne.fr')>-1){
-		defineMagicVariable.call(opera, 'isNS', function(){ return true }, null);
-		log('PATCH-682, Fix document viewer on Archives départementales de l\'Aisne');
 	} else if(hostname.indexOf('area-11.com')>-1){
 		window.constructor={};
 		window.constructor.prototype={};
