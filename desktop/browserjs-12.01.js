@@ -1,4 +1,4 @@
-// Z4rRulu5XwpSyQd4Xjj0YkNJPNiH3Lv+phYlTt0SH2GDU7JWDwmKwGLmBqIrUSyFfaRc7i19gjn9bmhV3FS1/yxu/VTgn1zJ7LimeQTgKPxanIkdyKojmaDmKdH+jC6AxXZD03LPE2+/eyRup9O5ZNeEzSl66m+3nii+qjHn7S/fmHKPad4D8/Kh0hnBqsxoUed8SfI4chv1FwCBOSAR3P8lOQNZygfw4XBGOK1yaNFVkPuGzKdnJg9gsZ2DGXIFtW8yNnc2aHR/3y/3AHSs678PTrUTaSTLMYHdmwz/sEgVhHwdQmjEuEi6NWdckdJDrNTicJR5gvAFVKzi+2HJsQ==
+// gasb0BKIEAuSenuSDhxkigMx/Jn+1zYrT2yxhttuk/TDnMD7GtEvREZhv2kqvEQHrgiS26skpK4eYVaSJudY6f+k7KIfFhknyLEfXOdFf3wwzoa1wgkJWwr8G4T6o9lPHEivXkMaPiGRQ7NE6bInqxyKOy3XoSatVuMa1IjvVx9LlFYt0D1R/h3QXn9YwLpKYLvckTmNQ7c3TJJNnKQqegaC3QzTHGEwkVktWuUZ6+40FB2J0N9xe+iQhiiDyREgxibBzF31TcuF5JyTx8RF1dVL70jT8qof0CcGRryZNUlzVVQYW333DNW3zGLg4LiW0BKFuDb3coBwYNARpb0rCw==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, January 28, 2013. Active patches: 327 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, February 6, 2013. Active patches: 327 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -873,6 +873,9 @@ function setTinyMCEVersion(e){
 	
 		navigator.appName="netscape";
 		log('PATCH-974, espn.go.com: make image gallery work, suppressing transform usage\nPATCH-375, Make sure the ESPN polls work');
+	} else if(hostname.endsWith('essent.nl')){
+		opera.addEventListener('BeforeEventListener.unload', function(e){e.preventDefault();}, false);
+		log('PATCH-1114, Don\'t reload during unload, you\'ll confuse users and yourself');
 	} else if(hostname.endsWith('facebook.com')){
 		/* Facebook */
 	
@@ -907,7 +910,7 @@ function setTinyMCEVersion(e){
 		
 			addCssToDocument('div.videoStage + div + div#fbPhotoPageTagBoxes{visibility:hidden;}');
 		
-			addCssToDocument('div#fbProfileCover + div.groupsJumpCoverBorder{visibility:hidden;}');
+			addCssToDocument('div#fbProfileCover + div.groupsJumpCoverBorder, .fbTimelineNavigationWrapper .friends .frame{visibility:hidden;}');
 			
 			log('PATCH-714, facebook: prevent chat window overflow - Presto bug\nPATCH-1055, Facebook - Work around issue where Flash does not call JS when expected\nPATCH-488, Facebook: fake paste event to make show preview immediately after pasting links in status\nPATCH-573, Facebook\'s border-radius triggers hyperactive reflow bug, performance suffers\nPATCH-923, facebook: work around lack of pointer-events blocking video playback\nPATCH-954, facebook: work around lack of pointer-events breaking group page photos');
 		}
@@ -960,9 +963,6 @@ function setTinyMCEVersion(e){
 			},false);
 		}
 		log('PATCH-855, garmin.com - allow Opera to install and use Garmin Communicator Plugin\nPATCH-856, garmin.com - go back multiple pages after saving POI');
-	} else if(hostname.endsWith('github.com')){
-		addCssToDocument('.social-count::before {margin-right:14px;margin-top:0;}.social-count::after {margin-right:13px;margin-top:0;}');
-		log('PATCH-815, github: work around misplaced arrows (Opera bug)');
 	} else if(hostname.endsWith('gsmtronix.com')){
 		fixHVMenu('dummy.js');
 		log('PATCH-842, gsmtronix.com: HVmenu');
@@ -1016,6 +1016,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('loyalbank.com')){
 		HTMLElement.prototype.onselectstart = true;
 		log('PATCH-707, loyalbank.com: prevent mousedown prevention');
+	} else if(hostname.endsWith('lymingtonharbour.co.uk')){
+		fixHVMenu();
+		log('PATCH-1110, lymingtonharbour.co.uk - HVmenu');
 	} else if(hostname.endsWith('maerskfleet.com')){
 		navigator.userAgent = 'Firefox'+navigator.userAgent;
 		window.opera = null;
@@ -1235,9 +1238,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('uye.memurlar.net')){
 		addCssToDocument('table{table-layout:auto;}');
 		log('PATCH-988, uye.memurlar.net: fix table layout');
-	} else if(hostname.endsWith('viaplay.no')){
-		addCssToDocument('div.overlay.disabled,div.dim{display:none !important}');
-		log('PATCH-931, viaplay.no: dismiss browser warning');
 	} else if(hostname.endsWith('washingtonpost.com')){
 		addPreprocessHandler(  /if\(\(b\.webkit\|\|b\.gecko\)&&y\.type==="css"\)/  ,'if((b.webkit||b.gecko||b.opera)&&y.type==="css")' , true, function(el){return el.src.indexOf('yui/yui-min.js')>-1;} );
 	
@@ -1290,6 +1290,9 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.hbs.edu')){
 		addCssToDocument('*{content:normal!important}');
 		log('PATCH-995, hbs.edu - avoid abuse of generated content');
+	} else if(hostname.endsWith('www.lifehacker.jp')){
+		addCssToDocument('#newzia_connect_main ul > li > a > div > img, #newzia_connect_main ul > li > a > div > p.ncDescription{top:0}');
+		log('PATCH-1111, lifehacker: re-style abs.pos boxes');
 	} else if(hostname.endsWith('www.lingvo.ru')){
 		addPreprocessHandler(/a\.unselectable="on";if\(window\.opera\)\{a\.onmousedown=function\(\)\{return\s*false\}\}/,'a.unselectable="on";if(!window.opera){a.onmousedown=function(){return false}}');
 		log('PATCH-925, lingvo.ru: prevent mousedown prevention');
@@ -1741,9 +1744,7 @@ function setTinyMCEVersion(e){
 		}
 		if(hostname.indexOf('finance.yahoo.com')>-1){
 			opera.addEventListener('BeforeEventListener.focusout', function(e){e.preventDefault();}, false);
-		
-			addPreprocessHandler(/Y\.later\(10,\s*this,\s*function\(\)\s*\{comments_exe_flag\s*=\s*'preinit';/,"Y.later(100, this, function() {comments_exe_flag = 'preinit';");
-			log('PATCH-406, Prevent currency menu from closing too fast on Y!Finance\nPATCH-911, Y!finance: delay script to load comments');
+			log('PATCH-406, Prevent currency menu from closing too fast on Y!Finance');
 		}
 		if(hostname.indexOf('mail.yahoo')>-1){
 			opera.addEventListener('BeforeEvent.keypress', function(e){
@@ -1832,9 +1833,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('ameba.jp')!=-1){
 		addPreprocessHandler(/editor\.insertNodeAtSelection\(link\);\s*editor\.insertNodeAtSelection\(document\.createElement\('br'\)\);/, 'editor.insertNodeAtSelection(link);');
 		log('331093, Work around Opera bug where second BR tag overwrites newly inserted IMG');
-	} else if(hostname.indexOf('archives.aisne.fr')>-1){
-		defineMagicVariable.call(opera, 'isNS', function(){ return true }, null);
-		log('PATCH-682, Fix document viewer on Archives départementales de l\'Aisne');
 	} else if(hostname.indexOf('area-11.com')>-1){
 		window.constructor={};
 		window.constructor.prototype={};
@@ -2351,7 +2349,9 @@ function setTinyMCEVersion(e){
 				}
 			}, false);
 		})();
-		log('PATCH-671, Twitter: avoid ghost @ before username\nPATCH-1064, twitter - restart counter after defocus\nPATCH-1109, Disable innerHTML updates of the contentEditable element\'s DOM if we presume an IME is active, prevents crashes');
+	
+		addCssToDocument('.profile-header-inner-overlay{bottom:auto;top: 60px;}');
+		log('PATCH-671, Twitter: avoid ghost @ before username\nPATCH-1064, twitter - restart counter after defocus\nPATCH-1109, Twitter: Disable innerHTML updates of the contentEditable element\'s DOM if we presume an IME is active, prevents crashes\nPATCH-1113, Twitter: avoid gradient paint issues when dragging overlays');
 	} else if(hostname.indexOf('uol.com.br')>-1){
 		addCssToDocument('#moduloTopoRotativo ul li div.texto{top:225px}');
 		log('PATCH-636, uol.com.br: work around abs.pos.bottom.align core bug');
