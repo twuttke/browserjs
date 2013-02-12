@@ -1,4 +1,4 @@
-// tacYedQoBZAK2onQrv54NKnzR86QF/N/gbJgDac9OiX2ulUebTKfqvXJtUIHl+gc7vHHYRPF+/f4xoNspDgk3a7uHuvYPMerFpxWHgNsAMb5IcVMDp3o5XNX+/9n+h3nCmEg5r2yXh8ckPygw4ocJM3ag/6H27OVBbcAMCG2j73sON2K1GLBm+zp6CZ3hYh18mwAhGcs31roIbvoVnqWREExwcYjT2APn/XOmhrYedu61mGiWfhG8V/rBrpqQHtfHlPDuvUe2BYYJZjb90ojjbcOTO84LQklEOwGKitFsW3nEyJ2GQSaXGxcQOINsfEL2+rbgVRo6w6JBYvaIIWw1A==
+// iVs9LEOQ9XTqImvBHSlgf4DCxRoRIBFwC3qYdkerny8ld1fKhbJhy4R4g//USJi+HmnY6s3VxWRxWRZcdS9eupA/y4IVfsz0+uY5UAusHJNfAi43BSOZtBvXCuvJJSWNhHBfh65/gVj0YeqogZVKR//Wgcxe4aldTb2a8xMfqXZRYUZ0z9ikg0Rwpd8bYuAHGqG+dflppRI/fKtExPdmNQXao910AxEFsLt5CJOj+2gq5ip8jVciA0eaQeE0552FQbJ4jSuQz78JIXimFp/VDogNd9lmpSkc3MXOUt6xQcXk07M9nZygBC3YkB29bboAmEUnSSNJ/Cd8dnlLXJKFJA==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, February 6, 2013. Active patches: 313 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, February 12, 2013. Active patches: 316 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1303,6 +1303,15 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('www.finanzas.com')){
 		addCssToDocument('body{content: normal !important}');
 		log('PATCH-901, finanzas.com: work around generated content abuse');
+	} else if(hostname.endsWith('www.fotoromantika.ru')){
+		addCssToDocument('div.HorizontalBar{float:left}');
+		log('PATCH-1119, fotoromantika.ru: fix float');
+	} else if(hostname.endsWith('www.gvt.com.br')){
+		navigator.userAgent = 'Mozilla/5.0 (Windows NT 5.1; rv:19.0) Gecko/20100101 Firefox/19.0';
+		HTMLHtmlElement.prototype.__defineGetter__('offsetHeight', function(){
+			return  (this.scrollHeight);
+		});
+		log('PATCH-1118, gvt.com.br: browser blocking');
 	} else if(hostname.endsWith('www.hbs.edu')){
 		addCssToDocument('*{content:normal!important}');
 		log('PATCH-995, hbs.edu - avoid abuse of generated content');
@@ -1664,6 +1673,15 @@ function undoFunctionKeypressEventRemoval(){
 		/* Yahoo! */
 	
 	
+		// PATCH-1120, Work around CSS selector-triggered freeze on Y! news articles
+	
+		opera.addEventListener('BeforeCSS', function(e){
+			if(e.element.href&&e.element.href.indexOf('ugcrate')>-1){
+				e.cssText = e.cssText.replace( /\.yom-sentimentrate-(LONG_SLIDER_SOUTH|DEFAULT)\+\.ugcrtg-sponad\+\.ugcrtg-footer/g, '.brjsnomatchselector' );
+			}
+		}, false);
+	
+	
 		if(hostname.indexOf('.mail.yahoo.')>-1){
 			if(self==top&&location.search.indexOf('reason=ignore')==-1){
 				document.addEventListener('DOMContentLoaded',function(){
@@ -1730,13 +1748,11 @@ function undoFunctionKeypressEventRemoval(){
 			}
 			log('194334, Y!Mail remove selectSingleNode and selectNodes ("old new mail" only)');
 		}
-		if(hostname.indexOf('finance.yahoo.')>-1){
-			navigator.userAgent = 'Mozilla/5.0 (Windows NT 5.1; rv:6.0) Gecko/20100101 Firefox/6.0'; 
-			log('PATCH-297, Fool browser sniffing that prevents stock ticker on Yahoo Finance');
-		}
 		if(hostname.indexOf('finance.yahoo.com')>-1){
+			navigator.userAgent = 'Mozilla/5.0 (Windows NT 5.1; rv:6.0) Gecko/20100101 Firefox/6.0'; 
+		
 			opera.addEventListener('BeforeEventListener.focusout', function(e){e.preventDefault();}, false);
-			log('PATCH-406, Prevent currency menu from closing too fast on Y!Finance');
+			log('PATCH-297, Fool browser sniffing that prevents stock ticker on Yahoo Finance\nPATCH-406, Prevent currency menu from closing too fast on Y!Finance');
 		}
 		if(hostname.indexOf('yahoo.co.jp')>-1){
 			opera.defineMagicVariable('judgeMethod',function(curVal){if(curVal && curVal.indexOf('genOSError')<0 && curVal.indexOf('genBrowserError')<0){return(curVal)}return null},null);	// Player.js
