@@ -1,4 +1,4 @@
-// WN8IplALTRWJgSQtOpiKPIOIuu3Mp9HuLpudVJEn7AkfL6iaL6rZ188JkA4By9qcx9VHBlSbkDW24DVnt8GOu+Mk2LC4WQBWLbMcyk4F09+Rb0CITR2JxX8cQjZDA6CcbAKKnY7YM42s5fMtI6cmf0ZuuK5KpBfbUvVSA70Vh4ClRXtIqdxMaivZq9Qm+tjik8jL2j2DON4pTcE5W/C//OnAcZx9o6p5a6F8ZFesLF+J85/9lNZZYQVbc+hUk4ydTwGoXI1cxpgh6DANN4LxdxcYH9I497IWAx70N8kdF1uB8BUqEPOZEitu8Jps5bcaIPLLWoYAtqdA7Uav49I5yQ==
+// msMdAGKEh44uUUKN/MxA2E8DEtLLzZDX7Hj/D47btfY29YwCP4Wq6EYDPf9TMthF2K4fJoD3Lx9VgEVTJ0mfeN6i5/Gvs46TofQMrgBS3tMtSBwxcok3uksdKGxsn2JD7WPPUlZKVhCW0veKbzvUKdAgzwEu3KKk42/cmZEQJVbgIswcSEeVpT5PlkYFEHBbVf087QLh0rmDWNk2cZZkXDwRzu5mG5ld7Kr8enrhZ17GEzM5TVQXw0aLxoCy0k11wlf62VkAZTkpx8iqlE30zXNyZduGrW7yuAEzNAWW2V42h18TWVLu332fTMCzpTHnAh9eppRxHBClhRTRy6A4Mw==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, February 6, 2013. Active patches: 289 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, February 27, 2013. Active patches: 293 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1071,6 +1071,13 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('thaiair.co.jp')){
 		navigator.appName = 'M'+navigator.appName;
 		log('PATCH-943, thaiair.co.jp - fix drop-down menu positioning');
+	} else if(hostname.endsWith('try.github.com')){
+		opera.defineMagicVariable('ns',function(){return true},null); //otherwise pluginlist becomes undefined
+		addPreprocessHandler(/if\s*\(\$\.browser\.webkit\s*\|\|\s*\$\.browser\.mozilla\)\s*return false;/, 'return false;')
+		log('PATCH-1123, Prevent unwanted scrolling in Code School editor');
+	} else if(hostname.endsWith('try.jquery.com')){
+		addPreprocessHandler(/if\s*\(\$\.browser\.webkit\s*\|\|\s*\$\.browser\.mozilla\)\s*return false;/, 'return false;')
+		log('PATCH-1123, Prevent unwanted scrolling in Code School editor');
 	} else if(hostname.endsWith('usbank.com')){
 		opera.defineMagicVariable('is_opera',function(){return false},null);
 		opera.defineMagicVariable('is_nav6up',function(){return true},null);
@@ -1109,6 +1116,12 @@ function setTinyMCEVersion(e){
 		}, false);
 		}
 		log('PATCH-875, bankofamerica: don\'t use IE stylesheet');
+	} else if(hostname.endsWith('www.gvt.com.br')){
+		navigator.userAgent = 'Mozilla/5.0 (Windows NT 5.1; rv:19.0) Gecko/20100101 Firefox/19.0';
+		HTMLHtmlElement.prototype.__defineGetter__('offsetHeight', function(){
+			return  (this.scrollHeight);
+		});
+		log('PATCH-1118, gvt.com.br: browser blocking');
 	} else if(hostname.endsWith('www.udemy.com')){
 		window.addEventListener('load',
 		function(){
@@ -1548,13 +1561,11 @@ function setTinyMCEVersion(e){
 			avoidDocumentWriteAbuse();
 			log('PATCH-359, Y!Mail Avoid overwriting classic inbox');
 		}
-		if(hostname.indexOf('finance.yahoo.')>-1){
-			navigator.userAgent = 'Mozilla/5.0 (Windows NT 5.1; rv:6.0) Gecko/20100101 Firefox/6.0'; 
-			log('PATCH-297, Fool browser sniffing that prevents stock ticker on Yahoo Finance');
-		}
 		if(hostname.indexOf('finance.yahoo.com')>-1){
+			navigator.userAgent = 'Mozilla/5.0 (Windows NT 5.1; rv:6.0) Gecko/20100101 Firefox/6.0'; 
+		
 			opera.addEventListener('BeforeEventListener.focusout', function(e){e.preventDefault();}, false);
-			log('PATCH-406, Prevent currency menu from closing too fast on Y!Finance');
+			log('PATCH-297, Fool browser sniffing that prevents stock ticker on Yahoo Finance\nPATCH-406, Prevent currency menu from closing too fast on Y!Finance');
 		}
 		if(hostname.indexOf('mail.yahoo')>-1){
 			opera.addEventListener('BeforeEvent.keypress', function(e){
@@ -1908,14 +1919,16 @@ function setTinyMCEVersion(e){
 			var name=ev.element.src; 
 			if(!name){return;}
 			if(name.indexOf('merge_all_logic.js')!=-1){
-				ev.element.text = ev.element.text.replace(/if\s*\(!MBrowser.opera\)\s*{/,'if(true){');
+				ev.element.text = ev.element.text.replace(/MBrowser.opera\|\|/,'false||');
 			}
 		},false);
 		document.addEventListener('DOMContentLoaded', function(e){
-			var orig_onKeyDown = MKeyboardHandler.onKeyDown;
-			MKeyboardHandler.onKeyDown = function(e) {
-				orig_onKeyDown(e);
-				e.preventDefault();
+			if (typeof MKeyboardHandler != "undefined") {
+				var orig_onKeyDown = MKeyboardHandler.onKeyDown;
+				MKeyboardHandler.onKeyDown = function(e) {
+					orig_onKeyDown(e);
+					e.preventDefault();
+				}
 			}
 		},false);
 		log('PATCH-649, Enable keyboard controls on Mapion');
@@ -1931,7 +1944,9 @@ function setTinyMCEVersion(e){
 		log('PATCH-540, Merriam-Webster: override embed with hidden attribute. Conflicts with HTML global hidden attribute.');
 	} else if(hostname.indexOf('myspace.com')>-1){
 		addCssToDocument('.punymce iframe{display:inline!important}');
-		log('PATCH-487, MySpace: fix smiley insertion in mail and blog editor');
+	
+		HTMLButtonElement.prototype.setCustomValidity=function(){}
+		log('PATCH-487, MySpace: fix smiley insertion in mail and blog editor\nPATCH-1121, myspace.com - avoid setCustomValidity on HTMLButtonElement throwing');
 	} else if(hostname.indexOf('nbc.com')>-1){
 		navigator.userAgent += " Chrome/5.0.375.9 Safari/533.4";
 	
