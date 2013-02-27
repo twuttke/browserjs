@@ -1,4 +1,4 @@
-// nWB0/3CG/Xl1LUYvQTYQ5NENph/XSRMNrDQKA/Pmf9/cCxuBGvl7lP6r6gGgWBNsdZQCmVL/YzdWXVTdMsQJwcb5xKIfrKAjU4OMkYe+gK1cTCf/ED4qFKbSmsj0AaiWiZCbWF6l6KEnXuu9stmvKDk54txIX4fVZQgoAE0Rhcey0uOXxZem0J/r4bmmDauIRaRlt7IiDXFuQ9b4jTpA+C2+iK5JP88HLw+f+xG3uE+/T4kmOfjm8fZEXU3ZDPXVrO89Y8jasgtgx3puFSZo9tV1/npXWgctqJyy88F/fzZlZvRnhe1iBcEAscEr8xgJZFopVErBk2RaP4mm9SpNUw==
+// CW6Q91xZsv5EZoGsWr6blj3EUHmVXQY1ffT35wMhXvLK2VaUmlgIu/rj6IWYU3ua4HZWnVRUg/Il0zHvW6gb2QLzUmwejNg7CylwuF7fHqnzw/rILAVotLy2Z5BN/baj8OB9xboh9YVQe2uNuArzZ+204STg5fEfurHELeJL33Dpk0GVSlfK0QeZ8EX9WWf9MbNukRqUNkfv9GBnAJTreussrzUTDrhjR6xSehUWFAAj4li6Z6rC+Ie7oeI6ycCAxMQj/Ivk1bXqDSHpuEI9zmgn2YvKaqjHPU8cq02WObB9bFhoPeaX5w+Lvn0vOnB8yl9olFCASMrCoNXGzqaTCA==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, February 12, 2013. Active patches: 330 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, February 27, 2013. Active patches: 333 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1231,6 +1231,13 @@ function setTinyMCEVersion(e){
 			}
 		}, true);
 		log('PATCH-993, thenextweb.com - top bar placed too low');
+	} else if(hostname.endsWith('try.github.com')){
+		opera.defineMagicVariable('ns',function(){return true},null); //otherwise pluginlist becomes undefined
+		addPreprocessHandler(/if\s*\(\$\.browser\.webkit\s*\|\|\s*\$\.browser\.mozilla\)\s*return false;/, 'return false;')
+		log('PATCH-1123, Prevent unwanted scrolling in Code School editor');
+	} else if(hostname.endsWith('try.jquery.com')){
+		addPreprocessHandler(/if\s*\(\$\.browser\.webkit\s*\|\|\s*\$\.browser\.mozilla\)\s*return false;/, 'return false;')
+		log('PATCH-1123, Prevent unwanted scrolling in Code School editor');
 	} else if(hostname.endsWith('usbank.com')){
 		opera.defineMagicVariable('is_opera',function(){return false},null);
 		opera.defineMagicVariable('is_nav6up',function(){return true},null);
@@ -2093,14 +2100,16 @@ function setTinyMCEVersion(e){
 			var name=ev.element.src; 
 			if(!name){return;}
 			if(name.indexOf('merge_all_logic.js')!=-1){
-				ev.element.text = ev.element.text.replace(/if\s*\(!MBrowser.opera\)\s*{/,'if(true){');
+				ev.element.text = ev.element.text.replace(/MBrowser.opera\|\|/,'false||');
 			}
 		},false);
 		document.addEventListener('DOMContentLoaded', function(e){
-			var orig_onKeyDown = MKeyboardHandler.onKeyDown;
-			MKeyboardHandler.onKeyDown = function(e) {
-				orig_onKeyDown(e);
-				e.preventDefault();
+			if (typeof MKeyboardHandler != "undefined") {
+				var orig_onKeyDown = MKeyboardHandler.onKeyDown;
+				MKeyboardHandler.onKeyDown = function(e) {
+					orig_onKeyDown(e);
+					e.preventDefault();
+				}
 			}
 		},false);
 		log('PATCH-649, Enable keyboard controls on Mapion');
@@ -2116,7 +2125,9 @@ function setTinyMCEVersion(e){
 		log('PATCH-540, Merriam-Webster: override embed with hidden attribute. Conflicts with HTML global hidden attribute.');
 	} else if(hostname.indexOf('myspace.com')>-1){
 		addCssToDocument('.punymce iframe{display:inline!important}');
-		log('PATCH-487, MySpace: fix smiley insertion in mail and blog editor');
+	
+		HTMLButtonElement.prototype.setCustomValidity=function(){}
+		log('PATCH-487, MySpace: fix smiley insertion in mail and blog editor\nPATCH-1121, myspace.com - avoid setCustomValidity on HTMLButtonElement throwing');
 	} else if(hostname.indexOf('nbc.com')>-1){
 		navigator.userAgent += " Chrome/5.0.375.9 Safari/533.4";
 	
