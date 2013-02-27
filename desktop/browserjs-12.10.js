@@ -1,4 +1,4 @@
-// iVs9LEOQ9XTqImvBHSlgf4DCxRoRIBFwC3qYdkerny8ld1fKhbJhy4R4g//USJi+HmnY6s3VxWRxWRZcdS9eupA/y4IVfsz0+uY5UAusHJNfAi43BSOZtBvXCuvJJSWNhHBfh65/gVj0YeqogZVKR//Wgcxe4aldTb2a8xMfqXZRYUZ0z9ikg0Rwpd8bYuAHGqG+dflppRI/fKtExPdmNQXao910AxEFsLt5CJOj+2gq5ip8jVciA0eaQeE0552FQbJ4jSuQz78JIXimFp/VDogNd9lmpSkc3MXOUt6xQcXk07M9nZygBC3YkB29bboAmEUnSSNJ/Cd8dnlLXJKFJA==
+// TzTttZgNLNOyy6bV/lWqz9eNPbVzQ/j+omgTnoNnumyf0opfCbYWTP/9+sexkyEMazmD1A8VDjEF0XM5Hv/HD9CIPHHJCje4YGqgJKDAjYHg2eQJuDQ9JIocNqeMNnuvDubMfc76lt62S/JF+kqlGHrMUAVVFIplbFIy3HzZ1Tpz7oDkF47nBbdO7+entEhedCXeYVkq2WZTP/yV0H/CFZA1iEMHC2rMOqczDlPlayBxqbn2HfDMtPJjmEtAqoKZ5LGSlqrTnRQAw0b/JVfSgWCQAmqUk2EkIDQyfWclsKswlEczlyQ3KuS6XcJ94nF3wSwp1evV2pENdsS/t3K0QA==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, February 12, 2013. Active patches: 316 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, February 27, 2013. Active patches: 319 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1247,6 +1247,13 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('todoist.com')){
 		KeyboardEvent.prototype.__defineGetter__('key', function(e){return this.keyCode});
 		log('PATCH-1021, todoist.com - fix event.key usage');
+	} else if(hostname.endsWith('try.github.com')){
+		opera.defineMagicVariable('ns',function(){return true},null); //otherwise pluginlist becomes undefined
+		addPreprocessHandler(/if\s*\(\$\.browser\.webkit\s*\|\|\s*\$\.browser\.mozilla\)\s*return false;/, 'return false;')
+		log('PATCH-1123, Prevent unwanted scrolling in Code School editor');
+	} else if(hostname.endsWith('try.jquery.com')){
+		addPreprocessHandler(/if\s*\(\$\.browser\.webkit\s*\|\|\s*\$\.browser\.mozilla\)\s*return false;/, 'return false;')
+		log('PATCH-1123, Prevent unwanted scrolling in Code School editor');
 	} else if(hostname.endsWith('usbank.com')){
 		opera.defineMagicVariable('is_opera',function(){return false},null);
 		opera.defineMagicVariable('is_nav6up',function(){return true},null);
@@ -2034,14 +2041,16 @@ function undoFunctionKeypressEventRemoval(){
 			var name=ev.element.src; 
 			if(!name){return;}
 			if(name.indexOf('merge_all_logic.js')!=-1){
-				ev.element.text = ev.element.text.replace(/if\s*\(!MBrowser.opera\)\s*{/,'if(true){');
+				ev.element.text = ev.element.text.replace(/MBrowser.opera\|\|/,'false||');
 			}
 		},false);
 		document.addEventListener('DOMContentLoaded', function(e){
-			var orig_onKeyDown = MKeyboardHandler.onKeyDown;
-			MKeyboardHandler.onKeyDown = function(e) {
-				orig_onKeyDown(e);
-				e.preventDefault();
+			if (typeof MKeyboardHandler != "undefined") {
+				var orig_onKeyDown = MKeyboardHandler.onKeyDown;
+				MKeyboardHandler.onKeyDown = function(e) {
+					orig_onKeyDown(e);
+					e.preventDefault();
+				}
 			}
 		},false);
 		log('PATCH-649, Enable keyboard controls on Mapion');
@@ -2057,7 +2066,9 @@ function undoFunctionKeypressEventRemoval(){
 		log('PATCH-540, Merriam-Webster: override embed with hidden attribute. Conflicts with HTML global hidden attribute.');
 	} else if(hostname.indexOf('myspace.com')>-1){
 		addCssToDocument('.punymce iframe{display:inline!important}');
-		log('PATCH-487, MySpace: fix smiley insertion in mail and blog editor');
+	
+		HTMLButtonElement.prototype.setCustomValidity=function(){}
+		log('PATCH-487, MySpace: fix smiley insertion in mail and blog editor\nPATCH-1121, myspace.com - avoid setCustomValidity on HTMLButtonElement throwing');
 	} else if(hostname.indexOf('nbc.com')>-1){
 		navigator.userAgent += " Chrome/5.0.375.9 Safari/533.4";
 	
