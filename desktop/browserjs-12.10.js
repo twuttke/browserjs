@@ -1,4 +1,4 @@
-// TzTttZgNLNOyy6bV/lWqz9eNPbVzQ/j+omgTnoNnumyf0opfCbYWTP/9+sexkyEMazmD1A8VDjEF0XM5Hv/HD9CIPHHJCje4YGqgJKDAjYHg2eQJuDQ9JIocNqeMNnuvDubMfc76lt62S/JF+kqlGHrMUAVVFIplbFIy3HzZ1Tpz7oDkF47nBbdO7+entEhedCXeYVkq2WZTP/yV0H/CFZA1iEMHC2rMOqczDlPlayBxqbn2HfDMtPJjmEtAqoKZ5LGSlqrTnRQAw0b/JVfSgWCQAmqUk2EkIDQyfWclsKswlEczlyQ3KuS6XcJ94nF3wSwp1evV2pENdsS/t3K0QA==
+// gO+iSSSB/k97wYBkzcpfxLxUi0mGcjSm5ihtVs2oaYzIHC2WtIKrznRiKRzCImiHefXUvLYVk8saWyZPTW4U//LeJb8W90UjRImM2YikfsXopVwg8VrEXeYTF4aTG/EcEnsvEwas76iP/7bPBLOnFvAWdc6L5WapaYscnI3Rb8u0A954ynUTO4XbK1X1/Cm+aIE+iPSw5P7n3mfIADlSWKBcMOWLph0/TAqijskF5t1hhoC4MyywKuCJf1mf7/ag0LhxcB9N4SzQHZJP5XV1KjCbf4DzFNI6hXGkW1l7SVwv3mwvk5a3skCHJrxnTj5jcpUhNjALmY6gTfRKXOXCpA==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, February 27, 2013. Active patches: 319 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, March 12, 2013. Active patches: 316 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -854,9 +854,6 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('cfe.urssaf.fr')){
 		opera.defineMagicFunction('navigateurAutorise',function(){return true});
 		log('PATCH-807, urssaf.fr: block browser block');
-	} else if(hostname.endsWith('checkvist.com')){
-		addPreprocessHandler(/e=Prototype\.Browser\.Opera,f=navigator\.userAgent\.indexOf\("Firefox"\)>-1\|\|e,/,'e=Prototype.Browser.Opera,f=navigator.userAgent.indexOf("Firefox")>-1,');
-		log('PATCH-960, checkvist.com: adapt to new keyboard handling');
 	} else if(hostname.endsWith('clarkhoward.com')){
 		addCssToDocument('blockquote{content: normal !important;}');
 		log('PATCH-844, clarkhoward.com: abouse of CSS content property');
@@ -1319,9 +1316,6 @@ function undoFunctionKeypressEventRemoval(){
 			return  (this.scrollHeight);
 		});
 		log('PATCH-1118, gvt.com.br: browser blocking');
-	} else if(hostname.endsWith('www.hbs.edu')){
-		addCssToDocument('*{content:normal!important}');
-		log('PATCH-995, hbs.edu - avoid abuse of generated content');
 	} else if(hostname.endsWith('www.lifehacker.jp')){
 		addCssToDocument('#newzia_connect_main ul > li > a > div > img, #newzia_connect_main ul > li > a > div > p.ncDescription{top:0}');
 		log('PATCH-1111, lifehacker: re-style abs.pos boxes');
@@ -1367,6 +1361,14 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('www.zebra.com')){
 		addCssToDocument('div.tabs{content:normal !important}');
 		log('PATCH-1083, zebra.com - generated content on real elements');
+	} else if(hostname.endsWith('zoeshare.htc.com')){
+		opera.addEventListener('BeforeScript', function(e){
+			if (e.element.src && e.element.src.indexOf('memories') > -1) {
+				e.element.text = e.element.text.replace(/translate3d\(([^,]*),([^,]*),([^)]*)\)/g,'translate($1,$2)');
+			}
+		},false);
+		
+		log('PATCH-1125, zoeshare.htc.com - Work around translate3d for HTC Zoe Share');
 	} else if(hostname.indexOf("cang.baidu.com") != -1 ){
 		window.opera.defineMagicFunction(
 			"top",
@@ -1468,9 +1470,6 @@ function undoFunctionKeypressEventRemoval(){
 			log('PATCH-195, Avoid IFRAME resize causing lots of empty space on auctions (the IFRAME part)');
 		}
 		log('0, eBay');
-	} else if(hostname.indexOf('.evaair.com')>-1){
-		navigator.appName='Netscape';
-		log('PATCH-688, evaair.com: broken sniffing');
 	} else if(hostname.indexOf('.geoaccess.com')>-1){
 		navigator.appName='Netscape';
 		opera.defineMagicVariable('is_nav6up', function(){return true},null);
@@ -2070,13 +2069,11 @@ function undoFunctionKeypressEventRemoval(){
 		HTMLButtonElement.prototype.setCustomValidity=function(){}
 		log('PATCH-487, MySpace: fix smiley insertion in mail and blog editor\nPATCH-1121, myspace.com - avoid setCustomValidity on HTMLButtonElement throwing');
 	} else if(hostname.indexOf('nbc.com')>-1){
-		navigator.userAgent += " Chrome/5.0.375.9 Safari/533.4";
-	
 		window.addEventListener('load', function(){
 			if(window.DPSVPlayer && window.DPSVPlayer.onReady)DPSVPlayer.onReady.call(window);
 		}, false);
 		
-		log('PATCH-236, Make NBC videos work\nPATCH-577, Unexpected script loading order breaks video player ready check');
+		log('PATCH-577, Unexpected script loading order breaks video player ready check');
 	} else if(hostname.indexOf('nbs.rs')>-1){
 		fixIFrameSSIscriptII('dyniframesize', 'rir');
 		log('PATCH-704, nbs.rs: fix iframe resize');
@@ -2104,7 +2101,7 @@ function undoFunctionKeypressEventRemoval(){
 		MouseEvent.prototype.__defineGetter__('button',function(){return this.which == 2 ? 1 : this.which == 3 ? 2 : 0;})
 		log('0, Microsoft Office Web Apps');
 	} else if(hostname.indexOf('opera.com')>-1&& pathname.indexOf('/docs/browserjs/')==0){
-		document.addEventListener((parseFloat(opera.version())>9?'DOMContentLoaded':'load'),function(){
+		document.addEventListener('DOMContentLoaded',function(){
 			if(document.getElementById('browserjs_active')){
 				document.getElementById('browserjs_active').style.display='';
 				document.getElementById('browserjs_active').getElementsByTagName('span')[0].appendChild(document.createTextNode(bjsversion));
