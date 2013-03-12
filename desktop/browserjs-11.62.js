@@ -1,4 +1,4 @@
-// msMdAGKEh44uUUKN/MxA2E8DEtLLzZDX7Hj/D47btfY29YwCP4Wq6EYDPf9TMthF2K4fJoD3Lx9VgEVTJ0mfeN6i5/Gvs46TofQMrgBS3tMtSBwxcok3uksdKGxsn2JD7WPPUlZKVhCW0veKbzvUKdAgzwEu3KKk42/cmZEQJVbgIswcSEeVpT5PlkYFEHBbVf087QLh0rmDWNk2cZZkXDwRzu5mG5ld7Kr8enrhZ17GEzM5TVQXw0aLxoCy0k11wlf62VkAZTkpx8iqlE30zXNyZduGrW7yuAEzNAWW2V42h18TWVLu332fTMCzpTHnAh9eppRxHBClhRTRy6A4Mw==
+// g7XbNuHOiRfadTpBZMO3QeO8TGCHdlriYlxpHeVt2OshcMZAXUhTYTOICz98C0rHXgh2NuKgPt9b7a5NKeal9AH2mtErLKarqjvHoTj1pUjZDxhJIGTtk2ICVbETwqmSPlMKNh+3jb6kotvoeNdtxlHrGFDCX7fpkCVKjR3XhoJYaKe9pWbEZy+65Ipqzkbh0A28l1zzkmh10jMj0SbYpIe+PRU6nFZ+/o8zlgH2S6Ol3jvQDKQX1iKtfxGIblsIf9E1X/dlcaPUgndTB12r5Wcs2+cTUE6fnSuhNktnvaX7vc46c7Hl5RDa2mIUiN1YydlfSABkJiblw5CCkr89Nw==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, February 27, 2013. Active patches: 293 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, March 12, 2013. Active patches: 292 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1141,6 +1141,14 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.zebra.com')){
 		addCssToDocument('div.tabs{content:normal !important}');
 		log('PATCH-1083, zebra.com - generated content on real elements');
+	} else if(hostname.endsWith('zoeshare.htc.com')){
+		opera.addEventListener('BeforeScript', function(e){
+			if (e.element.src && e.element.src.indexOf('memories') > -1) {
+				e.element.text = e.element.text.replace(/translate3d\(([^,]*),([^,]*),([^)]*)\)/g,'translate($1,$2)');
+			}
+		},false);
+		
+		log('PATCH-1125, zoeshare.htc.com - Work around translate3d for HTC Zoe Share');
 	} else if(hostname.indexOf("cang.baidu.com") != -1 ){
 		window.opera.defineMagicFunction(
 			"top",
@@ -1248,9 +1256,6 @@ function setTinyMCEVersion(e){
 			log('PATCH-195, Avoid IFRAME resize causing lots of empty space on auctions (the IFRAME part)');
 		}
 		log('0, eBay');
-	} else if(hostname.indexOf('.evaair.com')>-1){
-		navigator.appName='Netscape';
-		log('PATCH-688, evaair.com: broken sniffing');
 	} else if(hostname.indexOf('.geoaccess.com')>-1){
 		navigator.appName='Netscape';
 		opera.defineMagicVariable('is_nav6up', function(){return true},null);
@@ -1948,13 +1953,11 @@ function setTinyMCEVersion(e){
 		HTMLButtonElement.prototype.setCustomValidity=function(){}
 		log('PATCH-487, MySpace: fix smiley insertion in mail and blog editor\nPATCH-1121, myspace.com - avoid setCustomValidity on HTMLButtonElement throwing');
 	} else if(hostname.indexOf('nbc.com')>-1){
-		navigator.userAgent += " Chrome/5.0.375.9 Safari/533.4";
-	
 		window.addEventListener('load', function(){
 			if(window.DPSVPlayer && window.DPSVPlayer.onReady)DPSVPlayer.onReady.call(window);
 		}, false);
 		
-		log('PATCH-236, Make NBC videos work\nPATCH-577, Unexpected script loading order breaks video player ready check');
+		log('PATCH-577, Unexpected script loading order breaks video player ready check');
 	} else if(hostname.indexOf('nbs.rs')>-1){
 		fixIFrameSSIscriptII('dyniframesize', 'rir');
 		log('PATCH-704, nbs.rs: fix iframe resize');
@@ -1977,7 +1980,7 @@ function setTinyMCEVersion(e){
 		/* Microsoft Office Web Apps */
 		log('0, Microsoft Office Web Apps');
 	} else if(hostname.indexOf('opera.com')>-1&& pathname.indexOf('/docs/browserjs/')==0){
-		document.addEventListener((parseFloat(opera.version())>9?'DOMContentLoaded':'load'),function(){
+		document.addEventListener('DOMContentLoaded',function(){
 			if(document.getElementById('browserjs_active')){
 				document.getElementById('browserjs_active').style.display='';
 				document.getElementById('browserjs_active').getElementsByTagName('span')[0].appendChild(document.createTextNode(bjsversion));
