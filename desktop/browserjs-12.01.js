@@ -1,4 +1,4 @@
-// CW6Q91xZsv5EZoGsWr6blj3EUHmVXQY1ffT35wMhXvLK2VaUmlgIu/rj6IWYU3ua4HZWnVRUg/Il0zHvW6gb2QLzUmwejNg7CylwuF7fHqnzw/rILAVotLy2Z5BN/baj8OB9xboh9YVQe2uNuArzZ+204STg5fEfurHELeJL33Dpk0GVSlfK0QeZ8EX9WWf9MbNukRqUNkfv9GBnAJTreussrzUTDrhjR6xSehUWFAAj4li6Z6rC+Ie7oeI6ycCAxMQj/Ivk1bXqDSHpuEI9zmgn2YvKaqjHPU8cq02WObB9bFhoPeaX5w+Lvn0vOnB8yl9olFCASMrCoNXGzqaTCA==
+// goVeQzt4XCRGSvvlSBThTH+MJJx9gBSrv9HRpe0HOmkwcynP9cgB09pL59Z/QD840cG8qRaf984UWEOgphvKoav0FC4Q7sihxCeKoF0I0BWDI14UskFpaQGarz/47MFN2/lRjt20G3Tkm0C89TwltncVEItnZlArx3sD6+Om+iOSZubepyBjUzAKEySPZ/5PhtQAil+mDEmqor2TavBgCue0HyVViPgtEkSgiXS1MornEuq/idCo1m3SPT4A7fEMydc+OWTClrLEoLTdxUEt9s4NCB/UtsnsH7njMav+fEhLt9EqFrV04+iq+Lu30MTeZ0A1VjJeSMKp16YRp090RA==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, February 27, 2013. Active patches: 333 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, March 12, 2013. Active patches: 331 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1303,9 +1303,6 @@ function setTinyMCEVersion(e){
 			return  (this.scrollHeight);
 		});
 		log('PATCH-1118, gvt.com.br: browser blocking');
-	} else if(hostname.endsWith('www.hbs.edu')){
-		addCssToDocument('*{content:normal!important}');
-		log('PATCH-995, hbs.edu - avoid abuse of generated content');
 	} else if(hostname.endsWith('www.lifehacker.jp')){
 		addCssToDocument('#newzia_connect_main ul > li > a > div > img, #newzia_connect_main ul > li > a > div > p.ncDescription{top:0}');
 		log('PATCH-1111, lifehacker: re-style abs.pos boxes');
@@ -1351,6 +1348,14 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.zebra.com')){
 		addCssToDocument('div.tabs{content:normal !important}');
 		log('PATCH-1083, zebra.com - generated content on real elements');
+	} else if(hostname.endsWith('zoeshare.htc.com')){
+		opera.addEventListener('BeforeScript', function(e){
+			if (e.element.src && e.element.src.indexOf('memories') > -1) {
+				e.element.text = e.element.text.replace(/translate3d\(([^,]*),([^,]*),([^)]*)\)/g,'translate($1,$2)');
+			}
+		},false);
+		
+		log('PATCH-1125, zoeshare.htc.com - Work around translate3d for HTC Zoe Share');
 	} else if(hostname.indexOf("cang.baidu.com") != -1 ){
 		window.opera.defineMagicFunction(
 			"top",
@@ -1455,9 +1460,6 @@ function setTinyMCEVersion(e){
 			log('PATCH-195, Avoid IFRAME resize causing lots of empty space on auctions (the IFRAME part)');
 		}
 		log('0, eBay');
-	} else if(hostname.indexOf('.evaair.com')>-1){
-		navigator.appName='Netscape';
-		log('PATCH-688, evaair.com: broken sniffing');
 	} else if(hostname.indexOf('.geoaccess.com')>-1){
 		navigator.appName='Netscape';
 		opera.defineMagicVariable('is_nav6up', function(){return true},null);
@@ -2129,13 +2131,11 @@ function setTinyMCEVersion(e){
 		HTMLButtonElement.prototype.setCustomValidity=function(){}
 		log('PATCH-487, MySpace: fix smiley insertion in mail and blog editor\nPATCH-1121, myspace.com - avoid setCustomValidity on HTMLButtonElement throwing');
 	} else if(hostname.indexOf('nbc.com')>-1){
-		navigator.userAgent += " Chrome/5.0.375.9 Safari/533.4";
-	
 		window.addEventListener('load', function(){
 			if(window.DPSVPlayer && window.DPSVPlayer.onReady)DPSVPlayer.onReady.call(window);
 		}, false);
 		
-		log('PATCH-236, Make NBC videos work\nPATCH-577, Unexpected script loading order breaks video player ready check');
+		log('PATCH-577, Unexpected script loading order breaks video player ready check');
 	} else if(hostname.indexOf('nbs.rs')>-1){
 		fixIFrameSSIscriptII('dyniframesize', 'rir');
 		log('PATCH-704, nbs.rs: fix iframe resize');
@@ -2163,7 +2163,7 @@ function setTinyMCEVersion(e){
 		MouseEvent.prototype.__defineGetter__('button',function(){return this.which == 2 ? 1 : this.which == 3 ? 2 : 0;})
 		log('0, Microsoft Office Web Apps');
 	} else if(hostname.indexOf('opera.com')>-1&& pathname.indexOf('/docs/browserjs/')==0){
-		document.addEventListener((parseFloat(opera.version())>9?'DOMContentLoaded':'load'),function(){
+		document.addEventListener('DOMContentLoaded',function(){
 			if(document.getElementById('browserjs_active')){
 				document.getElementById('browserjs_active').style.display='';
 				document.getElementById('browserjs_active').getElementsByTagName('span')[0].appendChild(document.createTextNode(bjsversion));
