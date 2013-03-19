@@ -1,4 +1,4 @@
-// goVeQzt4XCRGSvvlSBThTH+MJJx9gBSrv9HRpe0HOmkwcynP9cgB09pL59Z/QD840cG8qRaf984UWEOgphvKoav0FC4Q7sihxCeKoF0I0BWDI14UskFpaQGarz/47MFN2/lRjt20G3Tkm0C89TwltncVEItnZlArx3sD6+Om+iOSZubepyBjUzAKEySPZ/5PhtQAil+mDEmqor2TavBgCue0HyVViPgtEkSgiXS1MornEuq/idCo1m3SPT4A7fEMydc+OWTClrLEoLTdxUEt9s4NCB/UtsnsH7njMav+fEhLt9EqFrV04+iq+Lu30MTeZ0A1VjJeSMKp16YRp090RA==
+// fhtKIqe1xRDVj4quBWMaJgk+eDZdjLheu99iTzZyo9dKlRN7Hbqn3dbo0hc8csoxnWS5kOYTHVrsmOsUh1PdDJB4fOePTfUK0guHPGXO+vSijKVDdgvCEdrFz6CBTRFupcVqVEhkJwjx7HEgx2JXSfgayyTPHuKuGDEqCDS8EXRFI3Bgba1ULd2p95BkpByDCSaKlx9hQllkO+OsJEG8+ceRQDqUGoDlQUkpad1JOZruzBSCCmfk7t5bwBQOqOFpX6M3+8fDPq20xZtJgiqNxe2U5KcGSQZ9nC6Ks2CrkszGvPXREmFum8BLcNszckvO/iT/ya7B2a2EIC3WZM90Ng==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, March 12, 2013. Active patches: 331 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, March 19, 2013. Active patches: 334 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1195,6 +1195,13 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('shopping.com')){
 		navigator.appName = "Netscape";
 		log('PATCH-836, shopping.com - work around browser sniff');
+	} else if(hostname.endsWith('snapguide.com')){
+		opera.addEventListener('BeforeScript', function(e){
+			if (e.element.src && e.element.src.indexOf('all.min.js') > -1) {
+				e.element.text = e.element.text.replace(/translate3d\(([^,]*),([^,]*),([^)]*)\)/g,'translate($1,$2)');
+			}
+		},false);
+		log('PATCH-1127, snapguide.com - hack translate3d usage');
 	} else if(hostname.endsWith('staples.com')){
 		(function(){
 			var xhrDocGetter=(new XMLHttpRequest).__lookupGetter__('responseXML');
@@ -1816,6 +1823,9 @@ function setTinyMCEVersion(e){
 			}catch(e){}
 		}
 		log('PATCH-512, Yammer: work around limitation on setting document.referrer inside https IFRAME');
+	} else if(hostname.indexOf('.youtube.com')>-1){
+		addCssToDocument('#feed .yt-uix-button-icon-feed-item-action-menu:hover{opacity:0.9}');
+		log('PATCH-1126, YouTube feed option menu does not appear because :hover opacity change, click event doesn\'t bubble correctly');
 	} else if(hostname.indexOf('265.com')>-1){
 		addCssToDocument('#coolSites .body li, #coolSites .body li a{line-height:2em !important}')
 		log('PATCH-475, Avoid overflowing text on 265.com');
@@ -1980,6 +1990,12 @@ function setTinyMCEVersion(e){
 		 }, false);
 		}
 		log('PATCH-710, dell.com: work around misguided use of prefixed white-space CSS property');
+	} else if(hostname.indexOf('deviantart.com')>-1){
+		if( href.indexOf('outgoing')>-1 ){
+			opera.addEventListener('AfterEvent.load', function(e){if(!document.body)return;var str=document.body.style.height; document.body.style.height='20px'; setTimeout( function(){ document.body.style.height=str; }, 500 );}, false);
+		}
+		
+		log('PATCH-1128, Brute-force an extra redraw of "outgoing link" warning page on Deviantart to avoid the box jumping away on first click');
 	} else if(hostname.indexOf('di.jal.co.jp')>-1){
 		var dw=document.write;
 		var MapViewer_dw;
