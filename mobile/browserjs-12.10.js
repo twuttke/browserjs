@@ -1,6 +1,6 @@
-// b+aJfMTpo9eZiBdaUzEryXYJkpc2T3CxkRKSUlQPRyxBvGDHhCGpkK2o2vlptXm5HtRNDloHoUr7MWw9gWt8uTiSJxvP7XrX748KD1avoMrbjCbZCenhLrG7kR0svyN9rS3JRICrX7jomdX8FjK4m1lsJFFgTh8v3Su8IFJPb2qzNftqq8nyteZKrkfcHB590/lOHrczVz5GafdwMukzbhbeumy69LBR5ruXIZ43Cez/5z9qiKwjbpsON6KiiuiF9kg8SVbygQ5ZX8usD1IkzfR9PkNNfCGe83zkf7rA6waAE05ieXDQvl7wl7Lj6RO5VCsPRR8ZdrF/Ripd/hGKug==
+// YSIogcWRT7zzQlx7bIIyKkNrFobye0FjZIa/9qych70NoXgx7ns/c+ngvmcphQZt9edFNRwkdGMSLJ70SACXPBD2uanypfJXyNReYpAXwgxfnouHR2aHsLe0QnztyKUxjf6APGCKgLq0ZFlR0xz+ilL0d3c61kRTjnJj7BEbxnGVEh3HSzxypgWJmnU4eM1+zY0WM7uuqH+qbfmVd0BxneHjNx8vP9QNaT6fr7EZnxTNTn9y+cdxwQp5TSud3sBPBTIzLKgKvf5Gfv2l3EuoTsCwCWgyx5NugbKtb0uLgg85HLhVu+Tuslt1rxQdb7SMD1qXhHSQl+mTFL3DugTi3A==
 /**
-** Copyright (C) 2000-2012 Opera Software ASA.  All rights reserved.
+** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
 ** This file is part of the Opera web browser.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Mobile 12.10 core 2.11.355, December 20, 2012. Active patches: 236 ';
+	var bjsversion=' Opera Mobile 12.10 core 2.11.355, April 3, 2013. Active patches: 226 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -216,11 +216,12 @@ function stopKeypressIfDownCancelled(stopKey){
 	
 
 	document.addEventListener("DOMContentLoaded", function (e) {
-		if( navigator.platform == "Android" && !navigator.plugins.length ){
-			var nodes = document.selectNodes('//object[starts-with(@data,"http://www.youtube.com/v/")] | //object//param[starts-with(@name,"src") and starts-with(@value,"http://www.youtube.com/v/")] | //embed[starts-with(@src,"http://www.youtube.com/v/")]');	
-			for ( var i = nodes.length-1; i >= 0 ; i-- ) {	
+		if( ( navigator.platform == "Android" || navigator.platform.indexOf("Linux armv") == 0 ) && !navigator.plugins.length ){
+			var xpath = '//object[starts-with(@data,"http://www.youtube.com/v/")] | //object//param[starts-with(@name,"src") and starts-with(@value,"http://www.youtube.com/v/")] | //embed[starts-with(@src,"http://www.youtube.com/v/")]';
+			var nodes = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,null);
+			for ( var i = nodes.snapshotLength-1; i >= 0 ; i-- ) {	
 				var id;
-				var element = nodes[i];
+				var element = nodes.snapshotItem(i);
 				var uri = document.createElement('a');
 				uri.href = (element.src) ? element.src : (element.data) ? element.data : (element.value) ? element.value : "";
 				id = (uri.pathname.match(/embed\//)) ?  uri.pathname.split(/embed\//)[1] : uri.pathname.split(/v\//)[1];		
@@ -607,9 +608,6 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.endsWith('www.dickmorris.com')){
 		addCssToDocument('*{content:normal !important}')
 		log('PATCH-929, dickmorris.com - avoid empty lightbox');
-	} else if(hostname.endsWith('www.tumblr.com')){
-		addCssToDocument(' .button.green{ background:-o-linear-gradient(#78b662,#679e55); } ');
-		log('PATCH-854, tumblr: using old webkit-gradient without fallback');
 	} else if(hostname.indexOf( '.56.com' )>-1){
 		addCssToDocument(".so {background-color:transparent !important;} .search .so .so_input .inp_search{ width:232px !important; } ");
 	
@@ -643,9 +641,6 @@ function stopKeypressIfDownCancelled(stopKey){
 			log('PNGLAI-704, Avoid overlap');
 		}
 		log('0, eBay');
-	} else if(hostname.indexOf('.evaair.com')>-1){
-		navigator.appName='Netscape';
-		log('PATCH-688, evaair.com: broken sniffing');
 	} else if(hostname.indexOf('.google.')>-1){
 		/* Google */
 	
@@ -1048,13 +1043,6 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('ameblo.jp')>-1){
 		addCssToDocument('.startBtn,.registBtn {background:-o-linear-gradient(top,#5C0,#3A0);} .socialLoginBtn li {background-size: 135px 30px!important;}'); 
 		log('PATCH-839, ameblo.jp - add missing gradients and background-size');
-	} else if(hostname.indexOf('ana.co.jp')>-1){
-		var cssText = '';
-		cssText += 'img:not([width]) {transform: scale(0.5); transform-origin:top;}';
-		cssText += '#config-btn-next a {background-image: -o-linear-gradient(top, #FC3, #F82);}';
-		cssText += 'p.txtBnr {background:-o-linear-gradient(top, #1F559A, #0A3A73);}';
-		addCssToDocument(cssText);
-		log('PATCH-953, ana.co.jp - add missing gradient and fix for css zoom');
 	} else if(hostname.indexOf('athome.co.jp') > -1){
 		opera.defineMagicFunction('checkTargetBrowser',function(){});
 		opera.defineMagicFunction('checkTargetCookie',function(){});
@@ -1311,26 +1299,6 @@ function stopKeypressIfDownCancelled(stopKey){
 	} else if(hostname.indexOf('gougou.com')>-1){
 		addCssToDocument(".searchform .in_txt { width: 110px !important;} .searchform { width: 225px !important; }");
 		log('YUSHAN-2457, Fixed gougou.com search button display issue');
-	} else if(hostname.indexOf('gry.pl')>-1){
-		var cssText = '';
-		/* Top Menu */
-		cssText += 'header > nav > ul > li a.active {background: -o-linear-gradient(top,#4B9BE9,#0170D7);}';
-		cssText += 'header > nav > ul > li a.active {background: linear-gradient(to bottom, #4B9BE9, #0170D7);}';
-		addCssToDocument(cssText);
-		log('PATCH-866, gry.pl - add missing gradients');
-	} else if(hostname.indexOf('hangame.co.jp')>-1){
-		var cssText = '';
-		/* top page */
-		cssText += '.m-rttnIcnAreaT00P00 {background: -o-linear-gradient(top, #FFF 40%, #EAEAEA 41%, #F7F7F7);}';		
-		cssText += '.p-tabT00P02 .tab, .p-tabT00P01 .tab {box-sizing: border-box; background:-o-linear-gradient(top, #FBFBFB, #F0F0F0);}';
-		/* game page */
-		cssText += '.p-btnT00P01 .u-w {background: -o-linear-gradient(top, #F66625, #CC1E03);}';
-		/* login page */
-		cssText += '.p-inpt .inpt input, .p-btn {box-sizing: border-box;}';
-		cssText += '.p-btnT01P01 .u-w {background: -o-linear-gradient(top, #FFF 20%, #E5E5E5 80%);}';
-		cssText += '.p-btn .u-w {box-sizing: border-box;}';
-		addCssToDocument(cssText);
-		log('PATCH-868, hangame.co.jp - layout fix and add missing gradient');
 	} else if(hostname.indexOf('hao123.com')>-1){
 		document.__defineGetter__('GlobalSharedObject', function(){ return document.getElementById('GlobalSharedObject'); });
 		log('DONGDAE-3678, Make sure site accesses correct Flash instance for saved user data');
@@ -1346,11 +1314,6 @@ function stopKeypressIfDownCancelled(stopKey){
 		cssText +='#block-tvMisyuran h1 {background:url(http://www.j-cast.com/tv/assets/img/heading-primal-css-sprite.png) 0 -140px no-repeat,-o-linear-gradient(top,#FFF,#FEE);}';
 		addCssToDocument(cssText);
 		log('PATCH-1014, j-cast.com - add missing gradients');
-	} else if(hostname.indexOf('jabong.com')>-1){
-		opera.addEventListener('BeforeCSS', function(e){
-		  e.cssText = e.cssText.replace(/.clearfix:after,#content,#content:after,/g,'.clearfix:after,#content:after,');
-		}, false);
-		log('PATCH-658, jabong.com: override usage of CSS content property on element content');
 	} else if(hostname.indexOf('java.vnet.mobi')>-1){
 		if( document.documentElement ){ 
 		 var meta=document.documentElement.appendChild(document.createElement('meta')); 
@@ -1381,15 +1344,6 @@ function stopKeypressIfDownCancelled(stopKey){
 		cssText += '.titlebar h3 {background-image: linear-gradient(to top,#E65F68,#C42931 25%,#A70000 90%);}';
 		addCssToDocument(cssText);
 		log('PATCH-944, konami.jp - add missing gradients');
-	} else if(hostname.indexOf('linkedin.com')>-1){
-		addCssToDocument('#li-header{background-image: -o-linear-gradient(top,white,#D2CFCA);}');
-	
-		var cssText = '';
-		/* Login Button */
-		cssText += '.controls .text, .controls input[type="submit"].text, .controls input[type="button"].text {background-image: -o-linear-gradient(top,#1F6A8D,#0E3E54);}';
-		cssText += '.controls .text, .controls input[type="submit"].text, .controls input[type="button"].text {background-image: linear-gradient(to bottom,#1F6A8D,#0E3E54);}';
-		addCssToDocument(cssText);
-		log('PATCH-1010, linkedin.com - add missing gradients top bar\nPATCH-865, linkedin.com - add missing gradients');
 	} else if(hostname.indexOf('m.chase.com')>-1){
 		var cssText = '';
 		/* Fixes for ATM and Branch icon*/
@@ -1718,7 +1672,7 @@ function stopKeypressIfDownCancelled(stopKey){
 		/* Microsoft Office Web Apps */
 		log('0, Microsoft Office Web Apps');
 	} else if(hostname.indexOf('opera.com')>-1&& pathname.indexOf('/docs/browserjs/')==0){
-		document.addEventListener((parseFloat(opera.version())>9?'DOMContentLoaded':'load'),function(){
+		document.addEventListener('DOMContentLoaded',function(){
 			if(document.getElementById('browserjs_active')){
 				document.getElementById('browserjs_active').style.display='';
 				document.getElementById('browserjs_active').getElementsByTagName('span')[0].appendChild(document.createTextNode(bjsversion));
@@ -1765,17 +1719,6 @@ function stopKeypressIfDownCancelled(stopKey){
 		 addCssToDocument('@-o-viewport {width:device-width; zoom:1; min-zoom:1; max-zoom:2; user-zoom:zoom;} @viewport {width:device-width; zoom:1; min-zoom:1; max-zoom:2; user-zoom:zoom;}');
 		}
 		log('NHSP-477, App ads position issue of qiushibaike.com');
-	} else if(hostname.indexOf('rikunabi.com')>-1){
-		var cssText = '';
-		/* top page */
-		cssText += '#main h2.title_blue {background: -o-linear-gradient(top , #417EC5 25%, #0B51A2);}';
-		cssText += '#main h2.title_red  {background: -o-linear-gradient(top , #F04848 25%, #FF0101);}';
-		cssText += '#main h2.title_orange {background: -o-linear-gradient(top , #FF9935 25%, #FF5A01);}';
-		cssText += '#main h2.title_gray {background: -o-linear-gradient(top , #999 25%, #333);}';
-		/* second pages */
-		cssText += '#mainContents h2, h2.h2Link, input[class="tdaction"], #smp_loginArea .smp_btn_login {background-image: -o-linear-gradient(top, #A2C6F3, #448CE6);}';
-		addCssToDocument(cssText);
-		log('PATCH-956, rikunabi.com - add missing gradient');
 	} else if(hostname.indexOf('rr.com') != -1 || hostname.indexOf('roadrunner.com') != -1){
 		addCssToDocument("a.btnXLRed span, .header .content .menu li a{text-shadow:none !important;}");
 		log('PIONER-353, Text-shadow not properly specified on rr.com');
@@ -2014,11 +1957,6 @@ function stopKeypressIfDownCancelled(stopKey){
 		cssText +='.title,a.topicsTtlBar {background:-o-linear-gradient(top,#06D,#5AF);}';
 		addCssToDocument(cssText);
 		log('PATCH-1004, www.biglobe.ne.jp - add missing gradients');
-	} else if(hostname.match(/mercadoli[vb]re\./)){
-		opera.addEventListener('BeforeCSS', function(e){
-		  e.cssText = e.cssText.replace(/\(-o-min-device-pixel-ratio:3\//, '(-o-min-device-pixel-ratio:3/2){}');
-		}, false);
-		log('PATCH-938, Fix broken @media rule for mobile versions of mercadolibre sites.');
 	} else if(hostname=='live.vodafone.com'&&pathname.indexOf('/jumppage')==0){
 		forceMobileView();
 		log('362160, Display Vodafone\'s Google search site in Normal Zoom by default');
