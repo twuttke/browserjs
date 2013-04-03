@@ -1,4 +1,4 @@
-// fhtKIqe1xRDVj4quBWMaJgk+eDZdjLheu99iTzZyo9dKlRN7Hbqn3dbo0hc8csoxnWS5kOYTHVrsmOsUh1PdDJB4fOePTfUK0guHPGXO+vSijKVDdgvCEdrFz6CBTRFupcVqVEhkJwjx7HEgx2JXSfgayyTPHuKuGDEqCDS8EXRFI3Bgba1ULd2p95BkpByDCSaKlx9hQllkO+OsJEG8+ceRQDqUGoDlQUkpad1JOZruzBSCCmfk7t5bwBQOqOFpX6M3+8fDPq20xZtJgiqNxe2U5KcGSQZ9nC6Ks2CrkszGvPXREmFum8BLcNszckvO/iT/ya7B2a2EIC3WZM90Ng==
+// meziEPru3kl8rLYE7QervAXsMy7tiGM/PY2P4ynKaC6Fbux7PWV6LKO20F1Zv3HlShxS5unnKUVS/fQ2lM0fRvz4qr4I97xwG5HLM8yl7QYvVPkyjH8EAI4w9+ZX+tjk8AaB1bHf3VOL5kfbCRk0UI/wSr0BFK6vmk1iu8sAirNLk5EXdwMihO45EyxUQ9pI70ixp4MGMgloSksViXTNnnl/VvZmXNTX05hU42GOaDRso3IeCQeuMwpybBmMQri0LKtjL+Hpcd5BBuZjq9TKlKQrJNcgOKPU44O3rwLLb8s1D3Mpygfkw81WlPwgZJNaqaFjkIHUQYQzZCGeltmGdA==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, March 19, 2013. Active patches: 334 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, April 3, 2013. Active patches: 336 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1862,7 +1862,9 @@ function setTinyMCEVersion(e){
 		if (navigator.appName!=='Opera'){
 			document.documentElement.style.MozAppearance = 'Opera';
 		}
-		log('PATCH-652, Fix displaying recommended items in Amazon\nPATCH-1025, Amazon - Black Friday deals float upwards due to margin styling on UL and innerHTML updates\nPATCH-1068, amazon - avoid looping hash decode\nPATCH-527, Add more spoofing when masking as another browser on Amazon');
+	
+		opera.defineMagicVariable('MediaServicesZoomMotion', null, function(obj){ Event.prototype.__defineGetter__('layerX', function(){return this.x;});  Event.prototype.__defineGetter__('layerY', function(){return this.y;}); return obj;});
+		log('PATCH-652, Fix displaying recommended items in Amazon\nPATCH-1025, Amazon - Black Friday deals float upwards due to margin styling on UL and innerHTML updates\nPATCH-1068, amazon - avoid looping hash decode\nPATCH-527, Add more spoofing when masking as another browser on Amazon\nPATCH-1129, Old DynAPI expects Netscape 4 event properties, breaks zooming/panning product images');
 	} else if(hostname.indexOf('ameba.jp')!=-1){
 		addPreprocessHandler(/editor\.insertNodeAtSelection\(link\);\s*editor\.insertNodeAtSelection\(document\.createElement\('br'\)\);/, 'editor.insertNodeAtSelection(link);');
 		log('331093, Work around Opera bug where second BR tag overwrites newly inserted IMG');
@@ -2392,7 +2394,26 @@ function setTinyMCEVersion(e){
 		})();
 	
 		addCssToDocument('.profile-header-inner-overlay{bottom:auto;top: 60px;}');
-		log('PATCH-671, Twitter: avoid ghost @ before username\nPATCH-1064, twitter - restart counter after defocus\nPATCH-1109, Twitter: Disable innerHTML updates of the contentEditable element\'s DOM if we presume an IME is active, prevents crashes\nPATCH-1113, Twitter: avoid gradient paint issues when dragging overlays');
+	
+		opera.addEventListener('AfterEvent.click', function(e){ 
+			var el=e.event.target, editors=['tweet-box-mini-home-profile','tweet-box-global'];
+			var focused=document.getSelection().focusNode;
+			for(i=0;i<editors.length;i++){
+				editor = document.getElementById(editors[i]);
+				if(editor&&(editor.contains(el)||editor===el)&&!(editor.contains(focused)||editor==focused)){ // User clicked inside editor but it's not focused..?
+					var rng=document.createRange();
+					try{ 
+						var n=editor.selectSingleNode( '(.//text())[last()]' );
+						rng.setStart(n, n.textContent.length);
+					}catch(e){ opera.postError(e);
+						rng.setStart(editor.firstChild, 0);
+					}
+					window.getSelection().removeAllRanges();
+					window.getSelection().addRange(rng);
+				}
+			}
+		},false);
+		log('PATCH-671, Twitter: avoid ghost @ before username\nPATCH-1064, twitter - restart counter after defocus\nPATCH-1109, Twitter: Disable innerHTML updates of the contentEditable element\'s DOM if we presume an IME is active, prevents crashes\nPATCH-1113, Twitter: avoid gradient paint issues when dragging overlays\nPATCH-1130, Make sure click inside tweet editor focuses it, even if outside the editable line');
 	} else if(hostname.indexOf('uol.com.br')>-1){
 		addCssToDocument('#moduloTopoRotativo ul li div.texto{top:225px}');
 		log('PATCH-636, uol.com.br: work around abs.pos.bottom.align core bug');
