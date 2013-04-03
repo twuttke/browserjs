@@ -1,4 +1,4 @@
-// swNrRzzvhpQxAMmJFuJCLo8uL1w7WsSdLWsowlwPiwn8MYI3qR3xJOTBmmuucb68OO5ht9RCKfANbo1orIfBL4lucJHAJrmF5a1McwJTDx4d383Cd7bNwzJSeMDNTmDupmDm4h15jT8t9Ng4n/Vz6Xor5M0pzG78ncbo17D1H7qmNsJz38TGmOeiu5GW4y5tNc/Zhc4YpVxWNytU2t+1sFJjU2RVMKB4mESKuJIRMYliG1nqwRPlPYJliIFItm/s7+78IHThAXA+M0EB9ESBKy+aJRXupNmJP4U5BdNGbJVyXe3WPIXNW4j3egZoxdQQiK68rYYNvHfdIMJmr2NB5Q==
+// bbg/yqzJIB0Du537cSThU3PlEdgL3jHS+bf/XGeyCgfzAG8mZG+n7pw+Rvrsva9smUA9aGqSO3T4vdeUMeo1Agd3HEWO+3Evfk+0LZxvQTLtA7ondA2szRUwow4U2rpyXFwSou/e/6tgDmVxgn8+ORx1sQ5YrWBVCxhqh1zIsgP2RVtldE+jPCJm7hgKP/fuGgHRA3vIFF2p22ydUpKG7djfyCjTEzqvxX2uM3cbV21/C4l/IxlGlx8ANgjg03PXGJqBHNrSdou7I9cjUX+DXPx34XWaxIJY7o0wOdIyNUmcxwNscZvv0FD+TH3SCymc3jw7BGEXQFsUF2SaEkcSHw==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, March 19, 2013. Active patches: 319 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, April 3, 2013. Active patches: 321 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1831,7 +1831,9 @@ function undoFunctionKeypressEventRemoval(){
 		if (navigator.appName!=='Opera'){
 			document.documentElement.style.MozAppearance = 'Opera';
 		}
-		log('PATCH-1025, Amazon - Black Friday deals float upwards due to margin styling on UL and innerHTML updates\nPATCH-1068, amazon - avoid looping hash decode\nPATCH-527, Add more spoofing when masking as another browser on Amazon');
+	
+		opera.defineMagicVariable('MediaServicesZoomMotion', null, function(obj){ Event.prototype.__defineGetter__('layerX', function(){return this.x;});  Event.prototype.__defineGetter__('layerY', function(){return this.y;}); return obj;});
+		log('PATCH-1025, Amazon - Black Friday deals float upwards due to margin styling on UL and innerHTML updates\nPATCH-1068, amazon - avoid looping hash decode\nPATCH-527, Add more spoofing when masking as another browser on Amazon\nPATCH-1129, Old DynAPI expects Netscape 4 event properties, breaks zooming/panning product images');
 	} else if(hostname.indexOf('ameba.jp')!=-1){
 		addPreprocessHandler(/editor\.insertNodeAtSelection\(link\);\s*editor\.insertNodeAtSelection\(document\.createElement\('br'\)\);/, 'editor.insertNodeAtSelection(link);');
 		log('331093, Work around Opera bug where second BR tag overwrites newly inserted IMG');
@@ -2326,7 +2328,26 @@ function undoFunctionKeypressEventRemoval(){
 		})();
 	
 		addCssToDocument('.profile-header-inner-overlay{bottom:auto;top: 60px;}');
-		log('PATCH-671, Twitter: avoid ghost @ before username\nPATCH-1064, twitter - restart counter after defocus\nPATCH-1109, Twitter: Disable innerHTML updates of the contentEditable element\'s DOM if we presume an IME is active, prevents crashes\nPATCH-1113, Twitter: avoid gradient paint issues when dragging overlays');
+	
+		opera.addEventListener('AfterEvent.click', function(e){ 
+			var el=e.event.target, editors=['tweet-box-mini-home-profile','tweet-box-global'];
+			var focused=document.getSelection().focusNode;
+			for(i=0;i<editors.length;i++){
+				editor = document.getElementById(editors[i]);
+				if(editor&&(editor.contains(el)||editor===el)&&!(editor.contains(focused)||editor==focused)){ // User clicked inside editor but it's not focused..?
+					var rng=document.createRange();
+					try{ 
+						var n=editor.selectSingleNode( '(.//text())[last()]' );
+						rng.setStart(n, n.textContent.length);
+					}catch(e){ opera.postError(e);
+						rng.setStart(editor.firstChild, 0);
+					}
+					window.getSelection().removeAllRanges();
+					window.getSelection().addRange(rng);
+				}
+			}
+		},false);
+		log('PATCH-671, Twitter: avoid ghost @ before username\nPATCH-1064, twitter - restart counter after defocus\nPATCH-1109, Twitter: Disable innerHTML updates of the contentEditable element\'s DOM if we presume an IME is active, prevents crashes\nPATCH-1113, Twitter: avoid gradient paint issues when dragging overlays\nPATCH-1130, Make sure click inside tweet editor focuses it, even if outside the editable line');
 	} else if(hostname.indexOf('virginamerica.com')>-1){
 		navigator.appName='Netscape';
 		opera.defineMagicVariable('browserType',function(){return 'gecko'},null);
