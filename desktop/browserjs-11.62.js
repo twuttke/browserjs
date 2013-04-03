@@ -1,4 +1,4 @@
-// HNcUIc3prbrIdYbxSLePFm9BNqXhmZZnxodM5/IbsivBFmesK1/EQ/6r7h2KWE4uAAoIZxoW8FYQz6NzGyF5nHPYTMwg+DK0rwtNNyKOt4XtRudW/e8vHZoCK6SKBCQpxsPbqnDzth/j1eL6cHdysBrqqRlnR/xg4du8QTy6tbzud7CIgQlGvHU8qli+Ykawd6JViJuT5DxSkxB7UaxSpXAmP+rNZAQO81WKwCbQRpzkbc1Geqw0UP3+56TNEWwnBeua3YWsjIWqmR9xKs6QfUaArc+whwl3szcuumF3SsgFyk6de9uQcJB3t7Sq3Vh6A0fzS23/Dsl2XVcqOJGarA==
+// gRpoP1hYDubhLOXlldLiNwHWmkdm+9j7kKc4FqasPLwHa+tQuL4x3aln0PGVejgYkrorfG//vLQkQCISTcqO3j0ahzDj7wfRydiI3QlBAogpgrfwyRR6ziuwo63VJIP4H7+8AkokuEpQ8WFvNMKwwNE7WkdXDGAbqnFRQq+1k3U5TXRfX2RzkCgUl6FConbTj21RGiuZjhNz0TDTuHml1/aeOY7PiKgZnhlUdATO947x6WnxPkJS36x4WGX2f8pGp1zkSbXIi7k7xEJVvLj9M4IyIFPVUFACB3MQy2YjKWvb+5d8PtIsu6F9OUaesv4GfMqiyeZpVMFlDabn50pYPA==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, March 19, 2013. Active patches: 295 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, April 3, 2013. Active patches: 297 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1682,7 +1682,9 @@ function setTinyMCEVersion(e){
 		if (navigator.appName!=='Opera'){
 			document.documentElement.style.MozAppearance = 'Opera';
 		}
-		log('PATCH-652, Fix displaying recommended items in Amazon\nPATCH-1025, Amazon - Black Friday deals float upwards due to margin styling on UL and innerHTML updates\nPATCH-1068, amazon - avoid looping hash decode\nPATCH-527, Add more spoofing when masking as another browser on Amazon');
+	
+		opera.defineMagicVariable('MediaServicesZoomMotion', null, function(obj){ Event.prototype.__defineGetter__('layerX', function(){return this.x;});  Event.prototype.__defineGetter__('layerY', function(){return this.y;}); return obj;});
+		log('PATCH-652, Fix displaying recommended items in Amazon\nPATCH-1025, Amazon - Black Friday deals float upwards due to margin styling on UL and innerHTML updates\nPATCH-1068, amazon - avoid looping hash decode\nPATCH-527, Add more spoofing when masking as another browser on Amazon\nPATCH-1129, Old DynAPI expects Netscape 4 event properties, breaks zooming/panning product images');
 	} else if(hostname.indexOf('ameba.jp')!=-1){
 		addPreprocessHandler(/editor\.insertNodeAtSelection\(link\);\s*editor\.insertNodeAtSelection\(document\.createElement\('br'\)\);/, 'editor.insertNodeAtSelection(link);');
 		log('331093, Work around Opera bug where second BR tag overwrites newly inserted IMG');
@@ -2217,7 +2219,26 @@ function setTinyMCEVersion(e){
 			}
 		})(HTMLTextAreaElement.prototype.setAttribute);
 		HTMLTextAreaElement.prototype.__defineSetter__('dir', function(v){ this.setAttribute('dir', v); });
-		log('PATCH-671, Twitter: avoid ghost @ before username\nPATCH-744, Twitter: work around comma-separated statement limit in Carakan ES engine\nPATCH-561, Twitter: allow selection in TEXTAREA');
+	
+		opera.addEventListener('AfterEvent.click', function(e){ 
+			var el=e.event.target, editors=['tweet-box-mini-home-profile','tweet-box-global'];
+			var focused=document.getSelection().focusNode;
+			for(i=0;i<editors.length;i++){
+				editor = document.getElementById(editors[i]);
+				if(editor&&(editor.contains(el)||editor===el)&&!(editor.contains(focused)||editor==focused)){ // User clicked inside editor but it's not focused..?
+					var rng=document.createRange();
+					try{ 
+						var n=editor.selectSingleNode( '(.//text())[last()]' );
+						rng.setStart(n, n.textContent.length);
+					}catch(e){ opera.postError(e);
+						rng.setStart(editor.firstChild, 0);
+					}
+					window.getSelection().removeAllRanges();
+					window.getSelection().addRange(rng);
+				}
+			}
+		},false);
+		log('PATCH-671, Twitter: avoid ghost @ before username\nPATCH-744, Twitter: work around comma-separated statement limit in Carakan ES engine\nPATCH-561, Twitter: allow selection in TEXTAREA\nPATCH-1130, Make sure click inside tweet editor focuses it, even if outside the editable line');
 	} else if(hostname.indexOf('virginamerica.com')>-1){
 		navigator.appName='Netscape';
 		opera.defineMagicVariable('browserType',function(){return 'gecko'},null);
