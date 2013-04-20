@@ -1,4 +1,4 @@
-// bbg/yqzJIB0Du537cSThU3PlEdgL3jHS+bf/XGeyCgfzAG8mZG+n7pw+Rvrsva9smUA9aGqSO3T4vdeUMeo1Agd3HEWO+3Evfk+0LZxvQTLtA7ondA2szRUwow4U2rpyXFwSou/e/6tgDmVxgn8+ORx1sQ5YrWBVCxhqh1zIsgP2RVtldE+jPCJm7hgKP/fuGgHRA3vIFF2p22ydUpKG7djfyCjTEzqvxX2uM3cbV21/C4l/IxlGlx8ANgjg03PXGJqBHNrSdou7I9cjUX+DXPx34XWaxIJY7o0wOdIyNUmcxwNscZvv0FD+TH3SCymc3jw7BGEXQFsUF2SaEkcSHw==
+// cVhjw68Il56YaUwxBI5OEgN82ocs24Wp5v22ee/6E/FU50vsfwRZu/otTI8ekdWM8QqYLzMbndDuIVdpjuxeNy4wGM8WZC2Omt0U1OashX95cpuYGBtr1iSqw8aNUwzeHmV2BShw3NMZajAsiSWD3pSWelzhTaFmUrkTtVDPfIbnXdnSrY5kTnpXGRuTB+wfnn6Tx8BaRrQmy1gzRQXho5XOIqPNtt+j2ZKhvdmxtzDdB2XtfR3uEFBbH8+eYslyEao2Ygfqe2bACoQxZD+wR1NOOA8QdyEhou6A2hCSd1ADrXiQ1wLL80jRmPeYdshiO44HDR3uE9o6RiwwMhVD4Q==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, April 3, 2013. Active patches: 321 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, April 20, 2013. Active patches: 322 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -784,6 +784,11 @@ function undoFunctionKeypressEventRemoval(){
 			}
 		},false);
 		log('PATCH-1052, .jus.br - block keypress event from shortcut combinations');
+	} else if(hostname.endsWith('.multibank.pl')){
+		opera.addEventListener('BeforeEventListener.keypress', function(e){
+			if( e.event.ctrlKey && e.event.keyCode === 3 )e.preventDefault();
+		}, false);
+		log('PATCH-1133, Don\'t send keypress events for shortcut keys, JS thinks every key is an enter key');
 	} else if(hostname.endsWith('.nexoneu.com')){
 		fixIFrameSSIscriptII('resizeIframe');
 		log('PATCH-1103, Nexon: fix old iframe resize script');
@@ -1187,15 +1192,7 @@ function undoFunctionKeypressEventRemoval(){
 		addPreprocessHandler(/if\(is_safari_31\|\|is_chrome\)\{return true\}utility\.stopEvent\(J\);/,'if(is_safari_31||is_chrome||is_opera){return true}utility.stopEvent(J);');
 		log('PATCH-905, rememberthemilk.com: adapt to Opera12.10\'s more compliant key event code');
 	} else if(hostname.endsWith('reservations.disney.go.com')){
-		opera.defineMagicVariable('Figment', null, function(obj){
-			var str=Element.prototype.__defineSetter__;
-			Element.prototype.__defineSetter__=function(name, func){
-				if( name in document.createElement('div') )return;
-				return str.call(this, name, func);
-			}
-			return obj;
-		});
-		
+		addPreprocessHandler(/set:\s*function\(\)\s*\{/g,'set: function(str) {', true, function(elm){return elm.src&&elm.src.indexOf('core.js')>-1});
 		log('PATCH-794, Prevent broken innerHTML setter on Disney booking site');
 	} else if(hostname.endsWith('ruter.no')){
 		fixJQueryAutocomplete();
@@ -1333,7 +1330,7 @@ function undoFunctionKeypressEventRemoval(){
 		addCssToDocument('div.mk-category-page{width:980px}');
 		log('PATCH-1089, myntra.com - content wraps');
 	} else if(hostname.endsWith('www.nfl.com')){
-		addPreprocessHandler( /if\(y&&y\["display"\]==="none"\)\{w=true;\}/ , '' , true , function(el){return ( el.src.indexOf('&g=nflbase')>-1 && el.src.indexOf('yui/min2/index.php')>-1 );} );
+		addPreprocessHandler( /if\(style&&style\['display'\]==='none'\)\{ret=true;\}/ , '');
 		log('PATCH-936, nfl.com: avoid hundreds of reflows');
 	} else if(hostname.endsWith('www.omv.cz')){
 		fixIFrameSSIscriptII('resizeIframeToFitContent');
