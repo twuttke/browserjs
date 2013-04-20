@@ -1,4 +1,4 @@
-// gRpoP1hYDubhLOXlldLiNwHWmkdm+9j7kKc4FqasPLwHa+tQuL4x3aln0PGVejgYkrorfG//vLQkQCISTcqO3j0ahzDj7wfRydiI3QlBAogpgrfwyRR6ziuwo63VJIP4H7+8AkokuEpQ8WFvNMKwwNE7WkdXDGAbqnFRQq+1k3U5TXRfX2RzkCgUl6FConbTj21RGiuZjhNz0TDTuHml1/aeOY7PiKgZnhlUdATO947x6WnxPkJS36x4WGX2f8pGp1zkSbXIi7k7xEJVvLj9M4IyIFPVUFACB3MQy2YjKWvb+5d8PtIsu6F9OUaesv4GfMqiyeZpVMFlDabn50pYPA==
+// qS40/fT62e7bqOYPG1kxSNbwtbr7yHi0NTMJyk82CYqsogMgFGcHNTKh0z2Z+z8BpugtKPq0HYh+k/5WHlwa3Nvmu1aU9Ijy7r6AXZwOTUqq5HPiqy/KjA2Wtov4Ychqu3QNuihDAf0wGor22C7XER7OV+9cgC8U1DaQIEaysNk4nSURr/fXIxGvpIXyU+3Ww3FReYhksMr3ZRue2VOgo4nr9a5FAvN+qPPxm5Ce4iQeFsQiAN7n6hrVbO4OE05kYWq8EbFWiXCZI5fBnkChWgxUExzktBGnsCd/xaimCzpsF9xhaRj/PH4Wt930XjoKvmt7583ZK4giDpq0LWHnJw==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, April 3, 2013. Active patches: 297 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, April 20, 2013. Active patches: 298 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -729,6 +729,11 @@ function setTinyMCEVersion(e){
 		 navigator.appName='Netscape';
 		}
 		log('PATCH-738, Work around sniffing hiding submit buttons on passport2.hp.com');
+	} else if(hostname.endsWith('.multibank.pl')){
+		opera.addEventListener('BeforeEventListener.keypress', function(e){
+			if( e.event.ctrlKey && e.event.keyCode === 3 )e.preventDefault();
+		}, false);
+		log('PATCH-1133, Don\'t send keypress events for shortcut keys, JS thinks every key is an enter key');
 	} else if(hostname.endsWith('.nexoneu.com')){
 		fixIFrameSSIscriptII('resizeIframe');
 		log('PATCH-1103, Nexon: fix old iframe resize script');
@@ -1025,15 +1030,7 @@ function setTinyMCEVersion(e){
 		
 		log('PATCH-863, Throttle scroll events and certain timeouts to improve Quora performance');
 	} else if(hostname.endsWith('reservations.disney.go.com')){
-		opera.defineMagicVariable('Figment', null, function(obj){
-			var str=Element.prototype.__defineSetter__;
-			Element.prototype.__defineSetter__=function(name, func){
-				if( name in document.createElement('div') )return;
-				return str.call(this, name, func);
-			}
-			return obj;
-		});
-		
+		addPreprocessHandler(/set:\s*function\(\)\s*\{/g,'set: function(str) {', true, function(elm){return elm.src&&elm.src.indexOf('core.js')>-1});
 		log('PATCH-794, Prevent broken innerHTML setter on Disney booking site');
 	} else if(hostname.endsWith('search.nta.co.jp')){
 		opera.addEventListener('BeforeScript',function(ev){
