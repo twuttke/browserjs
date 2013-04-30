@@ -1,4 +1,4 @@
-// cVhjw68Il56YaUwxBI5OEgN82ocs24Wp5v22ee/6E/FU50vsfwRZu/otTI8ekdWM8QqYLzMbndDuIVdpjuxeNy4wGM8WZC2Omt0U1OashX95cpuYGBtr1iSqw8aNUwzeHmV2BShw3NMZajAsiSWD3pSWelzhTaFmUrkTtVDPfIbnXdnSrY5kTnpXGRuTB+wfnn6Tx8BaRrQmy1gzRQXho5XOIqPNtt+j2ZKhvdmxtzDdB2XtfR3uEFBbH8+eYslyEao2Ygfqe2bACoQxZD+wR1NOOA8QdyEhou6A2hCSd1ADrXiQ1wLL80jRmPeYdshiO44HDR3uE9o6RiwwMhVD4Q==
+// SgDiwU9aIX3rLdmDoQn2kb8AfqD+7kY459Wv1nICQdUB+vfzHsbtUg0vdDWK9cnIqEtL42GAq3mlgqaaAj09XBEGXnTezRAaLv119wrX0DeMpJaf6Ts8Itd8+73rFB+uR+T27LOksh+J1pSDby+hPywqMtzBMx57oRhE2AG2o8giog8qSnerhiz/+ApFgU4zxcG9hGhhaEviMKKJVlzZ7rwaiJ3kwy+PhQqMe1jc9CRXisd/62qDRDyAjN0fuDIFpKiU34RlUS03bpI393QRMuRuvoRHnM+cMDNTWQZut7GDmQfcl+w16jwdk0COCeZktgVPIxVG5JakwVDFAG3EUg==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, April 20, 2013. Active patches: 322 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, April 30, 2013. Active patches: 320 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -760,9 +760,6 @@ function undoFunctionKeypressEventRemoval(){
 			navigator.userAgent = navigator.userAgent.replace(/OS X (\d+).(\d+).(\d+)+;/,'OS X $1_$2_$3;');
 		}
 		log('PATCH-846, apple.com: don\'t reload from within unload handler\nPATCH-888, apple_core: CSS animations are unprefixed from Opera 12.10\nPATCH-924, apple.com - reformat OS X version string with underscores');
-	} else if(hostname.endsWith('.coe.int')){
-		fixTransitionEndCase();
-		log('PATCH-1082, coe.int - transitionend casing');
 	} else if(hostname.endsWith('.hp.com')){
 		if(hostname.indexOf('passport2.')>-1){
 		 navigator.appName='Netscape';
@@ -827,7 +824,7 @@ function undoFunctionKeypressEventRemoval(){
 		if(pathname.indexOf('/portal/Start')==0){addCssToDocument('tr#steps{z-index:2}')}
 		log('PATCH-1094, bnpparibasfortis.be - unclickable radio buttons');
 	} else if(hostname.endsWith('book.lufthansa.com')){
-		addCssToDocument('td.fare input, td.fareOff input{position:inherit}');
+		addCssToDocument('td.fare input, td.fareOff input{position:inherit !important}');
 		log('PATCH-1018, lufthansa.com - fix unclickable positioned inputs');
 	} else if(hostname.endsWith('caisse-epargne.fr')){
 		addPreprocessHandler(/this\._changeHandler\);if\s*\(Sys\.Browser\.agent\s==\sSys\.Browser\.Opera\)/g, ' this._changeHandler);if(false)');
@@ -1758,6 +1755,23 @@ function undoFunctionKeypressEventRemoval(){
 			}
 			log('194334, Y!Mail remove selectSingleNode and selectNodes ("old new mail" only)');
 		}
+		if(hostname.indexOf('.yahoo.')>-1){
+			opera.addEventListener('AfterScript', function(e){
+			    if (window.YMedia && YMedia.Media && YMedia.Media.RMP && YMedia.Media.RMP.load ) {
+			        var theLoader = YMedia.Media.RMP.load;
+			        YMedia.Media.RMP.load = function(obj){
+			            obj.params.m_mode = 'fragment';
+			            delete obj.params._sig;
+			            delete obj.params.y_map_urn;
+			            return theLoader.call(this, obj);
+			        }
+			        opera.removeEventListener('AfterScript', arguments.callee, false);
+			    };
+			
+			}, false);
+			
+			log('PATCH-1135, Make Yahoo news load comments in "fragment" mode because there is a bug in Opera\'s "multipart" support');
+		}
 		if(hostname.indexOf('finance.yahoo.com')>-1){
 			navigator.userAgent = 'Mozilla/5.0 (Windows NT 5.1; rv:6.0) Gecko/20100101 Firefox/6.0'; 
 		
@@ -1959,10 +1973,6 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.indexOf('directv.com')>-1){
 		opera.defineMagicFunction('printContingencyWarningMessage',function(){});
 		log('PATCH-721, directv.com: suppress old browser message');
-	} else if(hostname.indexOf('e-pagofacil.com')>-1){
-		opera.defineMagicFunction('PNG_loader', function(){return false});
-		
-		log('PATCH-734, Avoid IE PNG transparency bug workaround that hides submit button');
 	} else if(hostname.indexOf('easycruit.com')>-1){
 		fixIFrameSSIscriptII('resizeIframe');
 		log('PATCH-219, Fujitsu recruitment page on EasyCruit hides content due to browser sniffing');
@@ -2206,18 +2216,6 @@ function undoFunctionKeypressEventRemoval(){
 	
 		addCssToDocument('span.et_main{padding-left:0 !important}');
 		log('PATCH-679, skydrive: correct MouseEvent button\nPATCH-571, live.com: make file names visible');
-	} else if(hostname.indexOf('smithbarney.com')>-1){
-		HTMLInputElement.prototype.__defineSetter__('type',function(){
-			if (this.getAttribute('type')!=arguments[0]) {
-				var doFocus=false, result;
-				if (this == document.activeElement) doFocus = true;
-				result = this.setAttribute('type',arguments[0]);
-				if (doFocus) this.focus();
-				return result;
-			}
-		});
-		
-		log('PATCH-360, Enable the password box on smithbarney.com');
 	} else if(hostname.indexOf('smn.gov.ar')>-1){
 		addCssToDocument('input#busqueda{max-width:108px}');
 		log('PATCH-572, smn.gov.ar: reduce search input width to avoid wrapping');
