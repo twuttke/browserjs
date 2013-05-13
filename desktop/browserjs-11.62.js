@@ -1,4 +1,4 @@
-// qS40/fT62e7bqOYPG1kxSNbwtbr7yHi0NTMJyk82CYqsogMgFGcHNTKh0z2Z+z8BpugtKPq0HYh+k/5WHlwa3Nvmu1aU9Ijy7r6AXZwOTUqq5HPiqy/KjA2Wtov4Ychqu3QNuihDAf0wGor22C7XER7OV+9cgC8U1DaQIEaysNk4nSURr/fXIxGvpIXyU+3Ww3FReYhksMr3ZRue2VOgo4nr9a5FAvN+qPPxm5Ce4iQeFsQiAN7n6hrVbO4OE05kYWq8EbFWiXCZI5fBnkChWgxUExzktBGnsCd/xaimCzpsF9xhaRj/PH4Wt930XjoKvmt7583ZK4giDpq0LWHnJw==
+// UUr9hXP4yc8Vi/FOHGxXHSQIQhX/YmFOXJsnkuknwsdJlI+j2fciLUTtCBOVzXqANjFw+yuFaBX+4YE96gnp2Z2IRJr/jjx/S3jvgvBXgtSZyu7JagQgzLm1tzbHKyesZvQ1oX/o2tbvrLGMi1Bw/KA0HQ3Y0HxHMhQHcKgMBE5st9nzz6e3BGCWJoHhrNDq4ClJygrZ5TFXcEdJ4WhOoz7LrPA/kY6UQ4pAK9MGFgCIWe7VDtrsPMkmyVQHidBl5FXXemJpTozXzkLtW35Ou40o7sk/n6i0osdROWdvIPB4i9+sJYZ7R975f2NhLO2Xf4aBpJtPWk3Au+/GRhxR6Q==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, April 20, 2013. Active patches: 298 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, May 13, 2013. Active patches: 295 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -931,7 +931,7 @@ function setTinyMCEVersion(e){
 		addCssToDocument('#c_memenu { width: 350px; }.c_m_l { float: left !important; }.c_m_r { float: right !important; }');
 	
 		opera.addEventListener('BeforeScript', function (e) {
-			if (e.element.src.indexOf('fullex.js') > -1) {
+			if (e.element.src.indexOf('fullex') > -1) {
 				e.element.text = e.element.text.replace('for(i.isArray(t)||(t in e?t=[t]:(t=i.camelCase(t),t=t in e?[t]:t.split(" "))),', 'if (!i.isArray(t))(t in e?t=[t]:(t=i.camelCase(t),t=t in e?[t]:t.split(" ")));for(');
 			}
 		}, false);
@@ -1029,9 +1029,19 @@ function setTinyMCEVersion(e){
 		})(setTimeout);
 		
 		log('PATCH-863, Throttle scroll events and certain timeouts to improve Quora performance');
-	} else if(hostname.endsWith('reservations.disney.go.com')){
-		addPreprocessHandler(/set:\s*function\(\)\s*\{/g,'set: function(str) {', true, function(elm){return elm.src&&elm.src.indexOf('core.js')>-1});
-		log('PATCH-794, Prevent broken innerHTML setter on Disney booking site');
+	} else if(hostname.endsWith('s7.addthis.com')){
+		Element.prototype.appendChild = (function (appendChild){
+			return function(child){
+				if (document.readyState === 'loading') {
+					var _this=this;
+					setTimeout(function(){ appendChild.call(_this, child) }, 100);
+					return child;
+				};
+				return appendChild.call(this, child);
+			}
+		})(Element.prototype.appendChild);
+		
+		log('PATCH-1136, Fix script loading order in addthis widget');
 	} else if(hostname.endsWith('search.nta.co.jp')){
 		opera.addEventListener('BeforeScript',function(ev){
 			var name=ev.element.src; 
@@ -1835,10 +1845,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('directv.com')>-1){
 		opera.defineMagicFunction('printContingencyWarningMessage',function(){});
 		log('PATCH-721, directv.com: suppress old browser message');
-	} else if(hostname.indexOf('e-pagofacil.com')>-1){
-		opera.defineMagicFunction('PNG_loader', function(){return false});
-		
-		log('PATCH-734, Avoid IE PNG transparency bug workaround that hides submit button');
 	} else if(hostname.indexOf('easycruit.com')>-1){
 		fixIFrameSSIscriptII('resizeIframe');
 		log('PATCH-219, Fujitsu recruitment page on EasyCruit hides content due to browser sniffing');
@@ -1915,9 +1921,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('internetbank.swedbank.se')>-1){
 		Event.prototype.__defineGetter__('charCode', function(){if( this.keyCode>=48 && this.keyCode<=57  )return this.keyCode;});
 		log('PATCH-611, SwedBank: temporary work around for mismatch between window.event support and charcode support');
-	} else if(hostname.indexOf('investordaily.com.au')>-1){
-		opera.defineMagicFunction('minmax_scan', function(){});
-		log('PATCH-238, Override minmax IE helper script');
 	} else if(hostname.indexOf('journalism.org')>-1){
 		fixIFrameSSIscriptII('resizeIframe');
 		log('PATCH-523, journalism.org: fix old IFrame SSI script');
@@ -2132,18 +2135,6 @@ function setTinyMCEVersion(e){
 			false
 		);
 		log('PATCH-657, skydrive: disable new upload code due to various Opera bugs\nPATCH-679, skydrive: correct MouseEvent button\nPATCH-782, skydrive.live.com - Allow upload of files');
-	} else if(hostname.indexOf('smithbarney.com')>-1){
-		HTMLInputElement.prototype.__defineSetter__('type',function(){
-			if (this.getAttribute('type')!=arguments[0]) {
-				var doFocus=false, result;
-				if (this == document.activeElement) doFocus = true;
-				result = this.setAttribute('type',arguments[0]);
-				if (doFocus) this.focus();
-				return result;
-			}
-		});
-		
-		log('PATCH-360, Enable the password box on smithbarney.com');
 	} else if(hostname.indexOf('smn.gov.ar')>-1){
 		addCssToDocument('input#busqueda{max-width:108px}');
 		log('PATCH-572, smn.gov.ar: reduce search input width to avoid wrapping');
