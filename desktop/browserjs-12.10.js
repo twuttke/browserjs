@@ -1,4 +1,4 @@
-// SgDiwU9aIX3rLdmDoQn2kb8AfqD+7kY459Wv1nICQdUB+vfzHsbtUg0vdDWK9cnIqEtL42GAq3mlgqaaAj09XBEGXnTezRAaLv119wrX0DeMpJaf6Ts8Itd8+73rFB+uR+T27LOksh+J1pSDby+hPywqMtzBMx57oRhE2AG2o8giog8qSnerhiz/+ApFgU4zxcG9hGhhaEviMKKJVlzZ7rwaiJ3kwy+PhQqMe1jc9CRXisd/62qDRDyAjN0fuDIFpKiU34RlUS03bpI393QRMuRuvoRHnM+cMDNTWQZut7GDmQfcl+w16jwdk0COCeZktgVPIxVG5JakwVDFAG3EUg==
+// UYBXK8GfIh4NdJLLhlwkEuPKo8nInuVKEUKQcIttjWxvKilefVaJphYoUMnbeKRA9uACWxWdTPtuJCZzJ6G9SSgJYNlX7cn6qO2iaNZ1iyo7krw9vmdeTclxTzYNuhQiIc1gAu/JhjSLZD03oWG7ZAP/0mvuiOKsDMMR5p7KV0KqWX/z9GQemrrwn09foAAThsTBK5xi4JBqVlgJnZecYvV7tLQgzywNASiVUOTfDOy1tGaBDIueMOH8IV09KXxR0fBZORab1Tu1y/8XH2z3IzaVXOOZyE9HM1L2CNzAUpiuKS5UtcXwziaHJMmYQapcB70YrVPjuJ2Dzkv7viQ+EQ==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, April 30, 2013. Active patches: 320 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, May 23, 2013. Active patches: 317 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -986,7 +986,7 @@ function undoFunctionKeypressEventRemoval(){
 		log('PATCH-862, hipmunk.com: avoid header table cell collapse. Core bug.');
 	} else if(hostname.endsWith('hotels.ctrip.com')){
 		addPreprocessHandler(/win.addEventListener/g,'ifm.addEventListener',true,function(elm){
-		 return elm.src && ( elm.src.indexOf('c_result.map.js')>-1 || elm.src.indexOf('c_detail.map.js')>-1 )
+		 return elm.src && elm.src.indexOf('map.js')>-1
 		});
 		log('PATCH-857, hotels.ctrip.com: word around iframe load event order issue with Opera');
 	} else if(hostname.endsWith('ieee.org')){
@@ -1188,12 +1188,22 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('rememberthemilk.com')){
 		addPreprocessHandler(/if\(is_safari_31\|\|is_chrome\)\{return true\}utility\.stopEvent\(J\);/,'if(is_safari_31||is_chrome||is_opera){return true}utility.stopEvent(J);');
 		log('PATCH-905, rememberthemilk.com: adapt to Opera12.10\'s more compliant key event code');
-	} else if(hostname.endsWith('reservations.disney.go.com')){
-		addPreprocessHandler(/set:\s*function\(\)\s*\{/g,'set: function(str) {', true, function(elm){return elm.src&&elm.src.indexOf('core.js')>-1});
-		log('PATCH-794, Prevent broken innerHTML setter on Disney booking site');
 	} else if(hostname.endsWith('ruter.no')){
 		fixJQueryAutocomplete();
 		log('PATCH-934, ruter.no: jQuery autocompleter');
+	} else if(hostname.endsWith('s7.addthis.com')){
+		Element.prototype.appendChild = (function (appendChild){
+			return function(child){
+				if (document.readyState === 'loading') {
+					var _this=this;
+					setTimeout(function(){ appendChild.call(_this, child) }, 100);
+					return child;
+				};
+				return appendChild.call(this, child);
+			}
+		})(Element.prototype.appendChild);
+		
+		log('PATCH-1136, Fix script loading order in addthis widget');
 	} else if(hostname.endsWith('search.nta.co.jp')){
 		opera.addEventListener('BeforeScript',function(ev){
 			var name=ev.element.src; 
@@ -1229,19 +1239,6 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('thaiair.co.jp')){
 		navigator.appName = 'M'+navigator.appName;
 		log('PATCH-943, thaiair.co.jp - fix drop-down menu positioning');
-	} else if(hostname.endsWith('thenextweb.com')){
-		document.addEventListener('load', function(e){
-			if( e.target instanceof HTMLIFrameElement && e.target.style.display=='none'){
-				try{
-					if(e.target.contentWindow.document){
-						e.target.contentWindow.document.body.__defineGetter__('scrollHeight', function(){
-							return 0; //if iframe is display none, WebKit/Gecko returns 0 for content height
-						});
-					}
-				}catch(e){}
-			}
-		}, true);
-		log('PATCH-993, thenextweb.com - top bar placed too low');
 	} else if(hostname.endsWith('todoist.com')){
 		KeyboardEvent.prototype.__defineGetter__('key', function(e){return this.keyCode});
 		log('PATCH-1021, todoist.com - fix event.key usage');
@@ -1293,9 +1290,6 @@ function undoFunctionKeypressEventRemoval(){
 		}, false);
 		}
 		log('PATCH-875, bankofamerica: don\'t use IE stylesheet');
-	} else if(hostname.endsWith('www.dickmorris.com')){
-		addCssToDocument('*{content:normal !important}')
-		log('PATCH-929, dickmorris.com - avoid empty lightbox');
 	} else if(hostname.endsWith('www.downg.com')){
 		addCssToDocument('.softwaretable .inner{font-size:10px}');
 		log('PATCH-1007, downg.com - decrease font-size to avoid wrapping');
@@ -1510,6 +1504,10 @@ function undoFunctionKeypressEventRemoval(){
 		if(hostname.contains('plus.google.')){
 			undoFunctionKeypressEventRemoval();
 			log('PATCH-1061, G+ - make navigation keys work');
+		}
+		if(hostname.contains('talkgadget.google.')){
+			addCssToDocument('div.hh{height: 85%;}');
+			log('PATCH-1138, G+ type in hangouts (nested 100% tables)');
 		}
 		if(hostname.indexOf('adwords.google.') > -1){
 			window.navigator.product = 'Gecko';
@@ -2041,15 +2039,9 @@ function undoFunctionKeypressEventRemoval(){
 			}
 		}, false);
 		log('PATCH-529, Fix SiteCatalyst H.9 code on Nissan/Infiniti USA');
-	} else if(hostname.indexOf('investordaily.com.au')>-1){
-		opera.defineMagicFunction('minmax_scan', function(){});
-		log('PATCH-238, Override minmax IE helper script');
 	} else if(hostname.indexOf('journalism.org')>-1){
 		fixIFrameSSIscriptII('resizeIframe');
 		log('PATCH-523, journalism.org: fix old IFrame SSI script');
-	} else if(hostname.indexOf('kort.arealinfo.dk')>-1){
-		opera.defineMagicVariable('op', function(){return false}, null);
-		log('PATCH-348, Disable Opera detection that causes hidden content');
 	} else if(hostname.indexOf('latenightwithjimmyfallon.com')>-1){
 		window.addEventListener('load', function(){
 			if(window.DPSVPlayer && window.DPSVPlayer.onReady)DPSVPlayer.onReady.call(window);
