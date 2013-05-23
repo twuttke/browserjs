@@ -1,4 +1,4 @@
-// UUr9hXP4yc8Vi/FOHGxXHSQIQhX/YmFOXJsnkuknwsdJlI+j2fciLUTtCBOVzXqANjFw+yuFaBX+4YE96gnp2Z2IRJr/jjx/S3jvgvBXgtSZyu7JagQgzLm1tzbHKyesZvQ1oX/o2tbvrLGMi1Bw/KA0HQ3Y0HxHMhQHcKgMBE5st9nzz6e3BGCWJoHhrNDq4ClJygrZ5TFXcEdJ4WhOoz7LrPA/kY6UQ4pAK9MGFgCIWe7VDtrsPMkmyVQHidBl5FXXemJpTozXzkLtW35Ou40o7sk/n6i0osdROWdvIPB4i9+sJYZ7R975f2NhLO2Xf4aBpJtPWk3Au+/GRhxR6Q==
+// RFtLx1AY833IGvhUPmJ78EHF5FxYjAlKfdo6sImoQ+g94/eKNyydy64NNr0Tk9QkZwoayKsflTpyH6lh6H96f5PpRE3hjxzGCC6TP/eh3UNHgJ3+XwFk9rr/U+cXgiCCI7mWc3lutHrplwjO5a4gu4RR5A9Z6PmFxg0CG+NaB8TYBJ8IwVhcxFCfffaoo5EVg4rNBcNkqXSA1DVMdNUHV5ZEWa/cya3y0s8AJsW6+xIYzk4+HobJLS96ZF7pl5ar6ln8wDnMnM2AdUS49NdCIUWH9MP73Yri9MSEiAHZAH02JAO8LPtkGhQFS7gcNJXroDsgLjRTebvD8XhWJVINeA==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, May 13, 2013. Active patches: 295 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, May 23, 2013. Active patches: 295 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1331,6 +1331,10 @@ function setTinyMCEVersion(e){
 			addCssToDocument('div.B-u-nd-nb, div.s-r-Ge-ec {display:block}');
 			log('PATCH-680, Work around bug that disregards BASE href on G+\nPATCH-526, G+: avoid tall narrow posts due to word-wrap in table ');
 		}
+		if(hostname.contains('talkgadget.google.')){
+			addCssToDocument('div.hh{height: 85%;}');
+			log('PATCH-1138, G+ type in hangouts (nested 100% tables)');
+		}
 		if(hostname.indexOf('adwords.google.') > -1){
 			window.navigator.product = 'Gecko';
 			log(' PATCH-332, Fix disabled charts on Google AdWords');
@@ -1924,9 +1928,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('journalism.org')>-1){
 		fixIFrameSSIscriptII('resizeIframe');
 		log('PATCH-523, journalism.org: fix old IFrame SSI script');
-	} else if(hostname.indexOf('kort.arealinfo.dk')>-1){
-		opera.defineMagicVariable('op', function(){return false}, null);
-		log('PATCH-348, Disable Opera detection that causes hidden content');
 	} else if(hostname.indexOf('latenightwithjimmyfallon.com')>-1){
 		window.addEventListener('load', function(){
 			if(window.DPSVPlayer && window.DPSVPlayer.onReady)DPSVPlayer.onReady.call(window);
