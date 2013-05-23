@@ -1,4 +1,4 @@
-// wxb92KZsnGwBnNReoKVVDVEBBLvy70Jaa4lZbLCGpDLSHRCF5S5c07pmHGB20jsf4qsc3JgUla+5GF8wzfH073zwQVBAHVsIoxzeOVfWUB2TMW9v5Bb3Eo2MTmIL9WdTC2nzxUoqZQFgh6VyECYu1K7M+IBOo1GwcTHJXyVhE0pPfw56sJggVtQgZm+rQJXlyOUon1aOObp1NRvBAd+MBfy7P0dEH1fDEmgBm+1ORc0EbSmV4Dudgt9TDmNSDoLHtbQbZf8WmzUoh+teT0ITk3rvtnpzrrGv4jOkDCoctQC/k3YwI/t5IwPKmV3WQ2lpWaRHgSlKZAoFdAiERNLyZg==
+// XoPUwIdWh5c4Unb96sguzWhNe6KMb2/eryHBDP8jyla9wP1qiBL7nn5v47l2qrg0uZfpMcGYO2Ki0imOy3Li76r4oCIU9t4Cs8+5iLEAyCHXFcvyxGBsx62xAUyovO5F+H8zgHF0KN8B1MQqb0wcTJxKCqqv7vWebsZ5mtbbYslrWX+TakeWcv+7hTYhiFrXiRfMFEpIAHY4ROqjA3eyERYGcZZxZbOu6aLBWDTf9jpJPSDN8F8r9e5cWvGXogv34ah4fP8hSxe31IkwuaNm3F94jBx3zbr0zh+bwRiIfdGuJEZPNEOdDCntciDz6DmTcT7HyFstdW8MCNe41ZM52A==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, May 13, 2013. Active patches: 332 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, May 23, 2013. Active patches: 331 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -982,7 +982,7 @@ function setTinyMCEVersion(e){
 		log('PATCH-862, hipmunk.com: avoid header table cell collapse. Core bug.');
 	} else if(hostname.endsWith('hotels.ctrip.com')){
 		addPreprocessHandler(/win.addEventListener/g,'ifm.addEventListener',true,function(elm){
-		 return elm.src && ( elm.src.indexOf('c_result.map.js')>-1 || elm.src.indexOf('c_detail.map.js')>-1 )
+		 return elm.src && elm.src.indexOf('map.js')>-1
 		});
 		log('PATCH-857, hotels.ctrip.com: word around iframe load event order issue with Opera');
 	} else if(hostname.endsWith('ieee.org')){
@@ -1229,19 +1229,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('thaiair.co.jp')){
 		navigator.appName = 'M'+navigator.appName;
 		log('PATCH-943, thaiair.co.jp - fix drop-down menu positioning');
-	} else if(hostname.endsWith('thenextweb.com')){
-		document.addEventListener('load', function(e){
-			if( e.target instanceof HTMLIFrameElement && e.target.style.display=='none'){
-				try{
-					if(e.target.contentWindow.document){
-						e.target.contentWindow.document.body.__defineGetter__('scrollHeight', function(){
-							return 0; //if iframe is display none, WebKit/Gecko returns 0 for content height
-						});
-					}
-				}catch(e){}
-			}
-		}, true);
-		log('PATCH-993, thenextweb.com - top bar placed too low');
 	} else if(hostname.endsWith('try.github.com')){
 		opera.defineMagicVariable('ns',function(){return true},null); //otherwise pluginlist becomes undefined
 		addPreprocessHandler(/if\s*\(\$\.browser\.webkit\s*\|\|\s*\$\.browser\.mozilla\)\s*return false;/, 'return false;')
@@ -1509,6 +1496,10 @@ function setTinyMCEVersion(e){
 		if(hostname.contains('plus.google.')){
 			addCssToDocument('div.B-u-nd-nb, div.s-r-Ge-ec {display:block}');
 			log('PATCH-526, G+: avoid tall narrow posts due to word-wrap in table ');
+		}
+		if(hostname.contains('talkgadget.google.')){
+			addCssToDocument('div.hh{height: 85%;}');
+			log('PATCH-1138, G+ type in hangouts (nested 100% tables)');
 		}
 		if(hostname.indexOf('adwords.google.') > -1){
 			window.navigator.product = 'Gecko';
@@ -2097,9 +2088,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('journalism.org')>-1){
 		fixIFrameSSIscriptII('resizeIframe');
 		log('PATCH-523, journalism.org: fix old IFrame SSI script');
-	} else if(hostname.indexOf('kort.arealinfo.dk')>-1){
-		opera.defineMagicVariable('op', function(){return false}, null);
-		log('PATCH-348, Disable Opera detection that causes hidden content');
 	} else if(hostname.indexOf('latenightwithjimmyfallon.com')>-1){
 		window.addEventListener('load', function(){
 			if(window.DPSVPlayer && window.DPSVPlayer.onReady)DPSVPlayer.onReady.call(window);
