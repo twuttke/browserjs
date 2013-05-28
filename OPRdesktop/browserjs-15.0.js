@@ -1,4 +1,4 @@
-// jG+rruc80RQGEMBPpnuV04V3mvn321PH+SB9p5PiPTpQ61PXSX3y8+gOfU5OgcmC6PvXDNO+mRN+RDH89/u+j+/bXdEV803S3e6b1Qnkd4HPR/qQuDkreJdzVoMonJPc0ZZ2IjclGA+nzWuBi6IpcN5NHgO5W1sPgaRqcNPCkAlH9ZDnDjCBpufXer7XpMFxjQiX0dzOtRJAh6y+b7/k/qeBgOcRXWz97RcYSZ86A+hN+9JaRm6F5BeiCbPZd6nrTYLScjvVHXr+miQ4OMiRz+s8Mhi1NCYPGyzx+RH4/3vwe2TnqhRKjhZK2m6JGjr51AhpplM22ebe/QC4s7Kiyw==
+// qwNUfJCxGiCjO7kXe551VJLCjQSjjCHXhoLd4BIWy7hiCOkXc1A6CMucln5gjZc7eG1d1n7iAePBoaIamByNBFehXX+/3DfIagRHHxaSRgMI52gB+TIybqEnb0b1tZDrLlQFbYVbXmOjh/4CGBiA8XOCqFpO+jyH1nH3hlhw6zms/w6aE/bCZtrPfnAKskm2c7HP+iSgB/jxrjoq0+LughFpimzFv3b6cDyJ1fkWyhE6gz+HfJzaJ2zcDN0+i3sXsroN4xbcYch4Bz1rsEuk8ncunGbQeZ8wm1NRVdi1N/VFz3hBzVeIEN9g9RbyhHE8kodBmyC9cVjk2pyPmmGMWA==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -16,7 +16,7 @@
 **/
 // Generic fixes (mostly)
 (function(){
-	var bjsversion=' Opera OPRDesktop 15.0 core 1148.0, May 22, 2013. Active patches: 2 ';
+	var bjsversion=' Opera OPRDesktop 15.0 core 1147.0, May 28, 2013. Active patches: 4 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -44,8 +44,48 @@
 
 	// Utility functions
 
+	function addCssToDocument2(cssText, doc, mediaType){
+		getElementsByTagName.call=addEventListener.call=createElement.call=createTextNode.call=insertBefore.call=setAttribute.call=appendChild.call=call;
+		doc = doc||document;
+		mediaType = mediaType||'';
+		addCssToDocument2.styleObj=addCssToDocument2.styleObj||{};
+		var styles = addCssToDocument2.styleObj[mediaType];
+		if(!styles){
+			var head = getElementsByTagName.call(doc, "head")[0];
+			if( !head ){
+				var docEl = getElementsByTagName.call(doc, "html")[0];
+				if(!docEl){
+					// :S this shouldn't happen - see if document hasn't loaded
+					addEventListener.call(doc, 'DOMContentLoaded',
+					function(){ addCssToDocument2(cssText, doc); },false);
+					return;
+				}
+				head = createElement.call(doc, "head");
+				if(head) insertBefore.call(docEl, head,docEl.firstChild);
+				else head = docEl;
+			}
+			addCssToDocument2.styleObj[mediaType] = styles = createElement.call(doc, "style");
+			setAttribute.call(styles, "type","text/css");
+			if(mediaType)setAttribute.call(styles, "media", mediaType);
+			appendChild.call(styles, createTextNode.call(doc,' '));
+			appendChild.call(head, styles)
+		}
+		styles.firstChild.nodeValue += cssText+"\n";
+		return true;
+	}
 
-	if(hostname.indexOf('opera.com')>-1&& pathname.indexOf('/docs/browserjs/')==0){
+
+
+	if(hostname.indexOf('.google.')>-1){
+		/* Google */
+	
+	
+		if(hostname.contains('www.google.')){
+			addCssToDocument2('span#gsri_ok0{display:none}');
+			log('PATCH-1141, google.com - hide voice input icon while it is unsupported');
+		}
+		log('0, Google');
+	} else if(hostname.indexOf('opera.com')>-1&& pathname.indexOf('/docs/browserjs/')==0){
 		document.addEventListener('DOMContentLoaded',function(){
 			if(document.getElementById('browserjs_active')){
 				document.getElementById('browserjs_active').style.display='';
