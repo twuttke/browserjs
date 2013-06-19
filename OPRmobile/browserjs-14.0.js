@@ -1,4 +1,4 @@
-// IMPK5lkwvixO2tPYOYgqcf4DtyIII+InZcFVSRyBFBB+CO5YDBYYXfJ9GEnu+my7+Zr7JitLYBaXFu9fdv5ObxGhNv8MecGeRZdePVp4AN3h7yUhjVtre370lLqvx3cWIka7tq6sbq9JsZMFOiP5EaoRqzDMOPcUUKbVK3kpmu4iRIaWPJwhcgVdtJJWeMyAG3a4YNr4NYEL0daTQsulw+7T0ddt/lNXaKToYEnYdCxyvlmwGZgf9w54DZCc+5i57AQ6dBZzJdgTnoV6vgIR/vE6kKeMsFXOClPbfgznjek6I/b9vKX3SogF2v7McQcimoYBqUxJCR0gwr6Fz+mVuw==
+// Ww+vYNccXT91yKHeDMhMYQvpmbuOQb6zM3IbmY+NMAO/Fq2uyWuGlvis0tKyQ6ZNUSQZvaFxeUTCRj7XDFlQ0Afds6ryON+ndbOqAgF5yNbUWcEQ1blQNzbJDWRSrzOWBeW8if32GAdTJEB+jD4jJZW802Gyq2MDQk3h/HBSBgBAJudRh6c6OHUeB9ZbH+nCYEvrR6zj2SF1vCH1OW4zYG73cjmn/bxXcNPBh0gWWkWD2CM+RsBGr7hPZeHQ7HeWfvOiu1Lxr/xI0Lo53U0AbHLGU5p8E26DYyETiXIpxXKJaXjEguqaMfd3heoIzstsKEOxcXJNybMkomHfkCHThg==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -16,7 +16,7 @@
 **/
 // Generic fixes (mostly)
 (function(){
-	var bjsversion=' Opera OPRMobile 14.0 core , May 6, 2013. Active patches: 3 ';
+	var bjsversion=' Opera OPRMobile 14.0 core 1074.0, June 17, 2013. Active patches: 3 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -31,7 +31,7 @@
 	}
 	var href = location.href;
 	var pathname=location.pathname;
-	call = Function.prototype.call,
+	var call = Function.prototype.call,
 	getElementsByTagName=Document.prototype.getElementsByTagName,
 	addEventListener=Window.prototype.addEventListener,
 	createElement=Document.prototype.createElement,
