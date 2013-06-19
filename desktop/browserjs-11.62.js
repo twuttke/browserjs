@@ -1,4 +1,4 @@
-// RFtLx1AY833IGvhUPmJ78EHF5FxYjAlKfdo6sImoQ+g94/eKNyydy64NNr0Tk9QkZwoayKsflTpyH6lh6H96f5PpRE3hjxzGCC6TP/eh3UNHgJ3+XwFk9rr/U+cXgiCCI7mWc3lutHrplwjO5a4gu4RR5A9Z6PmFxg0CG+NaB8TYBJ8IwVhcxFCfffaoo5EVg4rNBcNkqXSA1DVMdNUHV5ZEWa/cya3y0s8AJsW6+xIYzk4+HobJLS96ZF7pl5ar6ln8wDnMnM2AdUS49NdCIUWH9MP73Yri9MSEiAHZAH02JAO8LPtkGhQFS7gcNJXroDsgLjRTebvD8XhWJVINeA==
+// MCPwGlsqWv8aQ5TZDeAxtjQJFE6KcCagbGEJHGzft5HpwIcw1fyHMvSlKMmY6UiRHdcaIyoR/lc7T14rgx7ZlWVEHzWoImQA9DZwXwcftz9p1TKMebEUDA8SaBu8PMk01e4msFYwqKxOL+dLwnd4GUHlWlKy+SvtWsW1bRKNfcLRph/oryiEWh3uJopXgivwBUBi8Gm69ETLkwKIbSkiKaUyIH+1HX+uNJqhrZT6enggz2YL+Yt5vmhmrxzB3QqrByoeciNGUIHwZHqp3Hn8oiJ0+uUzsfkKceNm4olN566GZ6I4uaAxcqwRDo9RioU7YuLaOenT3d2WPMOehpSo6w==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.62 core 2.10.229, May 23, 2013. Active patches: 295 ';
+	var bjsversion=' Opera Desktop 11.62 core 2.10.229, June 19, 2013. Active patches: 293 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1058,13 +1058,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('shopping.com')){
 		navigator.appName = "Netscape";
 		log('PATCH-836, shopping.com - work around browser sniff');
-	} else if(hostname.endsWith('snapguide.com')){
-		opera.addEventListener('BeforeScript', function(e){
-			if (e.element.src && e.element.src.indexOf('all.min.js') > -1) {
-				e.element.text = e.element.text.replace(/translate3d\(([^,]*),([^,]*),([^)]*)\)/g,'translate($1,$2)');
-			}
-		},false);
-		log('PATCH-1127, snapguide.com - hack translate3d usage');
 	} else if(hostname.endsWith('staples.com')){
 		(function(){
 			var xhrDocGetter=(new XMLHttpRequest).__lookupGetter__('responseXML');
@@ -1419,9 +1412,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('.sina.com.cn')>-1){
 		navigator.userAgent += ' not Gecko';
 		log('PATCH-614, sina.com: video doesn\'t play due to missing script readystate support');
-	} else if(hostname.indexOf('.sytadin.')!=-1){
-		fixIFrameSSIscriptII('resizeIframeOnContent');
-		log('OTW-5415, Sytadin.fr IFRAME resize script detects Opera');
 	} else if(hostname.indexOf('.t-online.de')>-1){
 		if(hostname.indexOf('unterhaltung')>-1){
 					//Fix browser detection
