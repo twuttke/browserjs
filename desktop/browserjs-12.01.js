@@ -1,4 +1,4 @@
-// XoPUwIdWh5c4Unb96sguzWhNe6KMb2/eryHBDP8jyla9wP1qiBL7nn5v47l2qrg0uZfpMcGYO2Ki0imOy3Li76r4oCIU9t4Cs8+5iLEAyCHXFcvyxGBsx62xAUyovO5F+H8zgHF0KN8B1MQqb0wcTJxKCqqv7vWebsZ5mtbbYslrWX+TakeWcv+7hTYhiFrXiRfMFEpIAHY4ROqjA3eyERYGcZZxZbOu6aLBWDTf9jpJPSDN8F8r9e5cWvGXogv34ah4fP8hSxe31IkwuaNm3F94jBx3zbr0zh+bwRiIfdGuJEZPNEOdDCntciDz6DmTcT7HyFstdW8MCNe41ZM52A==
+// OclDBMZK8ENF5/PLeMyuhAJbadm4mHreVRxuV7KT72voZO/65b9Fxuc9EBakpSQqYtdDjf47+gDdrKsw6W4ocK6vwxd8xq25BPimxIdyE5aKSCPsVYI89ZSestY6tFPU+Phyndob9weiMjM/bm2BxfuHmSLBTnXtZaKr/F+KAifrantbb4DW5OMPP/xznq5ub+Msi1Ja2+8amV64nQlCm/xRsXzJ1wfgp8wyN9/7MeSXoibwnI11IlhjP+z1IdCzjPfLancA9zejmoFWSQRcscS9EbSK9Wlup9ABKS5WQaJ4t++/94z4dDNM9eq38gEXgyE4p9p09dZZeWLV9HcvKQ==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, May 23, 2013. Active patches: 331 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, June 19, 2013. Active patches: 329 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -400,6 +400,7 @@ function setTinyMCEVersion(e){
 // PATCH-554, Workaround for jquery.jsonp plugin's workaround against missing onerror support
 // PATCH-298, Disable sniffing in old HTMLArea editors
 // PATCH-138, Asia-region Generic Patches
+// PATCH-1144, Opera is confused when 'multiple' attribute is added to a SELECT that already has several options with selected attribute, breaks Jira
 // PATCH-604, Facebook: work around iframe load event issue
 // PATCH-605, remove document.charset
 // PATCH-373, TinyMCE double IFRAME init problem, some versions
@@ -673,6 +674,16 @@ function setTinyMCEVersion(e){
 		}
 	},false);
 
+	HTMLSelectElement.prototype.setAttribute = function(name, value){
+		if(/multiple/i.test(name)){
+			for(var i=0,el,elms=this.getElementsByTagName('option');el=elms[i];i++){
+				if(el.hasAttribute('selected') && ! el.selected ) el.removeAttribute('selected');
+			}
+		}
+		Element.prototype.setAttribute.call(this, name, value);
+	}
+	
+
 	opera.addEventListener( 'BeforeExternalScript', function(ev){
 		indexOf.call=addEventListener.call=removeEventListener.call=call;
 		var name=ev.element.src;
@@ -756,10 +767,12 @@ function setTinyMCEVersion(e){
 	
 		addPreprocessHandler(/window\.onunload\s*=\s*function\(\)\{\s*location\.reload\(true\);\};/g,'');
 	
+		addCssToDocument('#search #content #results-container .results li .desc{display:block!important}#search #content #results-container.list-view .results li{overflow:hidden}');
+	
 		if (hostname.endsWith('itunes.apple.com')) {
 			navigator.userAgent = navigator.userAgent.replace(/OS X (\d+).(\d+).(\d+)+;/,'OS X $1_$2_$3;');
 		}
-		log('PATCH-387, Make Apple Store menu visible\nPATCH-387, Enable menu on Apple support pages\nPATCH-387, Enable menu on Apple community pages\nPATCH-846, apple.com: don\'t reload from within unload handler\nPATCH-924, apple.com - reformat OS X version string with underscores');
+		log('PATCH-387, Make Apple Store menu visible\nPATCH-387, Enable menu on Apple support pages\nPATCH-387, Enable menu on Apple community pages\nPATCH-846, apple.com: don\'t reload from within unload handler\nPATCH-1145, Undo the effects of buggy display: -webkit-box \'support\'\nPATCH-924, apple.com - reformat OS X version string with underscores');
 	} else if(hostname.endsWith('.hp.com')){
 		if(hostname.indexOf('passport2.')>-1){
 		 navigator.appName='Netscape';
@@ -968,18 +981,10 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('gsmtronix.com')){
 		fixHVMenu('dummy.js');
 		log('PATCH-842, gsmtronix.com: HVmenu');
-	} else if(hostname.endsWith('guardianretirement.com')){
-		opera.defineMagicFunction('frameCheck',function(){});
-		log('PATCH-971, guardianretirement.com: avoid reload');
 	} else if(hostname.endsWith('help.sap.com')){
 		navigator.appName = 'Netscape';
 		navigator.appVersion = '5.0';
 		log('PATCH-833, help.sap.com : fool sniffing to make frameset complete');
-	} else if(hostname.endsWith('hipmunk.com')){
-		if(pathname.indexOf('/flights')==0){
-		 addCssToDocument('div#header table td + td{width: 60%;}');
-		}
-		log('PATCH-862, hipmunk.com: avoid header table cell collapse. Core bug.');
 	} else if(hostname.endsWith('hotels.ctrip.com')){
 		addPreprocessHandler(/win.addEventListener/g,'ifm.addEventListener',true,function(elm){
 		 return elm.src && elm.src.indexOf('map.js')>-1
@@ -1199,13 +1204,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('shopping.com')){
 		navigator.appName = "Netscape";
 		log('PATCH-836, shopping.com - work around browser sniff');
-	} else if(hostname.endsWith('snapguide.com')){
-		opera.addEventListener('BeforeScript', function(e){
-			if (e.element.src && e.element.src.indexOf('all.min.js') > -1) {
-				e.element.text = e.element.text.replace(/translate3d\(([^,]*),([^,]*),([^)]*)\)/g,'translate($1,$2)');
-			}
-		},false);
-		log('PATCH-1127, snapguide.com - hack translate3d usage');
 	} else if(hostname.endsWith('staples.com')){
 		(function(){
 			var xhrDocGetter=(new XMLHttpRequest).__lookupGetter__('responseXML');
@@ -1582,9 +1580,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('.sina.com.cn')>-1){
 		navigator.userAgent += ' not Gecko';
 		log('PATCH-614, sina.com: video doesn\'t play due to missing script readystate support');
-	} else if(hostname.indexOf('.sytadin.')!=-1){
-		fixIFrameSSIscriptII('resizeIframeOnContent');
-		log('OTW-5415, Sytadin.fr IFRAME resize script detects Opera');
 	} else if(hostname.indexOf('.t-online.de')>-1){
 		if(hostname.indexOf('unterhaltung')>-1){
 					//Fix browser detection
