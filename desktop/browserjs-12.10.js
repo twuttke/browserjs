@@ -1,4 +1,4 @@
-// UYBXK8GfIh4NdJLLhlwkEuPKo8nInuVKEUKQcIttjWxvKilefVaJphYoUMnbeKRA9uACWxWdTPtuJCZzJ6G9SSgJYNlX7cn6qO2iaNZ1iyo7krw9vmdeTclxTzYNuhQiIc1gAu/JhjSLZD03oWG7ZAP/0mvuiOKsDMMR5p7KV0KqWX/z9GQemrrwn09foAAThsTBK5xi4JBqVlgJnZecYvV7tLQgzywNASiVUOTfDOy1tGaBDIueMOH8IV09KXxR0fBZORab1Tu1y/8XH2z3IzaVXOOZyE9HM1L2CNzAUpiuKS5UtcXwziaHJMmYQapcB70YrVPjuJ2Dzkv7viQ+EQ==
+// EbZkvp87Uq74F5lSM4TGxvTlj7DZNwZO+oFdxhGa0shS0RRh++/GPpKhWupwJIGs8lv/QkG5wtmngJYoSW/fbnGWqk0LKNE65Mg2oFeP4gJfK1FTF9vAZ/lkxEZ8Z7IK+WtFaqsNicM4hvAD2StTDBNIZMez7ZYzT4T0kPoMOgfO665MIW7ul5uPuVNB2iEcfcr8c2h7Zjemf893SNKCKKNnbK4oQbsbNkFeMb4ZMXcvHAW+AXBPdk4ZmRs7HMZGm47XLuqYefJ68N91LONAp+4oLT/JAzu+HezJQ5+zes1XYWegynPRakRizBFhRfSr8od7QevlBrhntXMoLxTYJQ==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, May 23, 2013. Active patches: 317 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, June 19, 2013. Active patches: 314 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -406,6 +406,7 @@ function undoFunctionKeypressEventRemoval(){
 // PATCH-554, Workaround for jquery.jsonp plugin's workaround against missing onerror support
 // PATCH-298, Disable sniffing in old HTMLArea editors
 // PATCH-138, Asia-region Generic Patches
+// PATCH-1144, Opera is confused when 'multiple' attribute is added to a SELECT that already has several options with selected attribute, breaks Jira
 // PATCH-373, TinyMCE double IFRAME init problem, some versions
 // PATCH-622, Unblock iCongo Platform product image zoom
 
@@ -675,6 +676,16 @@ function undoFunctionKeypressEventRemoval(){
 		}
 	},false);
 
+	HTMLSelectElement.prototype.setAttribute = function(name, value){
+		if(/multiple/i.test(name)){
+			for(var i=0,el,elms=this.getElementsByTagName('option');el=elms[i];i++){
+				if(el.hasAttribute('selected') && ! el.selected ) el.removeAttribute('selected');
+			}
+		}
+		Element.prototype.setAttribute.call(this, name, value);
+	}
+	
+
 	opera.addEventListener('bjsOnTinyMCEScript', function(e){
 	  if( tinyMCEVersionInfo && tinyMCEVersionInfo.majorVersion==3 && tinyMCEVersionInfo.minorVersion>1.0 ){
 	    Element.prototype.appendChild=function(el){ 
@@ -732,6 +743,8 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('.apple.com')){
 		addPreprocessHandler(/window\.onunload\s*=\s*function\(\)\{\s*location\.reload\(true\);\};/g,'');
 	
+		addCssToDocument('#search #content #results-container .results li .desc{display:block!important}#search #content #results-container.list-view .results li{overflow:hidden}');
+	
 		opera.addEventListener('BeforeEvent.animationend',function(e){
 			var evt = document.createEvent("Event");
 			evt.initEvent("OAnimationEnd",true,false);
@@ -759,7 +772,7 @@ function undoFunctionKeypressEventRemoval(){
 		if (hostname.endsWith('itunes.apple.com')) {
 			navigator.userAgent = navigator.userAgent.replace(/OS X (\d+).(\d+).(\d+)+;/,'OS X $1_$2_$3;');
 		}
-		log('PATCH-846, apple.com: don\'t reload from within unload handler\nPATCH-888, apple_core: CSS animations are unprefixed from Opera 12.10\nPATCH-924, apple.com - reformat OS X version string with underscores');
+		log('PATCH-846, apple.com: don\'t reload from within unload handler\nPATCH-1145, Undo the effects of buggy display: -webkit-box \'support\'\nPATCH-888, apple_core: CSS animations are unprefixed from Opera 12.10\nPATCH-924, apple.com - reformat OS X version string with underscores');
 	} else if(hostname.endsWith('.hp.com')){
 		if(hostname.indexOf('passport2.')>-1){
 		 navigator.appName='Netscape';
@@ -972,18 +985,10 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('gsmtronix.com')){
 		fixHVMenu('dummy.js');
 		log('PATCH-842, gsmtronix.com: HVmenu');
-	} else if(hostname.endsWith('guardianretirement.com')){
-		opera.defineMagicFunction('frameCheck',function(){});
-		log('PATCH-971, guardianretirement.com: avoid reload');
 	} else if(hostname.endsWith('help.sap.com')){
 		navigator.appName = 'Netscape';
 		navigator.appVersion = '5.0';
 		log('PATCH-833, help.sap.com : fool sniffing to make frameset complete');
-	} else if(hostname.endsWith('hipmunk.com')){
-		if(pathname.indexOf('/flights')==0){
-		 addCssToDocument('div#header table td + td{width: 60%;}');
-		}
-		log('PATCH-862, hipmunk.com: avoid header table cell collapse. Core bug.');
 	} else if(hostname.endsWith('hotels.ctrip.com')){
 		addPreprocessHandler(/win.addEventListener/g,'ifm.addEventListener',true,function(elm){
 		 return elm.src && elm.src.indexOf('map.js')>-1
@@ -1223,13 +1228,6 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('skype.com')){
 		fixJQueryAutocomplete();
 		log('PATCH-613, Work around sniffing in old jQuery autocomplete plugin');
-	} else if(hostname.endsWith('snapguide.com')){
-		opera.addEventListener('BeforeScript', function(e){
-			if (e.element.src && e.element.src.indexOf('all.min.js') > -1) {
-				e.element.text = e.element.text.replace(/translate3d\(([^,]*),([^,]*),([^)]*)\)/g,'translate($1,$2)');
-			}
-		},false);
-		log('PATCH-1127, snapguide.com - hack translate3d usage');
 	} else if(hostname.endsWith('steelarm.ua')){
 		addCssToDocument('.roktabs-links{text-align:inherit !important}');
 		log('PATCH-1104, steelarm.ua - text-align breaks hover detection');
@@ -1587,9 +1585,6 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.indexOf('.sina.com.cn')>-1){
 		navigator.userAgent += ' not Gecko';
 		log('PATCH-614, sina.com: video doesn\'t play due to missing script readystate support');
-	} else if(hostname.indexOf('.sytadin.')!=-1){
-		fixIFrameSSIscriptII('resizeIframeOnContent');
-		log('OTW-5415, Sytadin.fr IFRAME resize script detects Opera');
 	} else if(hostname.indexOf('.t-online.de')>-1){
 		if(hostname.indexOf('unterhaltung')>-1){
 					//Fix browser detection
@@ -1796,14 +1791,6 @@ function undoFunctionKeypressEventRemoval(){
 		}
 		log('0, Yahoo!');
 	} else if(hostname.indexOf('.youtube.com')>-1){
-		// Opera bug - document.onfullscreenchange not enumerable.
-		HTMLDocument.prototype.onfullscreenchange = null;
-		// YouTube following old spec.
-		HTMLDocument.prototype.__defineGetter__('fullScreenElement', function() { return this.fullscreenElement; });
-		HTMLDocument.prototype.__defineGetter__('fullScreenEnabled', function() { return this.fullscreenEnabled; });
-		HTMLElement.prototype.requestFullScreen = HTMLElement.prototype.requestFullscreen;
-		HTMLDocument.prototype.cancelFullScreen = HTMLDocument.prototype.exitFullscreen;
-	
 		if(pathname.indexOf('/all_comments')==0){
 		opera.addEventListener('BeforeCSS',function(e){
 			e.cssText = e.cssText.replace(/;animation:pulse 2s ease-out 0s infinite}/g,';}');
@@ -1811,7 +1798,7 @@ function undoFunctionKeypressEventRemoval(){
 		}
 	
 		addCssToDocument('#feed .yt-uix-button-icon-feed-item-action-menu:hover{opacity:0.9}');
-		log('PATCH-1086, youtube - work around old fullscreen spec usage\nPATCH-1099, YouTube comments: bad opacity animation performance in Presto\nPATCH-1126, YouTube feed option menu does not appear because :hover opacity change, click event doesn\'t bubble correctly');
+		log('PATCH-1099, YouTube comments: bad opacity animation performance in Presto\nPATCH-1126, YouTube feed option menu does not appear because :hover opacity change, click event doesn\'t bubble correctly');
 	} else if(hostname.indexOf('265.com')>-1){
 		addCssToDocument('#coolSites .body li, #coolSites .body li a{line-height:2em !important}')
 		log('PATCH-475, Avoid overflowing text on 265.com');
