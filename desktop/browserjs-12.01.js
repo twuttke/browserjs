@@ -1,4 +1,4 @@
-// OclDBMZK8ENF5/PLeMyuhAJbadm4mHreVRxuV7KT72voZO/65b9Fxuc9EBakpSQqYtdDjf47+gDdrKsw6W4ocK6vwxd8xq25BPimxIdyE5aKSCPsVYI89ZSestY6tFPU+Phyndob9weiMjM/bm2BxfuHmSLBTnXtZaKr/F+KAifrantbb4DW5OMPP/xznq5ub+Msi1Ja2+8amV64nQlCm/xRsXzJ1wfgp8wyN9/7MeSXoibwnI11IlhjP+z1IdCzjPfLancA9zejmoFWSQRcscS9EbSK9Wlup9ABKS5WQaJ4t++/94z4dDNM9eq38gEXgyE4p9p09dZZeWLV9HcvKQ==
+// dy6BMO+bp7OMsrgKYZRXBREaYAxEDRo/3n0xtIhvFF2DvdhtQry6DwB3ikdYB5ihWTeFSTaAm77pH0qhLwnXGMn5t9uJZlAVDAXUF8IBYjcrLwX1Svr+aY8FlgddEcFrWiE3JIbRN5LyThGxbqNMKbSBrGYbmFBUbFuM1qEwyR7DxZIjXEH6vqiDhzJHnGwYyBV9p2I07B6QE9ej4tlWXUj3WZY6xllQlzTyIgHDVNFjrSY5CRJZnnnJ5KNyh1rxp6dfJSIvwOwFUUaMsjU8D2Uv417IR0KjbdjG9WTiNG1tk21D5csQ++MjswakiJBovTXBBSuSFklMtmnKTO38mg==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.01 core 2.10.289, June 19, 2013. Active patches: 329 ';
+	var bjsversion=' Opera Desktop 12.01 core 2.10.289, August 12, 2013. Active patches: 325 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -985,11 +985,6 @@ function setTinyMCEVersion(e){
 		navigator.appName = 'Netscape';
 		navigator.appVersion = '5.0';
 		log('PATCH-833, help.sap.com : fool sniffing to make frameset complete');
-	} else if(hostname.endsWith('hotels.ctrip.com')){
-		addPreprocessHandler(/win.addEventListener/g,'ifm.addEventListener',true,function(elm){
-		 return elm.src && elm.src.indexOf('map.js')>-1
-		});
-		log('PATCH-857, hotels.ctrip.com: word around iframe load event order issue with Opera');
 	} else if(hostname.endsWith('ieee.org')){
 		(function(ac){
 			Element.prototype.insertBefore=function(newChild, refChild){
@@ -1254,11 +1249,14 @@ function setTinyMCEVersion(e){
 		opera.addEventListener('BeforeExternalScript',function(ev){
 			var name=ev.element.src; 
 			if(!name){return;}
-			if(name.indexOf('mqResultsControllerMini.js')>-1){
-				window.navigator.appName = "Netscape";
+			if(name.indexOf('mqcommon.js')>-1){
+				window.navigator.appName="Netscape";
+			}
+			if(name.indexOf('mqutils.js')>-1){
 				opera.defineMagicFunction('mqXmlToStr', function(oRealFunc, oThis, xmlDoc) {
+					if(xmlDoc == null)return "";
 					var serializer = new window.XMLSerializer();
-					return serializer.serializeToString(xmlDoc).replace('<?xml version="1.0"?>','');;
+					return serializer.serializeToString(xmlDoc).replace('<?xml version="1.0"?>','');
 				});
 			}
 		},false);
@@ -1308,9 +1306,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.endsWith('www.nfl.com')){
 		addPreprocessHandler( /if\(style&&style\['display'\]==='none'\)\{ret=true;\}/ , '');
 		log('PATCH-936, nfl.com: avoid hundreds of reflows');
-	} else if(hostname.endsWith('www.omv.cz')){
-		fixIFrameSSIscriptII('resizeIframeToFitContent');
-		log('PATCH-937, omv.cz: old iframe resize script');
 	} else if(hostname.endsWith('www.state.gov')){
 		opera.addEventListener('BeforeScript',function(e){
 			if(e.element.src.indexOf('sifr-config.js')>-1){e.preventDefault();}
@@ -1493,7 +1488,11 @@ function setTinyMCEVersion(e){
 		}
 		if(hostname.contains('plus.google.')){
 			addCssToDocument('div.B-u-nd-nb, div.s-r-Ge-ec {display:block}');
-			log('PATCH-526, G+: avoid tall narrow posts due to word-wrap in table ');
+		
+			if( ! window.URL )window.URL={};
+			if( ! window.URL.createObjectURL){window.URL.createObjectURL=function(obj){return obj;}}
+			addCssToDocument('div.lHuJhd{height:60% !important;width:80% !important;}');
+			log('PATCH-526, G+: avoid tall narrow posts due to word-wrap in table \nPATCH-1147, G+: allow photo sharing');
 		}
 		if(hostname.contains('talkgadget.google.')){
 			addCssToDocument('div.hh{height: 85%;}');
@@ -1813,9 +1812,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('.youtube.com')>-1){
 		addCssToDocument('#feed .yt-uix-button-icon-feed-item-action-menu:hover{opacity:0.9}');
 		log('PATCH-1126, YouTube feed option menu does not appear because :hover opacity change, click event doesn\'t bubble correctly');
-	} else if(hostname.indexOf('265.com')>-1){
-		addCssToDocument('#coolSites .body li, #coolSites .body li a{line-height:2em !important}')
-		log('PATCH-475, Avoid overflowing text on 265.com');
 	} else if(hostname.indexOf('aeonretail.jp')>-1){
 		addPreprocessHandler(/var el = win \? \$\.browser\.opera \? document\.body : document\.documentElement : elem;/, 'var el = win ? document.documentElement : elem;', true, function(elm){ return elm.src&&elm.src.indexOf('scroll.js')>-1&&elm.text.indexOf('Opera 9.22')>-1; });
 		log('PATCH-88, Make links work on Aeonretail (outdated jQuery plugin detects Opera and scrolls up)');
@@ -1842,16 +1838,12 @@ function setTinyMCEVersion(e){
 	
 		addCssToDocument('.ONETHIRTYFIVE-HERO ul{margin-bottom:0!important}');
 	
-		if(hostname.indexOf('wireless.')>-1){
-		addPreprocessHandler(/\$\.browser\.mozilla\?hash:decodeURIComponent\(hash\)/,'decodeURIComponent(hash)',true,function(el){return el.src.indexOf('js/build/browse-r1')>-1;});
-		}
-	
 		if (navigator.appName!=='Opera'){
 			document.documentElement.style.MozAppearance = 'Opera';
 		}
 	
 		opera.defineMagicVariable('MediaServicesZoomMotion', null, function(obj){ Event.prototype.__defineGetter__('layerX', function(){return this.x;});  Event.prototype.__defineGetter__('layerY', function(){return this.y;}); return obj;});
-		log('PATCH-652, Fix displaying recommended items in Amazon\nPATCH-1025, Amazon - Black Friday deals float upwards due to margin styling on UL and innerHTML updates\nPATCH-1068, amazon - avoid looping hash decode\nPATCH-527, Add more spoofing when masking as another browser on Amazon\nPATCH-1129, Old DynAPI expects Netscape 4 event properties, breaks zooming/panning product images');
+		log('PATCH-652, Fix displaying recommended items in Amazon\nPATCH-1025, Amazon - Black Friday deals float upwards due to margin styling on UL and innerHTML updates\nPATCH-527, Add more spoofing when masking as another browser on Amazon\nPATCH-1129, Old DynAPI expects Netscape 4 event properties, breaks zooming/panning product images');
 	} else if(hostname.indexOf('ameba.jp')!=-1){
 		addPreprocessHandler(/editor\.insertNodeAtSelection\(link\);\s*editor\.insertNodeAtSelection\(document\.createElement\('br'\)\);/, 'editor.insertNodeAtSelection(link);');
 		log('331093, Work around Opera bug where second BR tag overwrites newly inserted IMG');
@@ -2016,9 +2008,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('etour.co.jp') > -1){
 		navigator.appName='Netscape';
 		log('PATCH-152, etour.co.jp fix non-disappearing overlapping image');
-	} else if(hostname.indexOf('fintyre.it')>-1){
-		navigator.appName = "Netscape";
-		log('PATCH-661, fintyre.it: work around sniffing');
 	} else if(hostname.indexOf('forever21.co.jp') > -1){
 		if (pathname.indexOf('QuickView.aspx')>-1) {
 			addCssToDocument('html{background:#fff}');
