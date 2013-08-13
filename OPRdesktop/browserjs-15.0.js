@@ -1,4 +1,4 @@
-// i2inFTgkuSs1YXpptCj9cTuE5GXqwNu3AMuihN070Q0PabVV2SHsOpEPXNZ3DMbZeLmhw/nzsjRPjxIKSyg2kcVr7GY+m/ZzFJcRNBARE2V5gh8P9Y8Nq+J65KGs+8R8PBxCN0CP9GBHYzGBkIK3pYYqxY5aEo5GStAtocan9af35Se9S08qmPQ7SzyC1IW2NGQHRcfpIpHRQ/EmE6Tgh4tGpyvyFI3RdWzKVuXN4dgP58GYYhffVrJqQmrojegtPLR3dlY1TJFojNCbg6VHCS0y+e2uXRsc/txxCYOg77zaTmvpyp2VXVcMMMftej/oAG+2ekI6kAm4WP+di3sm9g==
+// Mh49pTIWPHUNsBNilJ1vN/9HsK3aRWHwFgdsIxXv8Q3UV8SyvMxG1sBtg+AxLIQsNy46Fd5rCUkF/W0jeKeFGs6af+Mv0u6GE5wbbxhGGPZiqSYtVukXgqVORLLX0sjKaZ/+iGON1KiIog0msCmBZtrl/sSEtm+aHo3KxJWIViKRbYPOVdnU6d1F1qQSa0Ao5q0fkCjZpF5PDaNPI2JFEGkT0qXFgHU68J7gtyGM72atHOw2IeivNTVAB2GgWWxV1ycX9PCXV+v8YN1Vmcykm/vyiSu3b9W5YhdDoxMECYe5AVXVDk9nVF9K+aJXodiB693KNnDDV3K/WL77Uw0lkA==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -16,7 +16,7 @@
 **/
 // Generic fixes (mostly)
 (function(){
-	var bjsversion=' Opera OPRDesktop 15.0 core 1147.0, June 17, 2013. Active patches: 4 ';
+	var bjsversion=' Opera OPRDesktop 15.0 core 1147.104, August 12, 2013. Active patches: 5 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -44,45 +44,26 @@
 
 	// Utility functions
 
-	function addCssToDocument2(cssText, doc, mediaType){
-		getElementsByTagName.call=addEventListener.call=createElement.call=createTextNode.call=insertBefore.call=setAttribute.call=appendChild.call=call;
-		doc = doc||document;
-		mediaType = mediaType||'';
-		addCssToDocument2.styleObj=addCssToDocument2.styleObj||{};
-		var styles = addCssToDocument2.styleObj[mediaType];
-		if(!styles){
-			var head = getElementsByTagName.call(doc, "head")[0];
-			if( !head ){
-				var docEl = getElementsByTagName.call(doc, "html")[0];
-				if(!docEl){
-					// :S this shouldn't happen - see if document hasn't loaded
-					addEventListener.call(doc, 'DOMContentLoaded',
-					function(){ addCssToDocument2(cssText, doc); },false);
-					return;
-				}
-				head = createElement.call(doc, "head");
-				if(head) insertBefore.call(docEl, head,docEl.firstChild);
-				else head = docEl;
-			}
-			addCssToDocument2.styleObj[mediaType] = styles = createElement.call(doc, "style");
-			setAttribute.call(styles, "type","text/css");
-			if(mediaType)setAttribute.call(styles, "media", mediaType);
-			appendChild.call(styles, createTextNode.call(doc,' '));
-			appendChild.call(head, styles)
-		}
-		styles.firstChild.nodeValue += cssText+"\n";
-		return true;
-	}
 
 
-
-	if(hostname.indexOf('.google.')>-1){
+	if(hostname.endsWith('www.stanserhorn.ch')){
+		navigator.__defineGetter__('vendor',function(){return 'Google Inc.'});
+		log('OTWK-21, stanserhorn.ch - fix UDM sniffing');
+	} else if(hostname.indexOf('.google.')>-1){
 		/* Google */
 	
 	
-		if(hostname.contains('www.google.')){
-			addCssToDocument2('span#gsri_ok0{display:none}');
-			log('PATCH-1141, google.com - hide voice input icon while it is unsupported');
+		if(hostname.contains('translate.google.')){
+			document.addEventListener('DOMContentLoaded',
+				function(){
+					var obj = '<object type="application/x-shockwave-flash" data="//ssl.gstatic.com/translate/sound_player2.swf" width="18" height="18" id="tts"><param value="//ssl.gstatic.com/translate/sound_player2.swf" name="movie"><param value="sound_name_cb=_TTSSoundFile" name="flashvars"><param value="transparent" name="wmode"><param value="always" name="allowScriptAccess"></object>';
+					var aud = document.getElementById('tts');
+					if(aud && aud instanceof HTMLAudioElement && aud.parentNode.childNodes.length == 1){
+						aud.parentNode.innerHTML = obj;
+					}
+				}
+			,false);
+			log('PATCH-1148, Google Translate: use flash instead of mp3-audio');
 		}
 		log('0, Google');
 	} else if(hostname.indexOf('opera.com')>-1&& pathname.indexOf('/docs/browserjs/')==0){
