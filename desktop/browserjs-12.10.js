@@ -1,4 +1,4 @@
-// EbZkvp87Uq74F5lSM4TGxvTlj7DZNwZO+oFdxhGa0shS0RRh++/GPpKhWupwJIGs8lv/QkG5wtmngJYoSW/fbnGWqk0LKNE65Mg2oFeP4gJfK1FTF9vAZ/lkxEZ8Z7IK+WtFaqsNicM4hvAD2StTDBNIZMez7ZYzT4T0kPoMOgfO665MIW7ul5uPuVNB2iEcfcr8c2h7Zjemf893SNKCKKNnbK4oQbsbNkFeMb4ZMXcvHAW+AXBPdk4ZmRs7HMZGm47XLuqYefJ68N91LONAp+4oLT/JAzu+HezJQ5+zes1XYWegynPRakRizBFhRfSr8od7QevlBrhntXMoLxTYJQ==
+// jO9K+zWIUeWKuScsbAeFq7Y4NLgGAGDlIe0b/a5xgo6WD+G1/RoIjcYfB/HI6cvMYaGpZoyGWbSP8uBzmf61A+j0LwDUXTp2hmdeTUtUhGO+QzG1H22gUjjdO/dSzRc/KBfbj7NCc79occtnE7yW9jNzQz5INKs7IRYfa2iWhAdoO1EP5MbmyFGnekg8O0+AUqrxNF/5+amwJ/fHgIqdfCo9I7o6ENtykQdtGcodppvr0k/zzZfkv04RIHpcRTBULVc99v72soWasFdFhZRC/h15pD1IYIrdrMfY7T2HBBUlp4qMssXouGOg2E2oyjp162NTw+h9fLYi3c3drUuddA==
 /**
 ** Copyright (C) 2000-2013 Opera Software ASA.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || opera._browserjsran)return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.10 core 2.12.388, June 19, 2013. Active patches: 314 ';
+	var bjsversion=' Opera Desktop 12.10 core 2.12.388, August 12, 2013. Active patches: 309 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -989,11 +989,6 @@ function undoFunctionKeypressEventRemoval(){
 		navigator.appName = 'Netscape';
 		navigator.appVersion = '5.0';
 		log('PATCH-833, help.sap.com : fool sniffing to make frameset complete');
-	} else if(hostname.endsWith('hotels.ctrip.com')){
-		addPreprocessHandler(/win.addEventListener/g,'ifm.addEventListener',true,function(elm){
-		 return elm.src && elm.src.indexOf('map.js')>-1
-		});
-		log('PATCH-857, hotels.ctrip.com: word around iframe load event order issue with Opera');
 	} else if(hostname.endsWith('ieee.org')){
 		(function(ac){
 			Element.prototype.insertBefore=function(newChild, refChild){
@@ -1190,9 +1185,6 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('razri.com')){
 		addPreprocessHandler(/b=b\.substring\(c\+4,b\.length\);c=b\.indexOf\("\)"\);/,'b=b.substring(c+5,b.length);c = b.indexOf(\'")\');', true, function(elm){return elm.src&&elm.src.indexOf('main.min.js')>-1});
 		log('PATCH-1097, razri.com: CSS url() argument takes quotes');
-	} else if(hostname.endsWith('rememberthemilk.com')){
-		addPreprocessHandler(/if\(is_safari_31\|\|is_chrome\)\{return true\}utility\.stopEvent\(J\);/,'if(is_safari_31||is_chrome||is_opera){return true}utility.stopEvent(J);');
-		log('PATCH-905, rememberthemilk.com: adapt to Opera12.10\'s more compliant key event code');
 	} else if(hostname.endsWith('ruter.no')){
 		fixJQueryAutocomplete();
 		log('PATCH-934, ruter.no: jQuery autocompleter');
@@ -1267,11 +1259,14 @@ function undoFunctionKeypressEventRemoval(){
 		opera.addEventListener('BeforeExternalScript',function(ev){
 			var name=ev.element.src; 
 			if(!name){return;}
-			if(name.indexOf('mqResultsControllerMini.js')>-1){
-				window.navigator.appName = "Netscape";
+			if(name.indexOf('mqcommon.js')>-1){
+				window.navigator.appName="Netscape";
+			}
+			if(name.indexOf('mqutils.js')>-1){
 				opera.defineMagicFunction('mqXmlToStr', function(oRealFunc, oThis, xmlDoc) {
+					if(xmlDoc == null)return "";
 					var serializer = new window.XMLSerializer();
-					return serializer.serializeToString(xmlDoc).replace('<?xml version="1.0"?>','');;
+					return serializer.serializeToString(xmlDoc).replace('<?xml version="1.0"?>','');
 				});
 			}
 		},false);
@@ -1321,9 +1316,6 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.endsWith('www.nfl.com')){
 		addPreprocessHandler( /if\(style&&style\['display'\]==='none'\)\{ret=true;\}/ , '');
 		log('PATCH-936, nfl.com: avoid hundreds of reflows');
-	} else if(hostname.endsWith('www.omv.cz')){
-		fixIFrameSSIscriptII('resizeIframeToFitContent');
-		log('PATCH-937, omv.cz: old iframe resize script');
 	} else if(hostname.endsWith('www.state.gov')){
 		opera.addEventListener('BeforeScript',function(e){
 			if(e.element.src.indexOf('sifr-config.js')>-1){e.preventDefault();}
@@ -1501,7 +1493,11 @@ function undoFunctionKeypressEventRemoval(){
 		}
 		if(hostname.contains('plus.google.')){
 			undoFunctionKeypressEventRemoval();
-			log('PATCH-1061, G+ - make navigation keys work');
+		
+			if( ! window.URL )window.URL={};
+			if( ! window.URL.createObjectURL){window.URL.createObjectURL=function(obj){return obj;}}
+			addCssToDocument('div.lHuJhd{height:60% !important;width:80% !important;}');
+			log('PATCH-1061, G+ - make navigation keys work\nPATCH-1147, G+: allow photo sharing');
 		}
 		if(hostname.contains('talkgadget.google.')){
 			addCssToDocument('div.hh{height: 85%;}');
@@ -1799,9 +1795,6 @@ function undoFunctionKeypressEventRemoval(){
 	
 		addCssToDocument('#feed .yt-uix-button-icon-feed-item-action-menu:hover{opacity:0.9}');
 		log('PATCH-1099, YouTube comments: bad opacity animation performance in Presto\nPATCH-1126, YouTube feed option menu does not appear because :hover opacity change, click event doesn\'t bubble correctly');
-	} else if(hostname.indexOf('265.com')>-1){
-		addCssToDocument('#coolSites .body li, #coolSites .body li a{line-height:2em !important}')
-		log('PATCH-475, Avoid overflowing text on 265.com');
 	} else if(hostname.indexOf('aeonretail.jp')>-1){
 		addPreprocessHandler(/var el = win \? \$\.browser\.opera \? document\.body : document\.documentElement : elem;/, 'var el = win ? document.documentElement : elem;', true, function(elm){ return elm.src&&elm.src.indexOf('scroll.js')>-1&&elm.text.indexOf('Opera 9.22')>-1; });
 		log('PATCH-88, Make links work on Aeonretail (outdated jQuery plugin detects Opera and scrolls up)');
@@ -1820,16 +1813,12 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.indexOf('amazon.')>-1){
 		addCssToDocument('.ONETHIRTYFIVE-HERO ul{margin-bottom:0!important}');
 	
-		if(hostname.indexOf('wireless.')>-1){
-		addPreprocessHandler(/\$\.browser\.mozilla\?hash:decodeURIComponent\(hash\)/,'decodeURIComponent(hash)',true,function(el){return el.src.indexOf('js/build/browse-r1')>-1;});
-		}
-	
 		if (navigator.appName!=='Opera'){
 			document.documentElement.style.MozAppearance = 'Opera';
 		}
 	
 		opera.defineMagicVariable('MediaServicesZoomMotion', null, function(obj){ Event.prototype.__defineGetter__('layerX', function(){return this.x;});  Event.prototype.__defineGetter__('layerY', function(){return this.y;}); return obj;});
-		log('PATCH-1025, Amazon - Black Friday deals float upwards due to margin styling on UL and innerHTML updates\nPATCH-1068, amazon - avoid looping hash decode\nPATCH-527, Add more spoofing when masking as another browser on Amazon\nPATCH-1129, Old DynAPI expects Netscape 4 event properties, breaks zooming/panning product images');
+		log('PATCH-1025, Amazon - Black Friday deals float upwards due to margin styling on UL and innerHTML updates\nPATCH-527, Add more spoofing when masking as another browser on Amazon\nPATCH-1129, Old DynAPI expects Netscape 4 event properties, breaks zooming/panning product images');
 	} else if(hostname.indexOf('ameba.jp')!=-1){
 		addPreprocessHandler(/editor\.insertNodeAtSelection\(link\);\s*editor\.insertNodeAtSelection\(document\.createElement\('br'\)\);/, 'editor.insertNodeAtSelection(link);');
 		log('331093, Work around Opera bug where second BR tag overwrites newly inserted IMG');
@@ -1969,9 +1958,6 @@ function undoFunctionKeypressEventRemoval(){
 	} else if(hostname.indexOf('etour.co.jp') > -1){
 		navigator.appName='Netscape';
 		log('PATCH-152, etour.co.jp fix non-disappearing overlapping image');
-	} else if(hostname.indexOf('fintyre.it')>-1){
-		navigator.appName = "Netscape";
-		log('PATCH-661, fintyre.it: work around sniffing');
 	} else if(hostname.indexOf('forever21.co.jp') > -1){
 		if (pathname.indexOf('QuickView.aspx')>-1) {
 			addCssToDocument('html{background:#fff}');
