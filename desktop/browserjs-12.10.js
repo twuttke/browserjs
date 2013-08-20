@@ -2265,7 +2265,7 @@ function undoFunctionKeypressEventRemoval(){
 			var theGetter=(document.createElement('div').__lookupGetter__('innerHTML'));
 			var lastStr, lastElm;
 			HTMLDivElement.prototype.__defineGetter__('innerHTML', function(){
-				if( this===lastElm && lastStr )return lastStr;
+				if( this===lastElm )return lastStr;
 				return theGetter.apply(this,arguments);
 			});
 			HTMLDivElement.prototype.__defineSetter__('innerHTML', function(str){
@@ -2273,6 +2273,7 @@ function undoFunctionKeypressEventRemoval(){
 					lastElm=this, lastStr=str; 
 					return str;
 				}
+				if( this===lastElm )lastElm = undefined;
 				return theSetter.apply(this,arguments);
 			});
 			
